@@ -1,10 +1,10 @@
-# Skills da distribuicao publica
+# Skills in the public distribution
 
-Somente material original da NECTAR e incluido. Complementos externos/locais sao opcionais e estao registrados em ../skills-opcionais.json, sem copiar seu conteudo.
+Only NECTAR's original material is included. External or local add-ons are optional and are listed in ../skills-opcionais.json, without copying their content.
 
-| skill | origem | licenca |
+| skill | origin | license |
 |---|---|---|
-| versionamento-git | Material original da NECTAR | LICENSE na raiz |
-| midia-de-entrega | Material original da NECTAR | LICENSE na raiz |
+| versionamento-git | NECTAR original material | LICENSE at the root |
+| midia-de-entrega | NECTAR original material | LICENSE at the root |
 
-Conteudo de terceiros ou de licenca proprietária, incluindo pacotes pptx/docx, nao e redistribuido. As licencas independentes dos complementos precisam ser respeitadas por quem os instalar.
+Third-party or proprietary-licensed content, including pptx/docx packages, is not redistributed. Whoever installs an add-on must respect its independent license.

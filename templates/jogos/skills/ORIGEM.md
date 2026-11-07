@@ -1,15 +1,15 @@
-# Skills da distribuicao publica
+# Skills in the public distribution
 
-Somente material original da NECTAR e incluido. Complementos externos/locais sao opcionais e estao registrados em ../skills-opcionais.json, sem copiar seu conteudo.
+Only NECTAR's original material is included. External or local add-ons are optional and are listed in ../skills-opcionais.json, without copying their content.
 
-| skill | origem | licenca |
+| skill | origin | license |
 |---|---|---|
-| direcao-de-experiencia | Material original da NECTAR | LICENSE na raiz |
-| assets-abertos | Material original da NECTAR | LICENSE na raiz |
-| renpy-codigo | Material original da NECTAR | LICENSE na raiz |
-| renpy-mobile | Material original da NECTAR | LICENSE na raiz |
-| renpy-sprites | Material original da NECTAR | LICENSE na raiz |
-| renpy-ui-acabada | Material original da NECTAR | LICENSE na raiz |
-| renpy-vfx | Material original da NECTAR | LICENSE na raiz |
+| direcao-de-experiencia | NECTAR original material | LICENSE at the root |
+| assets-abertos | NECTAR original material | LICENSE at the root |
+| renpy-codigo | NECTAR original material | LICENSE at the root |
+| renpy-mobile | NECTAR original material | LICENSE at the root |
+| renpy-sprites | NECTAR original material | LICENSE at the root |
+| renpy-ui-acabada | NECTAR original material | LICENSE at the root |
+| renpy-vfx | NECTAR original material | LICENSE at the root |
 
-Conteudo de terceiros ou de licenca proprietária, incluindo pacotes pptx/docx, nao e redistribuido. As licencas independentes dos complementos precisam ser respeitadas por quem os instalar.
+Third-party or proprietary-licensed content, including pptx/docx packages, is not redistributed. Whoever installs an add-on must respect its independent license.

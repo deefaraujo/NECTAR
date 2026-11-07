@@ -1,9 +1,9 @@
-# Segurança
+# Security
 
-A NECTAR pode executar agentes com acesso a arquivos, comandos e serviços externos. Verifique permissões e backups antes de usar cenários desconhecidos em produção.
+NECTAR can run agents with access to files, commands, and external services. Check permissions and backups before using unfamiliar scenarios in production.
 
-Não publique tokens, credenciais, dados pessoais, conversas ou projetos de clientes em issues, pull requests ou relatórios de erro.
+Do not post tokens, credentials, personal data, conversations, or client projects in issues, pull requests, or bug reports.
 
-Para comunicar um possível problema, procure um contato privado informado em https://github.com/deefaraujo. Na ausência de um canal, solicite contato em uma issue sem expor a vulnerabilidade, segredos ou dados.
+To report a possible problem, use a private contact listed at https://github.com/deefaraujo. If no channel is available, ask for contact in an issue without exposing the vulnerability, secrets, or data.
 
-A verificação de publicação detecta diretórios e alguns padrões conhecidos. Não certifica a ausência de dados sensíveis nem substitui auditoria completa.
+The publication check detects directories and some known patterns. It does not certify the absence of sensitive data and does not replace a full audit.

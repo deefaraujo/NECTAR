@@ -1,11 +1,11 @@
-# Componentes e direitos independentes
+# Third-party components and independent rights
 
-A licença `LICENSE` rege o material original da NECTAR. Ela não altera licenças independentes de terceiros nem transfere direitos sobre projetos processados com a ferramenta.
+The `LICENSE` file governs NECTAR's original material. It does not alter independent third-party licenses and does not transfer rights over projects processed with the tool.
 
-- As dependências Node são declaradas em `package.json` e fixadas em `package-lock.json`. Não estão copiadas neste repositório; são obtidas com `npm ci` e mantêm suas próprias licenças, incluindo os avisos do Electron/Chromium, electron-builder e pdf-parse.
-- As fontes de interface em `public/fonts/` acompanham seus textos `OFL-*.txt`. Elas mantêm a SIL Open Font License e não estão submetidas à proibição comercial da licença do código original.
-- Skills ou bibliotecas de referência externas não são redistribuídas aqui. `templates/*/skills-opcionais.json` registra os identificadores de complementos conhecidos; uma instalação local pode fornecê-los separadamente, sob a licença de seus titulares. Os diretórios locais desses complementos são ignorados pelo Git.
-- Amostras externas de voz não são publicadas. `vozes/ORIGEM.md` documenta as referências de uma instalação de desenvolvimento; qualquer recurso de voz precisa ser configurado separadamente por quem tiver os direitos necessários.
-- Os testes distribuídos usam dados sintéticos. A amostra PDF do repositório é gerada para testar extração de texto, sem documentos de clientes ou publicações externas.
+- Node dependencies are declared in `package.json` and pinned in `package-lock.json`. They are not copied into this repository; they are fetched with `npm ci` and keep their own licenses, including the notices of Electron/Chromium, electron-builder, and pdf-parse.
+- The interface fonts in `public/fonts/` ship with their `OFL-*.txt` texts. They remain under the SIL Open Font License and are not subject to the commercial restriction of the original code's license.
+- External skills or reference libraries are not redistributed here. `templates/*/skills-opcionais.json` lists the identifiers of known add-ons; a local installation may provide them separately, under their owners' licenses. The local directories of those add-ons are ignored by Git.
+- The voice samples in `vozes/` are 12-second public domain excerpts from LibriVox recordings, documented in `vozes/ORIGEM.md`. A person's own sample stays outside the repository.
+- The distributed tests use synthetic data. The repository's sample PDF is generated to test text extraction, with no client documents or external publications.
 
-Não há projeto de cliente, empregador ou outro repositório de trabalho incluído nesta distribuição. Recursos e projetos locais não devem ser adicionados com `git add -f`.
+No client project, employer project, or other work repository is included in this distribution. Local resources and projects must not be added with `git add -f`.

@@ -1,4 +1,4 @@
-name: Verificações da ferramenta
+name: Tool checks
 on:
   push:
   pull_request:

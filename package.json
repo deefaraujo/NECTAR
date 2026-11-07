@@ -2,7 +2,7 @@
   "name": "work-ia",
   "productName": "NECTAR",
   "version": "1.0.0",
-  "description": "Equipe de agentes de IA com chat, planner e memória, por projeto",
+  "description": "A team of AI agents per project, with chat, board and memory",
   "private": true,
   "main": "electron/main.mjs",
   "scripts": {

@@ -5,59 +5,59 @@
 <h1 align="center">NECTAR</h1>
 
 <p align="center">
-  <strong>Uma equipe inteira de agentes de IA trabalhando no seu projeto, do jeito que um time de verdade trabalha.</strong><br>
-  Chat, quadro de tarefas, memória, agenda e uma colmeia que mostra quem está fazendo o quê.
+  <strong>A whole team of AI agents working on your project, the way a real team does.</strong><br>
+  Chat, task board, memory, calendar, and a hive view that shows who is doing what.
 </p>
 
 <p align="center">
-  <a href="#começar">Começar</a> ·
-  <a href="#como-funciona">Como funciona</a> ·
-  <a href="#equipes-prontas">Equipes prontas</a> ·
-  <a href="#apoie-o-projeto">Apoie o projeto</a> ·
-  <a href="#licença">Licença</a> ·
-  <a href="#contato">Contato</a>
+  <a href="#getting-started">Getting started</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#ready-made-teams">Ready-made teams</a> ·
+  <a href="#support-the-project">Support the project</a> ·
+  <a href="#license">License</a> ·
+  <a href="#contact">Contact</a>
 </p>
 
 <p align="center">
-  <img src="docs/imagens/chat.png" alt="Chat da equipe na NECTAR" width="900">
+  <img src="docs/images/chat.png" alt="Team chat in NECTAR" width="900">
 </p>
 
 ---
 
-## A ideia
+## The idea
 
-Ferramentas de IA para código costumam ser um único assistente que faz tudo. A NECTAR parte de outro princípio: **projetos grandes precisam de papéis, combinados e um quadro à vista**.
+Most AI coding tools are a single assistant that does everything. NECTAR starts from a different premise: **large projects need roles, agreements, and a board everyone can see**.
 
-Você descreve o que quer no chat. A liderança da equipe (uma P.O., uma Chief of Staff, uma Game Director, dependendo do template) transforma o pedido em cards, distribui para os especialistas certos, cobra critérios de aceite, passa por revisão e QA, e volta com uma entrega conferida. Tudo fica registrado: quem fez, com que evidência, quanto custou.
+You describe what you want in the chat. The team lead (a P.O., a Chief of Staff, or a Game Director, depending on the template) turns the request into cards, hands them to the right specialists, enforces acceptance criteria, runs them through review and QA, and comes back with a verified deliverable. Everything is recorded: who did it, with what evidence, at what cost.
 
-Os agentes rodam nos **CLIs que você já tem instalados** (Claude Code e Codex). A NECTAR não revende modelo, não guarda sua chave e não manda seu projeto para lugar nenhum: tudo roda no seu computador, com as contas e os limites que você já usa.
+Agents run through the **CLIs you already have installed** (Claude Code and Codex). NECTAR does not resell models, does not store your API keys, and does not ship your project anywhere: everything runs on your machine, with the accounts and limits you already use.
 
-## O que você ganha
+## What you get
 
-- **Uma equipe com papéis definidos.** Arquiteto, front, back, UI/UX, dados, integrações, pipeline, segurança, QA, revisor. Cada um com instruções, skills e limites próprios.
-- **Um quadro que o time respeita.** Backlog, Pronto, Em andamento, Impedimento, Revisão, QA, Concluído. Limites por coluna, critérios de aceite obrigatórios, dependências entre cards.
-- **Piloto automático com freio.** Ligue e a equipe puxa cards sozinha; os combinados que você escreveu valem para todo mundo, e decisões arriscadas voltam para você.
-- **Memória por projeto.** Regras, referências, fatos medidos e contexto de cada agente ficam salvos e entram no prompt na hora certa.
-- **Controle de custo.** Modelo por tipo de tarefa, teto de esforço, leitura do uso da sua conta, estimativa por card e relatório de consumo.
-- **Chamada de voz local.** Fale com a liderança como numa call, com transcrição e voz geradas na sua máquina.
-- **Integrações.** Jira, Notion, GitHub e Outlook pelo MCP, com conexão testada antes de aparecer como ativa.
+- **A team with defined roles.** Architect, front end, back end, UI/UX, data, integrations, pipeline, security, QA, reviewer. Each one has its own instructions, skills, and limits.
+- **A board the team respects.** Backlog, Ready, In progress, Blocked, Review, QA, Done. Per-column limits, mandatory acceptance criteria, dependencies between cards.
+- **Autopilot with a brake.** Turn it on and the team pulls cards on its own. The agreements you wrote apply to everyone, and risky decisions come back to you.
+- **Memory per project.** Rules, references, measured facts, and each agent's context are saved and enter the prompt at the right moment.
+- **Cost control.** Model per task type, effort ceiling, a read of your account usage, per-card estimate, and a consumption report.
+- **Local voice calls.** Talk to the team lead as in a call, with transcription and speech generated on your machine.
+- **Integrations.** Jira, Notion, GitHub, and Outlook through MCP, with the connection tested before it shows as active.
 
-## Telas
+## Screens
 
 <table>
   <tr>
-    <td align="center"><img src="docs/imagens/planner.png" alt="Quadro do projeto"><br><sub><b>Quadro</b> — colunas com limite, pontos, modelo escolhido por card e avatar de quem está no card</sub></td>
-    <td align="center"><img src="docs/imagens/card.png" alt="Detalhe de um card"><br><sub><b>Card</b> — critérios de aceite, fatos, dependências, revisão, QA e retrabalho</sub></td>
+    <td align="center"><img src="docs/images/planner.png" alt="Project board"><br><sub><b>Board</b>: columns with limits, points, the model chosen per card, and the avatar of whoever is on it</sub></td>
+    <td align="center"><img src="docs/images/card.png" alt="Card detail"><br><sub><b>Card</b>: acceptance criteria, facts, dependencies, review, QA, and rework</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/imagens/colmeia.png" alt="Colmeia"><br><sub><b>Colmeia</b> — a equipe inteira, quem trabalha, quem espera e a colheita do dia</sub></td>
-    <td align="center"><img src="docs/imagens/agenda.png" alt="Agenda"><br><sub><b>Agenda</b> — uma por projeto; você e os agentes marcam, e o lembrete vira notificação</sub></td>
+    <td align="center"><img src="docs/images/colmeia.png" alt="Hive view"><br><sub><b>Hive</b>: the whole team, who is working, who is waiting, and the day's harvest</sub></td>
+    <td align="center"><img src="docs/images/agenda.png" alt="Calendar"><br><sub><b>Calendar</b>: one per project; you and the agents schedule, and reminders become notifications</sub></td>
   </tr>
 </table>
 
-## Começar
+## Getting started
 
-Pré-requisitos: Windows, Node.js 22, npm e Git. Para executar agentes de verdade, tenha o [Claude Code](https://docs.claude.com/en/docs/claude-code) ou o [Codex CLI](https://github.com/openai/codex) instalados e logados.
+Prerequisites: Windows, Node.js 22, npm, and Git. To run real agents, have [Claude Code](https://docs.claude.com/en/docs/claude-code) or the [Codex CLI](https://github.com/openai/codex) installed and logged in.
 
 ```powershell
 git clone https://github.com/deefaraujo/NECTAR.git
@@ -66,80 +66,80 @@ npm ci
 npm start
 ```
 
-Isso abre o aplicativo desktop. Para só a interface no navegador, use `npm run web`.
+This opens the desktop app. For the web interface only, use `npm run web`.
 
-Primeiro uso:
+First use:
 
-1. Clique em **+** na barra lateral e aponte a pasta do seu projeto.
-2. Escolha um template de equipe (veja abaixo).
-3. Escreva no canal **#equipe** o que você quer. A liderança abre os cards e chama quem faz.
-4. Acompanhe pelo quadro ou pela colmeia. Ligue o **piloto automático** quando quiser que a equipe siga sozinha.
+1. Click **+** in the sidebar and point to your project folder.
+2. Pick a team template (see below).
+3. Write what you want in the team channel. The lead opens the cards and calls whoever does the work.
+4. Follow along on the board or in the hive. Turn on **autopilot** when you want the team to keep going by itself.
 
-Funcionalidades opcionais (voz, agente visual, empacotamento) pedem Python e dependências próprias. Veja [docs/desenvolvimento.md](docs/desenvolvimento.md).
+The interface language can be changed in the header. Optional features (voice, visual agent, packaging) need Python and their own dependencies. See [docs/development.md](docs/development.md).
 
-## Como funciona
+## How it works
 
 ```
-você ──► #equipe ──► liderança ──► cards no quadro ──► especialistas ──► revisão ──► QA ──► entrega
-                         ▲                                   │
-                         └──── combinados, memória, fatos ◄──┘
+you ──► team chat ──► lead ──► cards on the board ──► specialists ──► review ──► QA ──► delivery
+                        ▲                                    │
+                        └──── agreements, memory, facts ◄────┘
 ```
 
-- **Templates** ([templates/](templates/)) descrevem cada equipe: cargos, personalidades, skills, fluxo de trabalho e regras.
-- **Orquestração** ([lib/](lib/)) cuida do quadro, das chamadas aos CLIs, de memória, créditos, agenda, integrações e do piloto automático.
-- **Interface** ([public/](public/)) é HTML, CSS e JavaScript puro, servida por um servidor local em loopback.
-- **Desktop** ([electron/](electron/)) embala tudo numa janela com isolamento de contexto.
+- **Templates** ([templates/](templates/)) describe each team: roles, personalities, skills, workflow, and rules.
+- **Orchestration** ([lib/](lib/)) handles the board, calls to the CLIs, memory, credits, calendar, integrations, and autopilot.
+- **Interface** ([public/](public/)) is plain HTML, CSS, and JavaScript, served by a local loopback server.
+- **Desktop** ([electron/](electron/)) wraps it all in a window with context isolation.
 
-Mais detalhes em [docs/arquitetura.md](docs/arquitetura.md).
+More in [docs/architecture.md](docs/architecture.md).
 
-## Equipes prontas
+## Ready-made teams
 
-| Template | O que faz | Agentes |
+| Template | What it does | Agents |
 |---|---|---|
-| **Desenvolvimento de software** | Arquitetura, front, UI/UX, back, dados, integrações, pipeline, segurança, QA, revisão e versionamento | 16 |
-| **Product Designer** | Da descoberta do problema ao protótipo funcional, testes e documentação | 41 |
-| **Creative & Visual Design Studio** | Branding, direção de arte, editorial, ilustração, motion, social e pré-impressão | 27 |
-| **Assessoria Profissional** | Chief of Staff que reconstrói o que você fez a partir de Git, quadros, Jira e Notion e monta reviews, relatórios e apresentações | 18 |
-| **Desenvolvimento de jogos** | Jogos 2D em Ren'Py para celular: roteiro, código, UI de toque, sprites, VFX e game feel | 14 |
-| **Novela Vertical** | Produtora de novela 9:16: da história ao storyboard animado de cada cena, com bíblia da série | 7 |
+| **Software development** | Architecture, front end, UI/UX, back end, data, integrations, pipeline, security, QA, review, and versioning | 16 |
+| **Product Designer** | From problem discovery to a working prototype, testing, and documentation | 41 |
+| **Creative & Visual Design Studio** | Branding, art direction, editorial, illustration, motion, social, and prepress | 27 |
+| **Professional Operations** | A Chief of Staff that reconstructs what you did from Git, boards, Jira, and Notion and builds reviews, reports, and presentations | 18 |
+| **Game development** | 2D games in Ren'Py for mobile: script, code, touch UI, sprites, VFX, and game feel | 14 |
+| **Vertical Series** | A 9:16 series studio: from the story to the animated storyboard of each scene, with a series bible | 7 |
 
-Cada template é só configuração: você pode copiar um e montar a sua própria equipe.
+Each template is just configuration: copy one and build your own team.
 
-## Verificações
+## Checks
 
 ```powershell
-npm test               # suíte principal (modo simulado, sem chamar modelo)
-npm run test:teamwork  # contratos, worktrees, política de segurança
+npm test               # main suite (simulated mode, no model calls)
+npm run test:teamwork  # contracts, worktrees, security policy
 npm run check:publicacao
 ```
 
-Testes simulados não comprovam o comportamento de modelos reais. Veja [docs/desenvolvimento.md](docs/desenvolvimento.md).
+Simulated tests do not prove the behavior of real models. See [docs/development.md](docs/development.md).
 
-## Privacidade
+## Privacy
 
-Este repositório contém **somente a ferramenta**. Projetos, conversas, credenciais e dados de execução ficam fora do Git, nas pastas `data/`, `projetos/` e `relatorios/`. Agentes podem editar arquivos e rodar comandos com as permissões do aplicativo: use projetos de teste e mantenha backups. Leia [docs/privacidade.md](docs/privacidade.md).
+This repository contains **the tool only**. Projects, conversations, credentials, and runtime data stay out of Git, in the `data/`, `projetos/`, and `relatorios/` folders. Agents can edit files and run commands with the permissions granted to the app: use test projects and keep backups. Read [docs/privacy.md](docs/privacy.md).
 
-## Apoie o projeto
+## Support the project
 
-A NECTAR é feita por uma pessoa, no tempo livre. Se ela te ajudou e você quiser colaborar com o desenvolvimento:
+NECTAR is built by one person, in their free time. If it helped you and you want to support development:
 
 <p align="center">
-  <a href="https://www.paypal.com/donate/?hosted_button_id=TNJJ5CSX9E5DC"><img src="https://img.shields.io/badge/Doar%20via%20PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white" alt="Doar via PayPal"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=TNJJ5CSX9E5DC"><img src="https://img.shields.io/badge/Donate%20via%20PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate via PayPal"></a>
 </p>
 <p align="center">
-  <a href="https://www.paypal.com/donate/?hosted_button_id=TNJJ5CSX9E5DC"><img src="docs/imagens/paypal-qr.png" width="140" alt="QR code para doação via PayPal"></a><br>
-  <sub>ou aponte a câmera para o QR code</sub>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=TNJJ5CSX9E5DC"><img src="docs/images/paypal-qr.png" width="140" alt="QR code for PayPal donation"></a><br>
+  <sub>or point your camera at the QR code</sub>
 </p>
 
-Doações não concedem licença comercial; são só um apoio ao trabalho. Ideias, dúvidas e bugs são bem-vindos nas issues.
+Donations do not grant a commercial license; they are only support for the work. Ideas, questions, and bug reports are welcome in the issues.
 
-## Licença
+## License
 
-O código é **source-available, para uso pessoal e estudo não comercial**, conforme [LICENSE](LICENSE). Uso comercial, profissional ou institucional exige autorização escrita e licença separada. Não é uma licença open source irrestrita.
+The code is **source-available, for personal use and non-commercial study**, as set out in [LICENSE](LICENSE). Commercial, professional, or institutional use requires written authorization and a separate license. This is not an unrestricted open source license.
 
-Dependências e fontes de terceiros mantêm as próprias licenças: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Antes de propor contribuições, leia [CONTRIBUTING.md](CONTRIBUTING.md).
+Third-party dependencies and fonts keep their own licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Before proposing contributions, read [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Contato
+## Contact
 
 **Déborah Fernandes**
 
@@ -150,4 +150,4 @@ Dependências e fontes de terceiros mantêm as próprias licenças: [THIRD_PARTY
   <a href="mailto:deefaraujo@gmail.com"><img src="https://img.shields.io/badge/E--mail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="E-mail"></a>
 </p>
 
-Para licença comercial, escreva por e-mail ou pelo GitHub. Silêncio ou repositório público não valem como autorização.
+For a commercial license, write by e-mail or through GitHub. Silence or a public repository does not count as authorization.

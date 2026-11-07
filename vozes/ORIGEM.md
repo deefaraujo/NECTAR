@@ -1,11 +1,11 @@
-# Vozes de referência da chamada
+# Reference voices for calls
 
-Trechos de 12 s de leituras em português do Brasil, domínio público (LibriVox, via archive.org), usados só como referência de timbre e sotaque para o Chatterbox. Nenhum trecho é reproduzido ao usuário; o modelo gera a fala nova.
+12-second excerpts of Brazilian Portuguese readings, public domain (LibriVox, via archive.org), used only as a timbre and accent reference for Chatterbox. No excerpt is played to the user; the model generates new speech.
 
-| arquivo | leitura | item no archive.org |
+| file | reading | archive.org item |
 |---|---|---|
-| leni.wav | Variações sobre o flirt, João do Rio, leitura de Leni | variacoesflirt_1905_librivox |
-| felipe.wav | Helena, Machado de Assis, leitura de Felipe Vale da Silva | helena_1501_librivox |
-| bilac.wav | Contos para Velhos, Olavo Bilac, capítulo 1 | contos_para_velhos_0912_librivox |
+| leni.wav | Variações sobre o flirt, João do Rio, read by Leni | variacoesflirt_1905_librivox |
+| felipe.wav | Helena, Machado de Assis, read by Felipe Vale da Silva | helena_1501_librivox |
+| bilac.wav | Contos para Velhos, Olavo Bilac, chapter 1 | contos_para_velhos_0912_librivox |
 
-Corte: `ffmpeg -ss 45 -t 12 -ac 1 -ar 24000 -af loudnorm=I=-18:TP=-2`. A amostra própria da pessoa fica fora do app, em `%APPDATA%/Game Studio AI/voz/vozes/propria.wav`.
+Cut: `ffmpeg -ss 45 -t 12 -ac 1 -ar 24000 -af loudnorm=I=-18:TP=-2`. The person's own sample stays outside the app, at `%APPDATA%/Game Studio AI/voz/vozes/propria.wav`.

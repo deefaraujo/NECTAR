@@ -1,112 +1,116 @@
-LICENÇA NECTAR — USO PESSOAL E ESTUDO NÃO COMERCIAL
-Versão 1.0 — 7 de novembro de 2026
+NECTAR LICENSE - PERSONAL AND NON-COMMERCIAL STUDY USE
+Version 1.0 - November 7, 2026
 
-Copyright (c) 2026 Déborah Fernandes. Todos os direitos reservados.
-Titular e contato para licenciamento: https://github.com/deefaraujo
+Copyright (c) 2026 Déborah Fernandes. All rights reserved.
+Owner and licensing contact: https://github.com/deefaraujo
 
-1. OBJETO E TITULARIDADE
+1. SUBJECT MATTER AND OWNERSHIP
 
-Esta licença rege apenas o código original, a documentação e os materiais da
-ferramenta NECTAR sobre os quais Déborah Fernandes detenha os direitos necessários
-("Software"). A disponibilização do código não transfere sua titularidade e não
-o coloca em domínio público. Todos os direitos não concedidos expressamente
-permanecem reservados à titular. Esta é uma licença de código disponível para
-consulta (source-available), não uma licença open source irrestrita.
+This license governs only the original code, documentation, and materials of
+the NECTAR tool for which Déborah Fernandes holds the necessary rights (the
+"Software"). Making the code available does not transfer its ownership and
+does not place it in the public domain. All rights not expressly granted
+remain reserved to the owner. This is a source-available license, not an
+unrestricted open source license.
 
-2. PERMISSÃO LIMITADA
+2. LIMITED PERMISSION
 
-Desde que você cumpra integralmente estes termos, a titular concede a uma pessoa
-física permissão gratuita, não exclusiva, não sublicenciável e não transferível
-para visualizar, baixar, executar e modificar privadamente o Software somente
-para uso pessoal, estudo individual, aprendizado e experimentação não comercial,
-sem prestação de serviços a terceiros e sem finalidade profissional, empresarial
-ou de geração de receita direta ou indireta. Uso por organizações, em benefício
-de organizações ou para treinamento profissional remunerado requer licença
-separada. A titular pode conceder autorizações e licenças diferentes a seu critério.
+Provided that you fully comply with these terms, the owner grants a natural
+person a free, non-exclusive, non-sublicensable, and non-transferable
+permission to view, download, run, and privately modify the Software solely
+for personal use, individual study, learning, and non-commercial
+experimentation, without providing services to third parties and without any
+professional, business, or direct or indirect revenue-generating purpose. Use
+by organizations, for the benefit of organizations, or for paid professional
+training requires a separate license. The owner may grant different
+authorizations and licenses at her discretion.
 
-3. ATIVIDADES QUE EXIGEM AUTORIZAÇÃO COMERCIAL PRÉVIA
+3. ACTIVITIES THAT REQUIRE PRIOR COMMERCIAL AUTHORIZATION
 
-Sem contrato de licença separado, prévio e escrito, não é permitido, entre outros:
+Without a separate, prior, written license agreement, you may not, among
+other things:
 
-a) vender, alugar, sublicenciar, cobrar pelo acesso ou monetizar o Software,
-   versões modificadas, trechos substanciais ou obras derivadas;
-b) incorporar o Software ou seus trechos em produtos, aplicativos, plataformas,
-   serviços, bibliotecas ou soluções destinados à comercialização;
-c) oferecê-lo como serviço hospedado, SaaS, API, plataforma, white-label ou parte
-   de um pacote, inclusive quando o acesso for gratuito mas houver publicidade,
-   patrocínio, venda associada ou outro benefício econômico;
-d) empregá-lo em atividades profissionais, trabalho remunerado, consultoria,
-   prestação de serviços, operações empresariais ou execução de projetos para
-   clientes ou empregadores, mesmo sem revenda direta do próprio Software;
-e) utilizar modificações, integrações ou derivações para contornar estas
-   restrições, inclusive mudar o nome, a aparência ou a forma de distribuição;
-f) utilizar o Software em pesquisa, ensino, treinamento, avaliação ou produção
-   com finalidade comercial ou profissional sem a autorização aplicável.
+a) sell, rent, sublicense, charge for access to, or monetize the Software,
+   modified versions, substantial portions, or derivative works;
+b) incorporate the Software or portions of it into products, applications,
+   platforms, services, libraries, or solutions intended for sale;
+c) offer it as a hosted service, SaaS, API, platform, white label, or part of
+   a bundle, including when access is free but there is advertising,
+   sponsorship, an associated sale, or any other economic benefit;
+d) use it in professional activities, paid work, consulting, service
+   provision, business operations, or the execution of projects for clients
+   or employers, even without direct resale of the Software itself;
+e) use modifications, integrations, or derivations to circumvent these
+   restrictions, including changing the name, appearance, or form of
+   distribution;
+f) use the Software in research, teaching, training, evaluation, or
+   production with a commercial or professional purpose without the
+   applicable authorization.
 
-O fato de uma atividade não cobrar diretamente pelo Software não a torna
-automaticamente pessoal ou não comercial. Se a finalidade não estiver coberta
-expressamente pela seção 2, solicite uma licença antes do uso.
+The fact that an activity does not charge directly for the Software does not
+automatically make it personal or non-commercial. If the purpose is not
+expressly covered by section 2, request a license before use.
 
-4. CÓPIAS, FORKS E REDISTRIBUIÇÃO
+4. COPIES, FORKS, AND REDISTRIBUTION
 
-Preserve esta licença, os avisos de autoria e os avisos de terceiros em toda
-cópia permitida. Os direitos de visualizar e realizar forks dentro da plataforma
-de hospedagem são respeitados na medida exigida pelos termos aplicáveis dessa
-plataforma; eles não autorizam uso comercial. Modificações e forks não ampliam
-as permissões desta licença. Fora dos direitos obrigatórios da plataforma e da
-legislação, publicar cópias, versões modificadas ou executáveis, redistribuir a
-terceiros ou sublicenciar o Software requer autorização prévia e escrita da
-titular. Não substitua esta licença por outra nem remova suas restrições.
+Preserve this license, the authorship notices, and the third-party notices in
+every permitted copy. The rights to view and fork within the hosting platform
+are respected to the extent required by that platform's applicable terms;
+they do not authorize commercial use. Modifications and forks do not expand
+the permissions of this license. Beyond the mandatory rights of the platform
+and of the law, publishing copies, modified versions, or executables,
+redistributing to third parties, or sublicensing the Software requires the
+owner's prior written authorization. Do not replace this license with another
+or remove its restrictions.
 
-5. PROJETOS E DADOS EXTERNOS
+5. EXTERNAL PROJECTS AND DATA
 
-Os projetos, arquivos, dados, credenciais e trabalhos processados com a ferramenta
-não fazem parte desta distribuição e não recebem esta licença automaticamente.
-Seus titulares mantêm seus próprios direitos. Esta licença não concede qualquer
-direito sobre projetos da titular, de clientes, de empregadores ou de terceiros.
-Resultados produzidos com auxílio de serviços ou modelos de terceiros também
-podem estar sujeitos a direitos e condições próprios. Nada aqui autoriza acesso
-a dados ou serviços para os quais você não tenha permissão.
+Projects, files, data, credentials, and work processed with the tool are not
+part of this distribution and do not automatically receive this license.
+Their owners keep their own rights. This license grants no right over
+projects of the owner, of clients, of employers, or of third parties. Results
+produced with the help of third-party services or models may also be subject
+to their own rights and conditions. Nothing here authorizes access to data or
+services for which you do not have permission.
 
-6. DEPENDÊNCIAS E COMPONENTES DE TERCEIROS
+6. THIRD-PARTY DEPENDENCIES AND COMPONENTS
 
-As restrições desta licença não alteram os direitos independentes concedidos
-pelos titulares de dependências, fontes, ferramentas ou outros componentes de
-terceiros. Esses itens permanecem sob suas próprias licenças e avisos, quando
-aplicáveis. Esta licença não reivindica autoria sobre eles. Consulte
-THIRD_PARTY_NOTICES.md e os avisos que acompanham cada componente. A existência
-de dependências permissivas não concede licença comercial para o código
-original da NECTAR.
+The restrictions of this license do not alter the independent rights granted
+by the owners of dependencies, fonts, tools, or other third-party components.
+Those items remain under their own licenses and notices, where applicable.
+This license claims no authorship over them. See THIRD_PARTY_NOTICES.md and
+the notices that accompany each component. The existence of permissive
+dependencies does not grant a commercial license for NECTAR's original code.
 
-7. MARCAS E CONTRIBUIÇÕES
+7. TRADEMARKS AND CONTRIBUTIONS
 
-Não é concedido direito de usar o nome, logotipo ou identidade visual NECTAR para
-identificar outro produto, sugerir associação ou anunciar endosso. Contribuições
-de terceiros não transferem direitos automaticamente; sua incorporação poderá
-depender de acordo específico com seus titulares, inclusive para permitir o
-licenciamento comercial pela titular da NECTAR.
+No right is granted to use the NECTAR name, logo, or visual identity to
+identify another product, suggest association, or advertise endorsement.
+Third-party contributions do not transfer rights automatically; their
+incorporation may depend on a specific agreement with their owners, including
+to allow commercial licensing by the owner of NECTAR.
 
-8. DESCUMPRIMENTO E DIREITOS LEGAIS
+8. BREACH AND LEGAL RIGHTS
 
-As permissões concedidas por esta licença cessam em caso de descumprimento de
-suas condições, na extensão permitida pela legislação aplicável. Cesse o uso não
-autorizado e procure a titular para regularização. Nenhuma cláusula elimina
-direitos obrigatórios ou exceções legais que não possam ser excluídos por contrato.
+The permissions granted by this license end in case of breach of its
+conditions, to the extent permitted by applicable law. Cease the unauthorized
+use and contact the owner to regularize it. No clause removes mandatory
+rights or legal exceptions that cannot be excluded by contract.
 
-9. AUSÊNCIA DE GARANTIAS E LIMITAÇÃO DE RESPONSABILIDADE
+9. NO WARRANTY AND LIMITATION OF LIABILITY
 
-Na máxima extensão permitida pela legislação aplicável, o Software é fornecido
-no estado em que se encontra, sem garantia de adequação, disponibilidade,
-segurança, desempenho ou ausência de erros. Você é responsável por avaliar os
-riscos de execução de agentes, acesso a arquivos, integrações e chamadas a
-serviços externos, bem como por manter backups e obter as autorizações
-necessárias. A titular não assume responsabilidade por danos decorrentes do uso,
-salvo quando a legislação aplicável não permitir essa exclusão.
+To the maximum extent permitted by applicable law, the Software is provided
+"as is", without warranty of fitness, availability, security, performance, or
+absence of errors. You are responsible for assessing the risks of running
+agents, file access, integrations, and calls to external services, as well
+as for keeping backups and obtaining the necessary authorizations. The owner
+assumes no liability for damages arising from use, except where applicable
+law does not allow that exclusion.
 
-10. CONTATO
+10. CONTACT
 
-Para uso comercial, profissional, institucional ou qualquer autorização não
-coberta expressamente, entre em contato com Déborah Fernandes pelo perfil
-https://github.com/deefaraujo e obtenha autorização escrita antes do uso.
-A ausência de resposta, a existência de um repositório público ou o silêncio da
-titular não constituem autorização.
+For commercial, professional, institutional, or any use not expressly
+covered, contact Déborah Fernandes through the profile
+https://github.com/deefaraujo and obtain written authorization before use.
+Lack of response, the existence of a public repository, or the owner's
+silence does not constitute authorization.

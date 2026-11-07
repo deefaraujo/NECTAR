@@ -28,7 +28,7 @@ for (const a of especialistas) {
 assert(fs.readFileSync(path.join(TPL, 'regras.md'), 'utf8').length < 12000, 'regras cabem inteiras no prompt (corte de 12 mil em equipe.mjs)');
 const origem = fs.readFileSync(path.join(TPL, 'skills', 'ORIGEM.md'), 'utf8');
 for (const s of fs.readdirSync(path.join(TPL, 'skills')).filter((x) => fs.existsSync(path.join(TPL, 'skills', x, 'SKILL.md')))) assert(origem.includes(s)||skillsOpcionais('professional-operations').some(x=>x.id===s), `Origem ou manifesto registra ${s}`);
-assert(/proprietária/.test(origem) && /pptx/.test(origem), 'ORIGEM.md explica por que pptx/docx oficiais ficaram de fora');
+assert(/proprietary/.test(origem) && /pptx/.test(origem), 'ORIGEM.md explica por que pptx/docx oficiais ficaram de fora');
 
 // ---- o que o prompt entrega, num projeto com equipe de software + assessoria
 const projetos = await import('../lib/projetos.mjs');
