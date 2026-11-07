@@ -1,0 +1,710 @@
+{
+  "id": "jogos",
+  "nome": "Desenvolvimento de jogos",
+  "descricao": "Equipe para criar jogos 2D em Ren'Py para celular: cards a partir do pedido, pesquisa e documentação, roteiro, diálogos, fluxo, código, UI de toque, sprites, game feel e QA.",
+  "rascunho": false,
+  "papeis": {
+    "lead": "po",
+    "qa": "qa",
+    "curador": "curador",
+    "creditos": "creditos"
+  },
+  "agentes": [
+    {
+      "id": "po",
+      "nome": "Helena",
+      "papel": "Lead e Product Owner",
+      "cor": "#F4C540",
+      "sigla": "PO",
+      "glifo": "bussola",
+      "token": "po",
+      "somenteLeitura": true,
+      "cargo": "P.O.",
+      "skills": [
+        "renpy-mobile",
+        "planning-and-task-breakdown",
+        "game-design-docs",
+        "game-prototype-loop",
+        "prototype-fast",
+        "pre-mortem",
+        "game-jam",
+        "itch-publish",
+        "verification-before-completion",
+        "assets-abertos",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "narrative",
+      "nome": "Caio",
+      "papel": "Cenas, humor e ritmo",
+      "cor": "#B58BE8",
+      "sigla": "RO",
+      "glifo": "pena",
+      "token": "roteirista",
+      "cargo": "Roteirista",
+      "skills": [
+        "plot-structure",
+        "sw-story-structure",
+        "sw-scene-craft",
+        "worldbuilding",
+        "character-arc",
+        "story-analysis",
+        "voice-style",
+        "series-continuity",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "dialogue",
+      "nome": "Bia",
+      "papel": "Falas, escolhas e flags",
+      "cor": "#E88BB5",
+      "sigla": "DI",
+      "glifo": "dialogos",
+      "token": "dialogos",
+      "cargo": "Diálogos",
+      "skills": [
+        "dialogue",
+        "sw-dialogue",
+        "sw-character-conflict",
+        "line-editing",
+        "dialogue-systems",
+        "interactive-fiction",
+        "renpy-codigo",
+        "renpy-vn",
+        "renpy-recursos"
+      ]
+    },
+    {
+      "id": "visual_novel",
+      "nome": "Davi",
+      "papel": "Fluxo, save e checkpoints",
+      "cor": "#8BA6E8",
+      "sigla": "VN",
+      "glifo": "livro",
+      "token": "vn",
+      "cargo": "Visual Novel",
+      "skills": [
+        "renpy-vn",
+        "renpy-codigo",
+        "visual-novel",
+        "interactive-fiction",
+        "dialogue-systems",
+        "save-systems",
+        "revision-continuity",
+        "series-continuity",
+        "renpy-recursos",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "architect",
+      "nome": "Rafa",
+      "papel": "Estrutura e decisões",
+      "cor": "#62C2B0",
+      "sigla": "AR",
+      "glifo": "blocos",
+      "token": "arquiteto",
+      "cargo": "Arquiteto",
+      "skills": [
+        "renpy-codigo",
+        "renpy-vn",
+        "renpy-mobile",
+        "architecture-patterns",
+        "architecture-decision-records",
+        "codebase-design",
+        "save-systems",
+        "performance-optimization",
+        "procedural-gen",
+        "renpy-recursos",
+        "renpy-vfx",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "developer",
+      "nome": "Lucas",
+      "papel": "Implementação",
+      "cor": "#7DD68B",
+      "sigla": "DV",
+      "glifo": "codigo",
+      "token": "dev",
+      "cargo": "Programação",
+      "skills": [
+        "renpy-codigo",
+        "renpy-vn",
+        "renpy-mobile",
+        "systematic-debugging",
+        "test-driven-development",
+        "verification-before-completion",
+        "input-systems",
+        "ai-behavior-trees-utility-ai",
+        "renpy-recursos",
+        "renpy-ui-acabada",
+        "renpy-vfx"
+      ]
+    },
+    {
+      "id": "uiux",
+      "nome": "Marina",
+      "papel": "Telas de toque, HUD e layout",
+      "cor": "#63B8F0",
+      "sigla": "UI",
+      "glifo": "layout",
+      "token": "ui",
+      "cargo": "UI/UX",
+      "skills": [
+        "renpy-codigo",
+        "renpy-vn",
+        "renpy-mobile",
+        "game-ui-ux",
+        "game-interface-feedback",
+        "accessibility",
+        "input-systems",
+        "renpy-recursos",
+        "auditing-game-screen-readability",
+        "renpy-ui-acabada",
+        "assets-abertos",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "sprites",
+      "nome": "Léo",
+      "papel": "Sprites, ajustes e lista de arte",
+      "cor": "#F0A06E",
+      "sigla": "SP",
+      "glifo": "imagem",
+      "token": "sprites",
+      "cargo": "Sprites",
+      "skills": [
+        "renpy-sprites",
+        "create-game-assets",
+        "pixel-art-sprites",
+        "character-design",
+        "art-consistency",
+        "color-palette",
+        "art-direction",
+        "directing-game-visuals",
+        "assets-abertos",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "gamefeel",
+      "nome": "Tati",
+      "papel": "Movimento e retorno",
+      "cor": "#EBCB72",
+      "sigla": "GF",
+      "glifo": "raio",
+      "token": "gamefeel",
+      "cargo": "Game Feel",
+      "skills": [
+        "renpy-codigo",
+        "renpy-vn",
+        "game-feel",
+        "game-mechanics-design",
+        "player-experience-modeling",
+        "game-balance-economy",
+        "camera-systems",
+        "physics-tuning",
+        "audio-design",
+        "level-design",
+        "ux-sound-design",
+        "renpy-recursos",
+        "maximizing-game-feel",
+        "designing-mini-games",
+        "renpy-vfx",
+        "assets-abertos",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "qa",
+      "nome": "Nina",
+      "papel": "Testes e evidências",
+      "cor": "#EE7B74",
+      "sigla": "QA",
+      "glifo": "escudo",
+      "token": "qa",
+      "cargo": "QA",
+      "skills": [
+        "renpy-codigo",
+        "renpy-mobile",
+        "renpy-vn",
+        "game-playtest-planning",
+        "test-scenarios",
+        "verification-before-completion",
+        "systematic-debugging",
+        "code-review",
+        "renpy-recursos",
+        "auditing-game-screen-readability",
+        "renpy-ui-acabada"
+      ]
+    },
+    {
+      "id": "pesquisa",
+      "nome": "Iara",
+      "papel": "Pesquisa, análise e documentação",
+      "cor": "#C9A0F0",
+      "sigla": "PQ",
+      "glifo": "busca",
+      "token": "pesquisa",
+      "cargo": "Pesquisa",
+      "skills": [
+        "renpy-codigo",
+        "renpy-mobile",
+        "renpy-vn",
+        "knowledge-synthesis",
+        "documentation",
+        "game-design-docs",
+        "story-analysis",
+        "player-experience-modeling",
+        "game-mechanics-design",
+        "renpy-recursos",
+        "designing-mini-games",
+        "assets-abertos",
+        "renpy-vfx",
+        "renpy-ui-acabada",
+        "direcao-de-experiencia"
+      ]
+    },
+    {
+      "id": "curador",
+      "nome": "Otávio",
+      "papel": "Memória e organização",
+      "cor": "#9BD45A",
+      "sigla": "CU",
+      "glifo": "memoria",
+      "token": "curador",
+      "somenteLeitura": true,
+      "cargo": "Curador",
+      "skills": [
+        "knowledge-synthesis",
+        "documentation",
+        "game-design-docs",
+        "series-continuity",
+        "architecture-decision-records",
+        "renpy-codigo"
+      ]
+    },
+    {
+      "id": "mcp",
+      "nome": "Max",
+      "cargo": "MCP",
+      "papel": "Conexões com outras ferramentas por MCP",
+      "cor": "#26C6DA",
+      "sigla": "MC",
+      "glifo": "plug",
+      "token": "mcp",
+      "skills": []
+    },
+    {
+      "id": "creditos",
+      "nome": "Cris",
+      "papel": "Uso e orçamento",
+      "cor": "#E5B84B",
+      "sigla": "CR",
+      "glifo": "relogio",
+      "token": "creditos",
+      "somenteLeitura": true,
+      "sistema": true,
+      "cargo": "Créditos",
+      "skills": []
+    }
+  ],
+  "rotas": {
+    "arquitetura": "architect",
+    "roteiro": "narrative",
+    "dialogos": "dialogue",
+    "visualnovel": "visual_novel",
+    "dev": "developer",
+    "ui": "uiux",
+    "sprites": "sprites",
+    "polimento": "gamefeel",
+    "testes": "qa",
+    "curadoria": "curador",
+    "equipe": "po",
+    "mcp": "mcp",
+    "pesquisa": "pesquisa",
+    "docs": "pesquisa"
+  },
+  "aliases": {
+    "roteiro": "narrative",
+    "dialogo": "dialogue",
+    "visual": "visual_novel",
+    "arquitetura": "architect",
+    "programacao": "developer",
+    "developer": "developer",
+    "ux": "uiux",
+    "sprite": "sprites",
+    "feel": "gamefeel",
+    "polimento": "gamefeel",
+    "testes": "qa",
+    "curadoria": "curador",
+    "memoria": "curador",
+    "credito": "creditos",
+    "uso": "creditos",
+    "orcamento": "creditos",
+    "tesoureiro": "creditos",
+    "mcp": "mcp",
+    "conexao": "mcp",
+    "conexoes": "mcp",
+    "figma": "mcp",
+    "higgsfield": "mcp",
+    "pesquisa": "pesquisa",
+    "pesquisar": "pesquisa",
+    "analise": "pesquisa",
+    "documentacao": "pesquisa",
+    "docs": "pesquisa",
+    "iara": "pesquisa"
+  },
+  "contrato": {
+    "fluxo": "leve",
+    "dominios": {
+      "narrativa": "narrative",
+      "dialogo": "dialogue",
+      "codigo": "developer",
+      "arquitetura": "architect",
+      "ui": "uiux",
+      "sprites": "sprites",
+      "gamefeel": "gamefeel",
+      "qa": "qa",
+      "vn": "visual_novel",
+      "pesquisa": "pesquisa"
+    },
+    "palavras": {
+      "narrativa": [
+        "história",
+        "historia",
+        "roteiro",
+        "enredo",
+        "arco",
+        "capítulo",
+        "capitulo",
+        "lore"
+      ],
+      "dialogo": [
+        "diálogo",
+        "dialogo",
+        "fala",
+        "linha",
+        "voz do personagem"
+      ],
+      "codigo": [
+        "script",
+        "código",
+        "codigo",
+        "bug",
+        "função",
+        "funcao",
+        "classe",
+        "engine",
+        "renpy",
+        "godot",
+        "unity",
+        "unreal",
+        "build",
+        "lint",
+        "apk",
+        "build android"
+      ],
+      "arquitetura": [
+        "arquitetura",
+        "sistema",
+        "módulo",
+        "modulo",
+        "save",
+        "estado"
+      ],
+      "ui": [
+        "menu",
+        "hud",
+        "tela",
+        "botão",
+        "botao",
+        "interface",
+        "toque",
+        "mobile",
+        "celular",
+        "android"
+      ],
+      "sprites": [
+        "sprite",
+        "asset",
+        "arte",
+        "textura",
+        "animação de sprite",
+        "tileset",
+        "ajuste de sprite",
+        "padronizar",
+        "recortar",
+        "expressão",
+        "expressao",
+        "folha de animação"
+      ],
+      "gamefeel": [
+        "game feel",
+        "feedback",
+        "juice",
+        "impacto",
+        "câmera",
+        "camera",
+        "partícula",
+        "particula",
+        "som"
+      ],
+      "qa": [
+        "teste",
+        "playtest",
+        "bug",
+        "regressão",
+        "regressao"
+      ],
+      "vn": [
+        "visual novel",
+        "cena",
+        "escolha",
+        "rota",
+        "cg"
+      ],
+      "pesquisa": [
+        "pesquisa",
+        "pesquisar",
+        "análise",
+        "analise",
+        "analisar",
+        "referência",
+        "referencia",
+        "documentação",
+        "documentacao",
+        "benchmark",
+        "como funciona"
+      ]
+    },
+    "checagens": [
+      {
+        "nome": "arquivos da entrega existem",
+        "tipo": "arquivos"
+      },
+      {
+        "nome": "imagens abrem e têm dimensões",
+        "tipo": "imagem"
+      }
+    ],
+    "entregas": "Entrega é arquivo na pasta do projeto: .rpy e assets em game/, documento em docs/, sprites ajustados numa pasta _padronizado/ ao lado do original, com o lint do Ren'Py limpo (job.rodar) e um print da tela pedida (variante de celular quando for UI). Liste os caminhos no campo arquivos do card; descrição sem arquivo não é entrega.",
+    "revisao": {
+      "nome": "playtest",
+      "instrucao": "Revise como playtest no celular: rode o lint, abra o jogo com RENPY_VARIANT=\"touch small mobile android\" (ou no aparelho), jogue o trecho e registre o que aconteceu (o que travou, texto pequeno, botão difícil de tocar, o que não ficou claro, o que divertiu). Evidência é o que você viu jogando, com passos reproduzíveis e print; não aprove por descrição."
+    }
+  },
+  "registro": {
+    "vista": "Produção",
+    "tipos": {
+      "jogo": {
+        "titulo": "Jogo",
+        "plural": "Jogo",
+        "sempre": true,
+        "descricao": "premissa, gênero, público, orientação (retrato ou paisagem), resolução, loop principal, escopo da primeira versão",
+        "pedidos": [
+          {
+            "rotulo": "Quebrar em cards",
+            "agente": "po",
+            "texto": "a partir da ficha do jogo {nome}, monte o plano da primeira versão jogável no celular: abra um planning se mexer em várias áreas, ou crie os cards (pequenos, com critério de aceite que eu consiga conferir no celular) na ordem das dependências."
+          },
+          {
+            "rotulo": "Direção de experiência",
+            "agente": "po",
+            "texto": "Abra uma sessão de direção de experiência (skill direcao-de-experiencia) com narrativa, design, game feel, UI/UX, arte e som: gancho e página da loja, primeiros 3 minutos, verbos próprios, atmosfera, tensão sem jump scare, momentos bonitos e o que cortar. Feche em docs/decisoes e transforme cada ideia aprovada em card com dono e aceite visual."
+          },
+          {
+            "rotulo": "Montar o projeto Ren'Py",
+            "agente": "developer",
+            "texto": "crie ou confira o projeto Ren'Py de {nome} para celular: gui.init na orientação e resolução da ficha, variante small ajustada, pastas game/cenas, game/sistemas e game/images organizadas, lint limpo e um print com a variante de celular."
+          },
+          {
+            "rotulo": "Documento de design",
+            "agente": "pesquisa",
+            "texto": "escreva docs/design.md de {nome}: visão, loop, telas, personagens, sistemas e o que fica fora da primeira versão, com o que já está decidido nas fichas. O que não estiver decidido vira lista de perguntas no fim."
+          }
+        ]
+      },
+      "estilo": {
+        "titulo": "Estilo visual",
+        "plural": "Estilo visual",
+        "sempre": true,
+        "descricao": "direção de arte, paleta, fontes com acento, tamanho de sprite e de tela, referências aprovadas",
+        "pedidos": [
+          {
+            "rotulo": "Guia de arte e UI",
+            "agente": "pesquisa",
+            "texto": "escreva docs/guia-visual.md a partir do estilo {nome}: paleta, fontes (conferir acentos do pt-BR), tamanhos de sprite, canvas e linha de base, tamanho mínimo de botão e texto no celular."
+          },
+          {
+            "rotulo": "Conferir a arte contra o estilo",
+            "agente": "sprites",
+            "texto": "rode info e folha nos sprites do projeto e me diga o que foge do estilo {nome} (escala, base, canvas, transparência, peso)."
+          },
+          {
+            "rotulo": "Escolher e baixar o kit de UI",
+            "agente": "uiux",
+            "texto": "escolha um kit de UI com licença aberta que combine com o estilo {nome}, baixe com a skill assets-abertos, registre no MANIFESTO.md e monte os estilos base (botão com estados, painel de 9 fatias, barra, fonte) num arquivo só, com print na variante de celular."
+          }
+        ]
+      },
+      "personagem": {
+        "titulo": "Personagem",
+        "plural": "Personagens",
+        "descricao": "quem é, aparência, expressões e poses necessárias, voz, onde aparece, arquivos de sprite",
+        "pedidos": [
+          {
+            "rotulo": "Ajustar os sprites",
+            "agente": "sprites",
+            "texto": "padronize os sprites de {nome} (mesmo canvas, mesma base, uma escala para o lote), gere a folha de conferência, e me mostre antes de trocar qualquer arquivo."
+          },
+          {
+            "rotulo": "Declarar no jogo",
+            "agente": "developer",
+            "texto": "declare {nome} no Ren'Py: Character com cor e voz da ficha e as imagens (layeredimage se tiver muitas expressões), com lint limpo e print."
+          },
+          {
+            "rotulo": "Voz e falas de exemplo",
+            "agente": "dialogue",
+            "texto": "escreva 6 falas de exemplo de {nome} em situações diferentes, no tom da ficha, para eu aprovar a voz."
+          },
+          {
+            "rotulo": "Buscar sprite pronto",
+            "agente": "sprites",
+            "texto": "procure sprites com licença aberta que sirvam para {nome} (ou um pacote de VN), confira a licença, baixe com a skill assets-abertos, padronize com a skill renpy-sprites e me mostre a folha antes de usar."
+          }
+        ]
+      },
+      "cenario": {
+        "titulo": "Cenário",
+        "plural": "Cenários",
+        "descricao": "lugar, hora, clima, em que cenas aparece, arquivo de fundo",
+        "pedidos": [
+          {
+            "rotulo": "Fundo provisório",
+            "agente": "sprites",
+            "texto": "crie o provisório nomeado do cenário {nome} no tamanho da tela do jogo e liste na lista de arte."
+          },
+          {
+            "rotulo": "Preparar para celular",
+            "agente": "sprites",
+            "texto": "confira o fundo de {nome}: tamanho igual à tela do jogo, peso, formato (webp para fundo grande); gere a versão ajustada em _padronizado/."
+          },
+          {
+            "rotulo": "Buscar fundo pronto",
+            "agente": "sprites",
+            "texto": "procure um fundo com licença aberta (OpenGameArt, Openverse, itch.io) para o cenário {nome}, confira a licença na página, baixe com a skill assets-abertos, adapte ao tamanho da tela e me mostre antes de usar."
+          }
+        ]
+      },
+      "tela": {
+        "titulo": "Tela",
+        "plural": "Telas",
+        "descricao": "menu, HUD, inventário, diálogo... o que mostra, o que o jogador toca, estados",
+        "pedidos": [
+          {
+            "rotulo": "Desenhar a tela",
+            "agente": "uiux",
+            "texto": "proponha a tela {nome} para celular: o que mostra, onde fica cada botão (alvo de toque grande), estados, e um esboço em screen language; me mostre antes de implementar."
+          },
+          {
+            "rotulo": "Acabar a tela com o kit",
+            "agente": "uiux",
+            "texto": "deixe a tela {nome} com acabamento de produto (skill renpy-ui-acabada): kit de UI do projeto, moldura de 9 fatias, botão com todos os estados, retorno ao toque, fonte do jogo, texto em português; print na variante de celular."
+          },
+          {
+            "rotulo": "Implementar a tela",
+            "agente": "developer",
+            "texto": "implemente a tela {nome} em screen language, com a variante de celular, lint limpo e print com RENPY_VARIANT de celular."
+          },
+          {
+            "rotulo": "Testar no toque",
+            "agente": "qa",
+            "texto": "teste a tela {nome} como celular (RENPY_VARIANT ou aparelho): toque em tudo, volte, salve e carregue; relate com prints."
+          }
+        ]
+      },
+      "cena": {
+        "titulo": "Cena",
+        "plural": "Cenas",
+        "descricao": "quem está, onde, o que acontece, escolhas e flags, label no script",
+        "pedidos": [
+          {
+            "rotulo": "Escrever a cena",
+            "agente": "narrative",
+            "texto": "escreva a cena {nome}: quem está, o que acontece, a virada e as escolhas, no tom do jogo."
+          },
+          {
+            "rotulo": "Diálogos e escolhas",
+            "agente": "dialogue",
+            "texto": "escreva os diálogos e as escolhas de {nome} com as flags que cada escolha muda."
+          },
+          {
+            "rotulo": "Montar no Ren'Py",
+            "agente": "visual_novel",
+            "texto": "monte {nome} em Ren'Py (label, show/hide com os nomes de imagem da lista, menu e flags em default), lint limpo e print da cena rodando."
+          },
+          {
+            "rotulo": "Efeitos da cena",
+            "agente": "gamefeel",
+            "texto": "proponha e implemente os efeitos visuais e sonoros de {nome} (partícula, flash, tremor, vinheta, transição, som) com a skill renpy-vfx, nomeados em game/sistemas/vfx.rpy, e prove com print no momento do efeito."
+          }
+        ]
+      },
+      "sistema": {
+        "titulo": "Sistema",
+        "plural": "Sistemas",
+        "descricao": "mecânica ou sistema: inventário, combate, afinidade, save... regras e números",
+        "pedidos": [
+          {
+            "rotulo": "Pesquisar como fazem",
+            "agente": "pesquisa",
+            "texto": "pesquise como jogos e projetos Ren'Py fazem {nome} (com fontes) e escreva docs/pesquisa/<nome>.md com as opções, o custo de cada uma e a recomendação."
+          },
+          {
+            "rotulo": "Especificar",
+            "agente": "gamefeel",
+            "texto": "especifique {nome}: regras, números, retorno ao jogador e como saber que está divertido."
+          },
+          {
+            "rotulo": "Arquitetura",
+            "agente": "architect",
+            "texto": "proponha como {nome} entra no código Ren'Py (arquivos, estado em default, save, o que não fazer), em poucas linhas, para eu aprovar."
+          },
+          {
+            "rotulo": "Aprender como se faz",
+            "agente": "pesquisa",
+            "texto": "procure tutorial ou exemplo de como implementar {nome} em Ren'Py (doc do SDK, feniksdev, Lemma Soft, repositório com licença), traduza para um trecho .rpy que rode no projeto, confira no lint e entregue em docs/pesquisa/ com a fonte."
+          }
+        ]
+      },
+      "documento": {
+        "titulo": "Documento",
+        "plural": "Documentos",
+        "descricao": "documentação de consulta: guia, pesquisa, decisão, análise",
+        "pedidos": [
+          {
+            "rotulo": "Escrever ou atualizar",
+            "agente": "pesquisa",
+            "texto": "escreva ou atualize o documento {nome} em docs/, curto e consultável, com fontes quando for pesquisa."
+          },
+          {
+            "rotulo": "Analisar o projeto",
+            "agente": "pesquisa",
+            "texto": "analise o projeto atual sob o tema {nome} (código, telas, arte) e escreva o que achou em docs/analises/, com o problema, onde está e a sugestão de card."
+          },
+          {
+            "rotulo": "Montar a tela de créditos",
+            "agente": "developer",
+            "texto": "monte a tela de créditos do jogo a partir de assets-fonte/MANIFESTO.md (autor, licença, link de cada asset), com rolagem por toque, e prove com print."
+          }
+        ]
+      }
+    }
+  }
+}

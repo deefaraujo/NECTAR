@@ -1,0 +1,210 @@
+{
+  "schema": "nectar.skills-opcionais.v1",
+  "skills": [
+    {
+      "id": "api-design-principles",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "architecture-decision-records",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "architecture-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "async-python-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "auth-implementation-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "code-review",
+      "origem": "https://github.com/mattpocock/skills",
+      "distribuido": false
+    },
+    {
+      "id": "codebase-design",
+      "origem": "https://github.com/mattpocock/skills",
+      "distribuido": false
+    },
+    {
+      "id": "deployment-pipeline-design",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "domain-modeling",
+      "origem": "https://github.com/mattpocock/skills",
+      "distribuido": false
+    },
+    {
+      "id": "e2e-testing-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "fastapi-templates",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "frontend-design",
+      "origem": "https://github.com/anthropics/skills",
+      "distribuido": false
+    },
+    {
+      "id": "git-advanced-workflows",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "gitlab-ci-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "gitops-workflow",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "improve-codebase-architecture",
+      "origem": "https://github.com/mattpocock/skills",
+      "distribuido": false
+    },
+    {
+      "id": "javascript-testing-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "k8s-manifest-generator",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "mcp-builder",
+      "origem": "https://github.com/anthropics/skills",
+      "distribuido": false
+    },
+    {
+      "id": "openapi-spec-generation",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "playwright-best-practices",
+      "origem": "https://github.com/currents-dev/playwright-best-practices-skill",
+      "distribuido": false
+    },
+    {
+      "id": "postgresql-table-design",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "python-anti-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "python-error-handling",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "python-testing-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "python-type-safety",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "receiving-code-review",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "secrets-management",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "security-requirement-extraction",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "sql-optimization-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "stride-analysis-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "supabase-postgres-best-practices",
+      "origem": "https://github.com/supabase/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "systematic-debugging",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "test-driven-development",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "threat-mitigation-mapping",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "vercel-composition-patterns",
+      "origem": "https://github.com/vercel-labs/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "vercel-react-best-practices",
+      "origem": "https://github.com/vercel-labs/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "verification-before-completion",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "versionamento-git",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "web-design-guidelines",
+      "origem": "https://github.com/vercel-labs/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "webapp-testing",
+      "origem": "https://github.com/anthropics/skills",
+      "distribuido": false
+    }
+  ]
+}

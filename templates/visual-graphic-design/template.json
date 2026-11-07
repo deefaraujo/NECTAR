@@ -1,0 +1,738 @@
+{
+  "id": "visual-graphic-design",
+  "nome": "Creative & Visual Design Studio",
+  "categoria": "creative-design",
+  "descricao": "Estúdio de design visual: branding, direção de arte, design gráfico, editorial, ilustração, personagens, motion, social, campanha, pré-impressão e entrega de assets, com 25 especialistas.",
+  "rascunho": false,
+  "papeis": {
+    "lead": "lider_criativo",
+    "qa": "qa_visual",
+    "curador": "entrega_assets",
+    "creditos": "creditos"
+  },
+  "agentes": [
+    {
+      "id": "lider_criativo",
+      "nome": "Vivi",
+      "cargo": "Liderança criativa",
+      "papel": "Interpretar o briefing, montar o time certo e conduzir o projeto até a entrega consolidada",
+      "cor": "#F4C540",
+      "sigla": "LC",
+      "glifo": "bussola",
+      "token": "lider",
+      "idEspecificacao": "creative-design-lead",
+      "departamento": "Leadership",
+      "somenteLeitura": true,
+      "skills": [
+        "planning-and-task-breakdown",
+        "team-composition-patterns",
+        "pre-mortem",
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "estrategista_marca",
+      "nome": "Bruno",
+      "cargo": "Estratégia de marca",
+      "papel": "Definir quem a marca é, para quem fala e por que é diferente",
+      "cor": "#F2994A",
+      "sigla": "ED",
+      "glifo": "blocos",
+      "token": "estrategia",
+      "idEspecificacao": "brand-strategist",
+      "departamento": "Strategy & Research",
+      "skills": [
+        "brand-strategy",
+        "brand-positioning",
+        "branding",
+        "brand-storytelling",
+        "customer-research",
+        "user-personas"
+      ]
+    },
+    {
+      "id": "pesquisa_visual",
+      "nome": "Íris",
+      "cargo": "Pesquisa visual e cultural",
+      "papel": "Mapear o território visual e cultural antes de criar",
+      "cor": "#56CCF2",
+      "sigla": "PV",
+      "glifo": "busca",
+      "token": "pesquisa",
+      "idEspecificacao": "visual-cultural-researcher",
+      "departamento": "Strategy & Research",
+      "skills": [
+        "research-repository",
+        "knowledge-synthesis",
+        "customer-research",
+        "brand-review"
+      ]
+    },
+    {
+      "id": "design_thinking",
+      "nome": "Duda",
+      "cargo": "Design Thinking",
+      "papel": "Enquadrar o problema e conduzir a ideação até conceitos que valem testar",
+      "cor": "#6FCF97",
+      "sigla": "DT",
+      "glifo": "raio",
+      "token": "dt",
+      "idEspecificacao": "design-thinking-facilitator",
+      "departamento": "Strategy & Research",
+      "skills": [
+        "identify-assumptions-new",
+        "opportunity-solution-tree",
+        "prototype-strategy",
+        "interview-script",
+        "journey-map"
+      ]
+    },
+    {
+      "id": "estrategista_campanha",
+      "nome": "Caio",
+      "cargo": "Estratégia de campanha",
+      "papel": "Transformar objetivo de comunicação em conceito e plano de campanha",
+      "cor": "#EB5757",
+      "sigla": "ED",
+      "glifo": "fluxo",
+      "token": "campanha",
+      "idEspecificacao": "creative-campaign-strategist",
+      "departamento": "Strategy & Research",
+      "skills": [
+        "campaign-plan",
+        "content-strategy",
+        "brand-storytelling",
+        "copywriting"
+      ]
+    },
+    {
+      "id": "diretor_arte",
+      "nome": "Luna",
+      "cargo": "Direção de arte",
+      "papel": "Definir e proteger a linguagem visual do projeto",
+      "cor": "#AB47BC",
+      "sigla": "DD",
+      "glifo": "imagem",
+      "token": "arte",
+      "idEspecificacao": "art-director",
+      "departamento": "Art Direction & Visual Identity",
+      "skills": [
+        "art-direction",
+        "art-consistency",
+        "color-theory",
+        "color-palette",
+        "refactoring-ui"
+      ]
+    },
+    {
+      "id": "identidade_marca",
+      "nome": "Theo",
+      "cargo": "Identidade visual",
+      "papel": "Criar sistemas de identidade que funcionam em qualquer aplicação",
+      "cor": "#2D9CDB",
+      "sigla": "IV",
+      "glifo": "blocos",
+      "token": "identidade",
+      "idEspecificacao": "brand-identity-designer",
+      "departamento": "Art Direction & Visual Identity",
+      "skills": [
+        "branding",
+        "color-system",
+        "typography",
+        "design-tokens",
+        "brand-review"
+      ]
+    },
+    {
+      "id": "designer_grafico",
+      "nome": "Bia",
+      "cargo": "Design gráfico",
+      "papel": "Produzir peças gráficas claras e bem compostas, dentro da identidade",
+      "cor": "#27AE60",
+      "sigla": "DG",
+      "glifo": "layout",
+      "token": "grafico",
+      "idEspecificacao": "graphic-designer",
+      "departamento": "Art Direction & Visual Identity",
+      "skills": [
+        "layout-grid",
+        "refactoring-ui",
+        "color-theory",
+        "typography"
+      ]
+    },
+    {
+      "id": "tipografia",
+      "nome": "Otto",
+      "cargo": "Tipografia e lettering",
+      "papel": "Escolher e organizar tipos que servem à leitura e à marca",
+      "cor": "#BDBDBD",
+      "sigla": "TE",
+      "glifo": "pena",
+      "token": "tipografia",
+      "idEspecificacao": "typography-lettering-specialist",
+      "departamento": "Art Direction & Visual Identity",
+      "skills": [
+        "typography",
+        "layout-grid"
+      ]
+    },
+    {
+      "id": "editorial",
+      "nome": "Clara",
+      "cargo": "Design editorial",
+      "papel": "Diagramar publicações com ritmo, hierarquia e integridade do conteúdo",
+      "cor": "#9B51E0",
+      "sigla": "DE",
+      "glifo": "livro",
+      "token": "editorial",
+      "idEspecificacao": "editorial-designer",
+      "departamento": "Graphic Production & Editorial",
+      "skills": [
+        "layout-grid",
+        "typography",
+        "documentation"
+      ]
+    },
+    {
+      "id": "informacao",
+      "nome": "Igor",
+      "cargo": "Informação e apresentação",
+      "papel": "Deixar dado e ideia complexa fáceis de entender, sem distorcer",
+      "cor": "#64B5F6",
+      "sigla": "IE",
+      "glifo": "banco",
+      "token": "informacao",
+      "idEspecificacao": "information-presentation-designer",
+      "departamento": "Graphic Production & Editorial",
+      "skills": [
+        "data-visualization",
+        "presentation-design",
+        "presentation-deck",
+        "layout-grid"
+      ]
+    },
+    {
+      "id": "embalagem",
+      "nome": "Nina",
+      "cargo": "Gráfico de embalagem",
+      "papel": "Criar a camada gráfica de embalagens e rótulos, pronta para produção",
+      "cor": "#F2C94C",
+      "sigla": "GD",
+      "glifo": "blocos",
+      "token": "embalagem",
+      "idEspecificacao": "packaging-graphic-designer",
+      "departamento": "Graphic Production & Editorial",
+      "skills": [
+        "packaging-print-production",
+        "typography",
+        "color-theory"
+      ]
+    },
+    {
+      "id": "ambiental",
+      "nome": "Pedro",
+      "cargo": "Gráfico ambiental e sinalização",
+      "papel": "Comunicar no espaço: orientar, informar e ambientar",
+      "cor": "#81C784",
+      "sigla": "GA",
+      "glifo": "globo",
+      "token": "sinalizacao",
+      "idEspecificacao": "environmental-graphic-designer",
+      "departamento": "Graphic Production & Editorial",
+      "skills": [
+        "typography",
+        "color-system",
+        "accessibility"
+      ]
+    },
+    {
+      "id": "ilustrador",
+      "nome": "Mila",
+      "cargo": "Ilustração e concept art",
+      "papel": "Criar ilustrações e conceitos visuais com estilo consistente",
+      "cor": "#FF8A80",
+      "sigla": "IE",
+      "glifo": "pena",
+      "token": "ilustracao",
+      "idEspecificacao": "illustrator-concept-artist",
+      "departamento": "Illustration & Imaging",
+      "skills": [
+        "illustration-style",
+        "icon-design",
+        "icon-system",
+        "art-consistency",
+        "create-game-assets"
+      ]
+    },
+    {
+      "id": "personagens",
+      "nome": "Joana",
+      "cargo": "Personagens e mascotes",
+      "papel": "Criar personagens e mascotes reconhecíveis e consistentes em qualquer pose",
+      "cor": "#EC407A",
+      "sigla": "PE",
+      "glifo": "dialogos",
+      "token": "personagens",
+      "idEspecificacao": "character-mascot-designer",
+      "departamento": "Illustration & Imaging",
+      "skills": [
+        "character-design",
+        "art-consistency",
+        "create-game-assets",
+        "pixel-art-sprites"
+      ]
+    },
+    {
+      "id": "padronagem",
+      "nome": "Rosa",
+      "cargo": "Superfície e padronagem",
+      "papel": "Criar padrões contínuos e superfícies que funcionam no material e na escala certos",
+      "cor": "#F48FB1",
+      "sigla": "SE",
+      "glifo": "layout",
+      "token": "padronagem",
+      "idEspecificacao": "surface-pattern-designer",
+      "departamento": "Illustration & Imaging",
+      "skills": [
+        "illustration-style",
+        "color-theory",
+        "color-system"
+      ]
+    },
+    {
+      "id": "fotografia",
+      "nome": "Leo",
+      "cargo": "Fotografia e tratamento",
+      "papel": "Dirigir e tratar imagens com fidelidade ao que precisa ser mantido",
+      "cor": "#90A4AE",
+      "sigla": "FE",
+      "glifo": "imagem",
+      "token": "foto",
+      "idEspecificacao": "photography-retouch-specialist",
+      "departamento": "Illustration & Imaging",
+      "skills": [
+        "color-theory",
+        "art-consistency"
+      ]
+    },
+    {
+      "id": "visualizacao",
+      "nome": "Kai",
+      "cargo": "Visualização 3D e mockups",
+      "papel": "Mostrar a marca e o produto em cena, com material e luz convincentes",
+      "cor": "#4DD0E1",
+      "sigla": "V3",
+      "glifo": "blocos",
+      "token": "3d",
+      "idEspecificacao": "3d-visualization-artist",
+      "departamento": "Illustration & Imaging",
+      "skills": [
+        "3d-modeling",
+        "art-direction",
+        "cinematography"
+      ]
+    },
+    {
+      "id": "motion",
+      "nome": "Tom",
+      "cargo": "Motion design",
+      "papel": "Dar movimento à marca com propósito e conforto visual",
+      "cor": "#5C6BC0",
+      "sigla": "MD",
+      "glifo": "raio",
+      "token": "motion",
+      "idEspecificacao": "motion-designer",
+      "departamento": "Motion & Social Content",
+      "skills": [
+        "motion-design",
+        "motion-graphics",
+        "motion-system",
+        "animation-principles"
+      ]
+    },
+    {
+      "id": "storyboard",
+      "nome": "Nico",
+      "cargo": "Storyboard e animação 2D",
+      "papel": "Planejar cenas e animação 2D plano a plano",
+      "cor": "#FFA726",
+      "sigla": "SE",
+      "glifo": "imagem",
+      "token": "storyboard",
+      "idEspecificacao": "storyboard-2d-animation-specialist",
+      "departamento": "Motion & Social Content",
+      "skills": [
+        "cinematography",
+        "sw-scene-craft",
+        "animation-principles"
+      ]
+    },
+    {
+      "id": "social_media",
+      "nome": "Lara",
+      "cargo": "Social media",
+      "papel": "Adaptar a marca para cada rede, legível em tela pequena",
+      "cor": "#26C6DA",
+      "sigla": "SM",
+      "glifo": "globo",
+      "token": "social",
+      "idEspecificacao": "social-media-designer",
+      "departamento": "Motion & Social Content",
+      "skills": [
+        "social-media-posts",
+        "content-strategy",
+        "layout-grid"
+      ]
+    },
+    {
+      "id": "conteudo_copy",
+      "nome": "Davi",
+      "cargo": "Conteúdo e copywriting",
+      "papel": "Escrever a mensagem da marca com voz própria e verdade",
+      "cor": "#F78C6C",
+      "sigla": "CE",
+      "glifo": "pena",
+      "token": "copy",
+      "idEspecificacao": "content-strategist-copywriter",
+      "departamento": "Motion & Social Content",
+      "skills": [
+        "copywriting",
+        "content-strategy",
+        "brand-storytelling",
+        "voice-style"
+      ]
+    },
+    {
+      "id": "preimpressao",
+      "nome": "Vera",
+      "cargo": "Impressão e pré-impressão",
+      "papel": "Garantir que o arquivo sai da tela e chega certo ao papel",
+      "cor": "#A1887F",
+      "sigla": "IE",
+      "glifo": "escudo",
+      "token": "impressao",
+      "idEspecificacao": "print-prepress-specialist",
+      "departamento": "Production & Quality",
+      "skills": [
+        "packaging-print-production",
+        "color-theory"
+      ]
+    },
+    {
+      "id": "qa_visual",
+      "nome": "Rui",
+      "cargo": "QA visual e auditoria de marca",
+      "papel": "Conferir a entrega contra o pedido, a marca e o critério de aceite",
+      "cor": "#E57373",
+      "sigla": "QV",
+      "glifo": "escudo",
+      "token": "qa",
+      "idEspecificacao": "visual-qa-brand-auditor",
+      "departamento": "Production & Quality",
+      "somenteLeitura": true,
+      "skills": [
+        "brand-review",
+        "refactoring-ui",
+        "accessibility",
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "entrega_assets",
+      "nome": "Ana",
+      "cargo": "Produção e entrega de assets",
+      "papel": "Entregar arquivos reais, organizados, nomeados e conferidos",
+      "cor": "#78909C",
+      "sigla": "PE",
+      "glifo": "memoria",
+      "token": "assets",
+      "idEspecificacao": "asset-production-specialist",
+      "departamento": "Production & Quality",
+      "skills": [
+        "create-game-assets",
+        "verification-before-completion",
+        "documentation"
+      ]
+    },
+    {
+      "id": "mcp",
+      "nome": "Max",
+      "cargo": "MCP",
+      "papel": "Conexões com outras ferramentas por MCP (Figma, geração de imagem e outras)",
+      "cor": "#26C6DA",
+      "sigla": "MC",
+      "glifo": "plug",
+      "token": "mcp",
+      "skills": []
+    },
+    {
+      "id": "creditos",
+      "nome": "Cris",
+      "cargo": "Créditos",
+      "papel": "Uso e orçamento",
+      "cor": "#E5B84B",
+      "sigla": "CR",
+      "glifo": "relogio",
+      "token": "creditos",
+      "somenteLeitura": true,
+      "sistema": true,
+      "skills": []
+    }
+  ],
+  "rotas": {
+    "lider": "lider_criativo",
+    "estrategia": "estrategista_marca",
+    "pesquisa": "pesquisa_visual",
+    "dt": "design_thinking",
+    "campanha": "estrategista_campanha",
+    "arte": "diretor_arte",
+    "identidade": "identidade_marca",
+    "grafico": "designer_grafico",
+    "tipografia": "tipografia",
+    "editorial": "editorial",
+    "informacao": "informacao",
+    "embalagem": "embalagem",
+    "sinalizacao": "ambiental",
+    "ilustracao": "ilustrador",
+    "personagens": "personagens",
+    "padronagem": "padronagem",
+    "foto": "fotografia",
+    "3d": "visualizacao",
+    "motion": "motion",
+    "storyboard": "storyboard",
+    "social": "social_media",
+    "copy": "conteudo_copy",
+    "impressao": "preimpressao",
+    "qa": "qa_visual",
+    "assets": "entrega_assets",
+    "mcp": "mcp",
+    "creditos": "creditos",
+    "equipe": "lider_criativo",
+    "curadoria": "entrega_assets"
+  },
+  "aliases": {
+    "marca": "estrategista_marca",
+    "posicionamento": "estrategista_marca",
+    "branding": "estrategista_marca",
+    "referencias": "pesquisa_visual",
+    "tendencias": "pesquisa_visual",
+    "workshop": "design_thinking",
+    "ideacao": "design_thinking",
+    "campanhas": "estrategista_campanha",
+    "moodboard": "diretor_arte",
+    "direcao": "diretor_arte",
+    "logo": "identidade_marca",
+    "brandbook": "identidade_marca",
+    "cartaz": "designer_grafico",
+    "poster": "designer_grafico",
+    "flyer": "designer_grafico",
+    "banner": "designer_grafico",
+    "fonte": "tipografia",
+    "lettering": "tipografia",
+    "livro": "editorial",
+    "catalogo": "editorial",
+    "revista": "editorial",
+    "infografico": "informacao",
+    "apresentacao": "informacao",
+    "slides": "informacao",
+    "rotulo": "embalagem",
+    "packaging": "embalagem",
+    "wayfinding": "ambiental",
+    "placa": "ambiental",
+    "ilustrar": "ilustrador",
+    "icones": "ilustrador",
+    "mascote": "personagens",
+    "personagem": "personagens",
+    "estampa": "padronagem",
+    "pattern": "padronagem",
+    "retoque": "fotografia",
+    "fotos": "fotografia",
+    "render": "visualizacao",
+    "mockup": "visualizacao",
+    "animacao": "motion",
+    "vinheta": "motion",
+    "roteiro": "storyboard",
+    "post": "social_media",
+    "carrossel": "social_media",
+    "stories": "social_media",
+    "texto": "conteudo_copy",
+    "legenda": "conteudo_copy",
+    "calendario": "conteudo_copy",
+    "grafica": "preimpressao",
+    "preflight": "preimpressao",
+    "cmyk": "preimpressao",
+    "revisao": "qa_visual",
+    "auditoria": "qa_visual",
+    "exportar": "entrega_assets",
+    "arquivos": "entrega_assets",
+    "conexao": "mcp",
+    "figma": "mcp",
+    "higgsfield": "mcp",
+    "credito": "creditos",
+    "uso": "creditos",
+    "orcamento": "creditos"
+  },
+  "contrato": {
+    "fluxo": "leve",
+    "dominios": {
+      "marca": "identidade_marca",
+      "tipografia": "tipografia",
+      "ilustracao": "ilustrador",
+      "impressao": "preimpressao",
+      "motion": "motion",
+      "social": "social_media",
+      "copy": "conteudo_copy",
+      "entrega": "entrega_assets",
+      "qa": "qa_visual",
+      "direcao": "diretor_arte",
+      "estrategia": "estrategista_marca",
+      "editorial": "editorial",
+      "embalagem": "embalagem",
+      "foto": "fotografia",
+      "3d": "visualizacao"
+    },
+    "palavras": {
+      "marca": [
+        "logo",
+        "logotipo",
+        "identidade",
+        "símbolo",
+        "simbolo",
+        "marca",
+        "paleta",
+        "manual de marca"
+      ],
+      "tipografia": [
+        "fonte",
+        "tipografia",
+        "lettering",
+        "kerning",
+        "entrelinha",
+        "família tipográfica"
+      ],
+      "ilustracao": [
+        "ilustração",
+        "ilustracao",
+        "concept",
+        "desenho",
+        "personagem",
+        "mascote"
+      ],
+      "impressao": [
+        "impressão",
+        "impressao",
+        "sangria",
+        "cmyk",
+        "gráfica",
+        "grafica",
+        "pdf/x",
+        "prova",
+        "papel"
+      ],
+      "motion": [
+        "animação",
+        "animacao",
+        "motion",
+        "vídeo",
+        "video",
+        "after effects",
+        "lottie"
+      ],
+      "social": [
+        "instagram",
+        "post",
+        "stories",
+        "carrossel",
+        "social",
+        "feed",
+        "reels"
+      ],
+      "copy": [
+        "copy",
+        "texto",
+        "headline",
+        "slogan",
+        "legenda",
+        "tom de voz"
+      ],
+      "entrega": [
+        "exportar",
+        "exportação",
+        "exportacao",
+        "svg",
+        "png",
+        "asset",
+        "entrega",
+        "pasta final",
+        "nomenclatura"
+      ],
+      "qa": [
+        "auditoria",
+        "conformidade",
+        "consistência",
+        "consistencia",
+        "qa visual"
+      ],
+      "direcao": [
+        "direção de arte",
+        "direcao de arte",
+        "conceito",
+        "moodboard",
+        "referência",
+        "referencia"
+      ],
+      "estrategia": [
+        "posicionamento",
+        "público",
+        "publico",
+        "proposta de valor",
+        "arquétipo",
+        "arquetipo"
+      ],
+      "editorial": [
+        "revista",
+        "livro",
+        "diagramação",
+        "diagramacao",
+        "editorial",
+        "grid"
+      ],
+      "embalagem": [
+        "embalagem",
+        "rótulo",
+        "rotulo",
+        "caixa",
+        "faca"
+      ],
+      "foto": [
+        "foto",
+        "fotografia",
+        "tratamento",
+        "retoque"
+      ],
+      "3d": [
+        "mockup",
+        "3d",
+        "render",
+        "visualização",
+        "visualizacao"
+      ]
+    },
+    "checagens": [
+      {
+        "nome": "arquivos da entrega existem",
+        "tipo": "arquivos"
+      },
+      {
+        "nome": "imagens abrem e têm dimensões",
+        "tipo": "imagem"
+      }
+    ],
+    "entregas": "Entrega é arquivo final na pasta do projeto (SVG, PNG, PDF, AI, FIG exportado) nas dimensões pedidas, mais a especificação (cores em HEX/CMYK, fontes, medidas, margens). O app confere que os arquivos existem e abrem; descrição sem arquivo não é entrega. Liste os caminhos no campo arquivos do card.",
+    "revisao": {
+      "nome": "crítica de design",
+      "instrucao": "Revise como crítica de design: abra cada arquivo entregue e compare com o briefing e com o sistema da marca (cores, tipografia, grid, hierarquia, legibilidade, consistência entre peças, acessibilidade de contraste). Aponte o que diverge citando o arquivo e o motivo. Não aprove por descrição: só pelo que você viu no arquivo."
+    }
+  }
+}

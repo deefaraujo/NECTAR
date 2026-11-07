@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {calcularTeamwork,compararBenchmark} from '../lib/teamwork-metrics.mjs';
+const start='2026-11-03T12:00:00Z';
+const result=calcularTeamwork({tasks:[{taskId:'a',status:'completed',createdAt:start,completedAt:'2026-11-03T12:01:00Z',usage:{calls:3,tokens:100,cost:1},submissionCount:1},{taskId:'b',status:'failed',createdAt:start,usage:{calls:2,tokens:50,cost:2},submissionCount:1}],attempts:[],handoffs:[],events:[]});
+assert.equal(result.ttvdMs.p50,60000);assert.equal(result.knownModelCost,3);assert.equal(result.completionRate,.5);assert.equal(result.firstPassAcceptance,.5);assert.equal(result.costPerValidatedDelivery,null);
+const run={workload:'bug',variant:'teamwork',mode:'stub',validated:true,ttvdMs:1,totalCost:0,baselineCommit:'abc',acceptanceHash:'x',toolsHash:'t',budgetHash:'b'};
+assert.equal(compararBenchmark([run])[0].promotion,'insufficient_evidence');assert.equal(compararBenchmark([run])[0].speedup,null);
+const repeated=[];for(const variant of ['solo','nectar_baseline','teamwork'])for(let n=0;n<5;n++)repeated.push({...run,taskId:'same-task',repeat:n,mode:'real',variant});
+assert.equal(compararBenchmark(repeated)[0].sufficient,false);
+const real=[];for(const variant of ['solo','nectar_baseline','teamwork'])for(let n=0;n<5;n++)real.push({...run,taskId:`task-${n}`,mode:'real',variant,ttvdMs:variant==='solo'?300:100,totalCost:1});
+assert.equal(compararBenchmark(real)[0].speedup,3);real[0].validated=false;assert.equal(compararBenchmark(real)[0].speedup,null);
+console.log('PASS: métricas preservam falhas, custo incompleto não vira zero e benchmark stub/amostra insuficiente não promove estratégia.');

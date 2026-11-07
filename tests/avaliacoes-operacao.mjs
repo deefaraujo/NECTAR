@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { criarOrganizador, validarRegistroOperacional } from '../lib/avaliacoes-operacao.mjs';
+let dados=null,gravacoes=0;
+const o=criarOrganizador({lerImpl:(_a,p)=>structuredClone(dados||p),gravarImpl:(_a,s)=>{dados=structuredClone(s);gravacoes++;},agora:()=> '2026-11-06T12:00:00.000Z'});
+const b={titulo:'Registro manual',referencia:'ID de teste',status:'aguardando_modelos',etapa:'respostas',turno:1,proximoPasso:'Retomar a leitura',pendencia:'',notas:'Nota operacional',checks:{login:true}};
+const t=o.criar({...b,prompt:'não deve persistir',transcript:'não deve persistir'});
+assert.equal(t.versao,1);assert.equal(t.checks.login,true);assert.equal(t.checks.licenca,false);
+assert.ok(!('prompt' in t)&&!('transcript' in t));
+const u=o.atualizar(t.id,{...b,versao:1,status:'pendencia',pendencia:'Acesso indisponível'});
+assert.equal(u.versao,2);assert.equal(o.listar().tarefas[0].pendencia,'Acesso indisponível');
+assert.throws(()=>o.atualizar(t.id,{...b,versao:1}),e=>e.status===409);
+assert.equal(gravacoes,2);
+assert.throws(()=>validarRegistroOperacional({...b,titulo:''}));
+assert.throws(()=>validarRegistroOperacional({...b,status:'aprovado_pela_ia'}));
+assert.throws(()=>validarRegistroOperacional({...b,turno:0}));
+assert.throws(()=>validarRegistroOperacional({...b,checks:{login:'sim'}}));
+console.log('Organizador manual: persistência, retomada, versão concorrente, whitelist de campos e validação passaram. Nenhum modelo é chamado.');

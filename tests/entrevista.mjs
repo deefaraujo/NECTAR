@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { validarAcao, decidirEntrevista } from '../lib/entrevista.mjs';
+for(const a of [{tipo:'clicar',x:0,y:1},{tipo:'digitar',texto:'Olá, experiência!'},{tipo:'tecla',tecla:'TAB'},{tipo:'rolar',passos:-2},{tipo:'concluir'}]) assert.equal(validarAcao(a),a);
+for(const a of [{tipo:'executar'},{tipo:'clicar',x:Infinity,y:0},{tipo:'clicar',x:2,y:0},{tipo:'tecla',tecla:'WIN'},{tipo:'rolar',passos:100},{tipo:'digitar',texto:'a'.repeat(4001)}]) assert.throws(()=>validarAcao(a));
+const anterior=process.env.NECTAR_VISAO_MODELO;
+process.env.NECTAR_VISAO_MODELO='teste-visual';
+const entrada={curriculo:'Analista de sistemas',quadro:'data:image/jpeg;base64,YWJj',historico:[]};
+let chamadas=0;
+const fetchImpl=async(url,op)=>{chamadas++;assert.ok(url.endsWith('/api/chat'));const b=JSON.parse(op.body);assert.equal(b.messages[1].images[0],'YWJj');assert.equal(b.model,'teste-visual');assert.equal(b.stream,false);return {ok:true,json:async()=>({message:{content:'{"tipo":"clicar","x":0.2,"y":0.3}'}})};};
+assert.equal((await decidirEntrevista(entrada,{fetchImpl})).tipo,'clicar');assert.equal(chamadas,1);
+await assert.rejects(()=>decidirEntrevista({...entrada,quadro:'file:///segredo'},{fetchImpl}));
+await assert.rejects(()=>decidirEntrevista(entrada,{fetchImpl:async()=>({ok:true,json:async()=>({message:{content:'{"tipo":"shell"}'}})})}));
+await assert.rejects(()=>decidirEntrevista(entrada,{fetchImpl:async()=>({ok:false,status:503})}),/503/);
+if(anterior===undefined)delete process.env.NECTAR_VISAO_MODELO;else process.env.NECTAR_VISAO_MODELO=anterior;
+console.log('Entrevista: contrato visual, limites e falhas validados (motor simulado).');

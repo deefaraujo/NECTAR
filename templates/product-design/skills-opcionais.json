@@ -1,0 +1,620 @@
+{
+  "schema": "nectar.skills-opcionais.v1",
+  "skills": [
+    {
+      "id": "ab-testing",
+      "origem": "https://github.com/coreyhaines31/marketingskills",
+      "distribuido": false
+    },
+    {
+      "id": "accessibility",
+      "origem": "https://github.com/addyosmani/web-quality-skills",
+      "distribuido": false
+    },
+    {
+      "id": "accessibility-compliance",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "accessibility-review",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "api-design-principles",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "architecture-decision-records",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "architecture-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "art-consistency",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "art-direction",
+      "origem": "https://github.com/rampstackco/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "belief-systems",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "card-sort-analysis",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "character-arc",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "character-design",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "ci-cd-and-automation",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "cinematography",
+      "origem": "https://github.com/fal-ai-community/skills",
+      "distribuido": false
+    },
+    {
+      "id": "code-review-and-quality",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "color-palette",
+      "origem": "https://github.com/jezweb/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "create-game-assets",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "create-prd",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "customer-journey-map",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "customer-research",
+      "origem": "https://github.com/coreyhaines31/marketingskills",
+      "distribuido": false
+    },
+    {
+      "id": "deployment-pipeline-design",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "design-handoff",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "design-system-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "design-tokens",
+      "origem": "https://github.com/julianoczkowski/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "dialogue",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "documentation",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "documentation-and-adrs",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "e2e-testing-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "fastapi-templates",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "frontend-design",
+      "origem": "https://github.com/anthropics/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-balance-economy",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-design-docs",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-feel",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-interface-feedback",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-mechanics-design",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-playtest-planning",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-prototype-loop",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-ui-ux",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "gitlab-ci-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "godot-gdscript-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "governance-systems",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "heuristic-evaluation",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "identify-assumptions-new",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "information-architecture",
+      "origem": "https://github.com/julianoczkowski/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "interaction-design",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "interactive-fiction",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "interview-script",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "javascript-testing-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "job-stories",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "journey-map",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "knowledge-synthesis",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "kpi-dashboard-design",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "level-design",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "line-editing",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "localization-strategy",
+      "origem": "https://github.com/kostja94/marketing-skills",
+      "distribuido": false
+    },
+    {
+      "id": "metrics-dashboard",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "micro-interaction-spec",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "microinteractions",
+      "origem": "https://github.com/wondelai/skills",
+      "distribuido": false
+    },
+    {
+      "id": "nodejs-backend-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "north-star-metric",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "opportunity-solution-tree",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "outcome-roadmap",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "pixel-art-sprites",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "planning-and-task-breakdown",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "player-experience-modeling",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "playwright-best-practices",
+      "origem": "https://github.com/currents-dev/playwright-best-practices-skill",
+      "distribuido": false
+    },
+    {
+      "id": "plot-structure",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "pre-mortem",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "prioritize-features",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "product-strategy",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "product-vision",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "prototype-strategy",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "python-testing-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "refactoring-ui",
+      "origem": "https://github.com/wondelai/skills",
+      "distribuido": false
+    },
+    {
+      "id": "research-repository",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "revision-continuity",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "secrets-management",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "security-and-hardening",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "security-requirement-extraction",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "series-continuity",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "service-blueprint",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sonic-branding",
+      "origem": "https://github.com/guia-matthieu/clawfu-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sound-design-film",
+      "origem": "https://github.com/guia-matthieu/clawfu-skills",
+      "distribuido": false
+    },
+    {
+      "id": "spec-driven-development",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sprint-plan",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "stakeholder-map",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "startup-metrics-framework",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "story-analysis",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "stride-analysis-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "summarize-interview",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "summarize-meeting",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-character-conflict",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-dialogue",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-scene-craft",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-story-structure",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "systematic-debugging",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "systemic-worldbuilding",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "team-composition-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "test-driven-development",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "test-scenarios",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "threat-mitigation-mapping",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "translation",
+      "origem": "https://github.com/kostja94/marketing-skills",
+      "distribuido": false
+    },
+    {
+      "id": "unity-ecs-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "unreal-blueprints",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "unreal-cpp-gameplay",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "usability-test-plan",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "usability-testing",
+      "origem": "https://github.com/rampstackco/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "user-personas",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "user-stories",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "ux-copy",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "ux-heuristics",
+      "origem": "https://github.com/wondelai/skills",
+      "distribuido": false
+    },
+    {
+      "id": "ux-sound-design",
+      "origem": "https://github.com/guia-matthieu/clawfu-skills",
+      "distribuido": false
+    },
+    {
+      "id": "ux-writing",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "vercel-composition-patterns",
+      "origem": "https://github.com/vercel-labs/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "vercel-react-best-practices",
+      "origem": "https://github.com/vercel-labs/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "verification-before-completion",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "voice-style",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "voiceover-direction",
+      "origem": "https://github.com/guia-matthieu/clawfu-skills",
+      "distribuido": false
+    },
+    {
+      "id": "wcag-audit-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "web-design-guidelines",
+      "origem": "https://github.com/vercel-labs/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "webapp-testing",
+      "origem": "https://github.com/anthropics/skills",
+      "distribuido": false
+    },
+    {
+      "id": "worldbuilding",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    }
+  ]
+}

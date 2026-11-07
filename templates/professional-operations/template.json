@@ -1,0 +1,429 @@
+{
+  "id": "professional-operations",
+  "nome": "Assessoria Profissional",
+  "descricao": "Escritório executivo liderado pelo seu Chief of Staff: reconstrói o que você fez a partir de registros reais (Git, quadros das outras equipes, Jira, Notion, agenda e e-mail), analisa resultados e produz Reviews, relatórios, apresentações e roteiros de fala com evidência rastreável.",
+  "rascunho": false,
+  "papeis": {
+    "lead": "chief_of_staff",
+    "qa": "qa_evidencias",
+    "curador": "conhecimento",
+    "creditos": "creditos"
+  },
+  "agentes": [
+    {
+      "id": "chief_of_staff",
+      "nome": "Helena",
+      "cargo": "Chief of Staff",
+      "papel": "Seu assessor: recebe o pedido, monta a menor equipe e entrega o pacote final",
+      "cor": "#F4C540",
+      "sigla": "CS",
+      "glifo": "bussola",
+      "token": "assessor",
+      "somenteLeitura": true,
+      "skills": [
+        "fluxos-assessoria",
+        "review-intelligence",
+        "enterprise-source-discovery",
+        "enterprise-data-governance",
+        "status-report",
+        "stakeholder-update",
+        "report-builder",
+        "pacote-apresentacao",
+        "render-slides"
+      ]
+    },
+    {
+      "id": "conhecimento",
+      "nome": "Otávio",
+      "cargo": "Conhecimento",
+      "papel": "Registro dos projetos, documentos, decisões, versões e origem de cada informação",
+      "cor": "#B59BE8",
+      "sigla": "KM",
+      "glifo": "memoria",
+      "token": "conhecimento",
+      "somenteLeitura": true,
+      "skills": [
+        "knowledge-synthesis",
+        "source-management",
+        "search-strategy",
+        "notion-project-knowledge",
+        "work-activity-ledger"
+      ]
+    },
+    {
+      "id": "coletor",
+      "nome": "Rafa",
+      "cargo": "Coleta de evidências",
+      "papel": "Busca nas fontes autorizadas o que foi feito: commits, issues, documentos, agenda e e-mail",
+      "cor": "#4FC3F7",
+      "sigla": "CO",
+      "glifo": "busca",
+      "token": "coletor",
+      "somenteLeitura": true,
+      "skills": [
+        "work-activity-ledger",
+        "search-strategy",
+        "source-management",
+        "jira-work-history",
+        "teams-project-context",
+        "enterprise-sync-health",
+        "pacote-apresentacao"
+      ]
+    },
+    {
+      "id": "progresso",
+      "nome": "Lívia",
+      "cargo": "Atividades e progresso",
+      "papel": "Linha do tempo do trabalho, marcos, comparação entre períodos e bloqueios",
+      "cor": "#81C784",
+      "sigla": "AP",
+      "glifo": "relogio",
+      "token": "progresso",
+      "somenteLeitura": true,
+      "skills": [
+        "work-activity-ledger",
+        "digest",
+        "cross-source-correlation",
+        "sprint-planning"
+      ]
+    },
+    {
+      "id": "contribuicao",
+      "nome": "Caio",
+      "cargo": "Contribuições e entregas",
+      "papel": "Separa o que é seu, coautoria, revisão, teste e coordenação, com a evidência de cada um",
+      "cor": "#FFB74D",
+      "sigla": "CE",
+      "glifo": "blocos",
+      "token": "contribuicao",
+      "somenteLeitura": true,
+      "skills": [
+        "contribution-attribution",
+        "work-activity-ledger",
+        "performance-review"
+      ]
+    },
+    {
+      "id": "projetos",
+      "nome": "Bianca",
+      "cargo": "Análise de projetos",
+      "papel": "Objetivos, escopo, experimentos, decisões técnicas e o que de fato foi obtido",
+      "cor": "#9575CD",
+      "sigla": "AN",
+      "glifo": "fluxo",
+      "token": "projetos",
+      "somenteLeitura": true,
+      "skills": [
+        "review-intelligence",
+        "research-synthesis",
+        "cross-source-correlation"
+      ]
+    },
+    {
+      "id": "desempenho",
+      "nome": "Diego",
+      "cargo": "Desempenho e impacto",
+      "papel": "Métricas e impacto medido, sem confundir correlação com causa",
+      "cor": "#4DB6AC",
+      "sigla": "DI",
+      "glifo": "raio",
+      "token": "desempenho",
+      "somenteLeitura": true,
+      "skills": [
+        "metrics-review",
+        "validate-data",
+        "data-visualization"
+      ]
+    },
+    {
+      "id": "riscos",
+      "nome": "Sofia",
+      "cargo": "Riscos e próximos passos",
+      "papel": "Bloqueios, dependências, decisões pendentes e recomendações (nunca como compromisso aprovado)",
+      "cor": "#E57373",
+      "sigla": "RP",
+      "glifo": "escudo",
+      "token": "riscos",
+      "somenteLeitura": true,
+      "skills": [
+        "risk-assessment",
+        "review-intelligence"
+      ]
+    },
+    {
+      "id": "relatorios",
+      "nome": "Marina",
+      "cargo": "Relatórios",
+      "papel": "Relatórios técnicos e executivos que separam fato, análise, hipótese e recomendação",
+      "cor": "#90A4AE",
+      "sigla": "RE",
+      "glifo": "pena",
+      "token": "relatorios",
+      "skills": [
+        "report-builder",
+        "internal-comms",
+        "status-report",
+        "documentos-editaveis"
+      ]
+    },
+    {
+      "id": "narrativa",
+      "nome": "Téo",
+      "cargo": "Narrativa executiva",
+      "papel": "Mensagens-chave e roteiro da história para o público certo, sem exagerar resultado",
+      "cor": "#F06292",
+      "sigla": "NE",
+      "glifo": "dialogos",
+      "token": "narrativa",
+      "somenteLeitura": true,
+      "skills": [
+        "stakeholder-update",
+        "internal-comms",
+        "review-intelligence"
+      ]
+    },
+    {
+      "id": "arquitetura_slides",
+      "nome": "Luana",
+      "cargo": "Arquitetura de apresentação",
+      "papel": "Sequência dos slides, mensagem de cada um, onde entra cada evidência e as notas",
+      "cor": "#7986CB",
+      "sigla": "AS",
+      "glifo": "layout",
+      "token": "slides",
+      "skills": [
+        "data-visualization",
+        "presentation-rehearsal",
+        "pacote-apresentacao"
+      ]
+    },
+    {
+      "id": "design_slides",
+      "nome": "Nico",
+      "cargo": "Design de apresentação",
+      "papel": "PPTX editável e consistente, gráficos e diagramas, conferido arquivo por arquivo",
+      "cor": "#26A69A",
+      "sigla": "DS",
+      "glifo": "imagem",
+      "token": "design",
+      "skills": [
+        "documentos-editaveis",
+        "ppt-template-creator",
+        "theme-factory",
+        "data-visualization",
+        "brand-presentation-registry",
+        "render-slides",
+        "pacote-apresentacao"
+      ]
+    },
+    {
+      "id": "marca",
+      "nome": "Clara",
+      "cargo": "Identidade e marca",
+      "papel": "Aplica a identidade aprovada de cada empresa e produto; sem identidade, marca a proposta como provisória",
+      "cor": "#BA68C8",
+      "sigla": "IM",
+      "glifo": "globo",
+      "token": "marca",
+      "somenteLeitura": true,
+      "skills": [
+        "brand-presentation-registry",
+        "brand-review",
+        "theme-factory"
+      ]
+    },
+    {
+      "id": "qa_evidencias",
+      "nome": "Vera",
+      "cargo": "QA de evidências",
+      "papel": "Confere fonte, data, métrica e atribuição de cada afirmação e a integridade dos arquivos",
+      "cor": "#EF5350",
+      "sigla": "QE",
+      "glifo": "cadeado",
+      "token": "qa",
+      "somenteLeitura": true,
+      "skills": [
+        "presentation-evidence-qa",
+        "validate-data",
+        "enterprise-data-governance",
+        "render-slides",
+        "pacote-apresentacao"
+      ]
+    },
+    {
+      "id": "reunioes",
+      "nome": "Paulo",
+      "cargo": "Preparação de reuniões",
+      "papel": "Briefing, pauta, contexto das pessoas e perguntas prováveis (como hipótese)",
+      "cor": "#FFD54F",
+      "sigla": "PR",
+      "glifo": "livro",
+      "token": "reunioes",
+      "somenteLeitura": true,
+      "skills": [
+        "presentation-rehearsal",
+        "teams-project-context",
+        "standup",
+        "pacote-apresentacao"
+      ]
+    },
+    {
+      "id": "comunicacao",
+      "nome": "Júlia",
+      "cargo": "Comunicação e fala",
+      "papel": "Roteiro completo e curto, notas do apresentador e ensaio dentro do tempo",
+      "cor": "#A1887F",
+      "sigla": "CF",
+      "glifo": "dialogos",
+      "token": "comunicacao",
+      "somenteLeitura": true,
+      "skills": [
+        "presentation-rehearsal",
+        "internal-comms",
+        "pacote-apresentacao"
+      ]
+    },
+    {
+      "id": "mcp",
+      "nome": "Max",
+      "cargo": "MCP",
+      "papel": "Conexões com outras ferramentas por MCP",
+      "cor": "#26C6DA",
+      "sigla": "MC",
+      "glifo": "plug",
+      "token": "mcp",
+      "skills": []
+    },
+    {
+      "id": "creditos",
+      "nome": "Cris",
+      "cargo": "Créditos",
+      "papel": "Uso e orçamento",
+      "cor": "#E5B84B",
+      "sigla": "CR",
+      "glifo": "relogio",
+      "token": "creditos",
+      "somenteLeitura": true,
+      "sistema": true,
+      "skills": []
+    }
+  ],
+  "rotas": {
+    "equipe": "chief_of_staff",
+    "assessor": "chief_of_staff",
+    "lead": "chief_of_staff",
+    "conhecimento": "conhecimento",
+    "fontes": "conhecimento",
+    "coleta": "coletor",
+    "evidencias": "coletor",
+    "progresso": "progresso",
+    "linha-do-tempo": "progresso",
+    "contribuicao": "contribuicao",
+    "entregas": "contribuicao",
+    "projetos": "projetos",
+    "desempenho": "desempenho",
+    "metricas": "desempenho",
+    "riscos": "riscos",
+    "proximos-passos": "riscos",
+    "relatorio": "relatorios",
+    "narrativa": "narrativa",
+    "slides": "arquitetura_slides",
+    "design": "design_slides",
+    "pptx": "design_slides",
+    "marca": "marca",
+    "qa": "qa_evidencias",
+    "reuniao": "reunioes",
+    "fala": "comunicacao",
+    "roteiro": "comunicacao",
+    "mcp": "mcp",
+    "creditos": "creditos"
+  },
+  "aliases": {
+    "professional-chief-of-staff": "chief_of_staff",
+    "chief": "chief_of_staff",
+    "assessora": "chief_of_staff",
+    "work-knowledge-manager": "conhecimento",
+    "work-intelligence-collector": "coletor",
+    "activity-progress-analyst": "progresso",
+    "contribution-deliverables-analyst": "contribuicao",
+    "project-intelligence-analyst": "projetos",
+    "performance-impact-analyst": "desempenho",
+    "risk-next-steps-analyst": "riscos",
+    "technical-business-report-writer": "relatorios",
+    "executive-storytelling-specialist": "narrativa",
+    "presentation-architect": "arquitetura_slides",
+    "corporate-presentation-designer": "design_slides",
+    "brand-compliance-specialist": "marca",
+    "evidence-documentation-qa": "qa_evidencias",
+    "meeting-preparation-specialist": "reunioes",
+    "professional-communication-coach": "comunicacao"
+  },
+  "contrato": {
+    "fluxo": "leve",
+    "dominios": {
+      "evidencias": "coletor",
+      "relatorios": "relatorios",
+      "slides": "design_slides",
+      "reunioes": "reunioes",
+      "riscos": "riscos",
+      "narrativa": "narrativa"
+    },
+    "palavras": {
+      "evidencias": [
+        "evidência",
+        "evidencia",
+        "ledger",
+        "fonte",
+        "rastreável",
+        "rastreavel",
+        "commit",
+        "card"
+      ],
+      "relatorios": [
+        "relatório",
+        "relatorio",
+        "review",
+        "pdf",
+        "resumo executivo"
+      ],
+      "slides": [
+        "slide",
+        "apresentação",
+        "apresentacao",
+        "deck",
+        "pptx"
+      ],
+      "reunioes": [
+        "reunião",
+        "reuniao",
+        "pauta",
+        "agenda",
+        "1:1"
+      ],
+      "riscos": [
+        "risco",
+        "impedimento",
+        "próximo passo",
+        "proximo passo"
+      ],
+      "narrativa": [
+        "narrativa",
+        "história",
+        "historia",
+        "mensagem",
+        "storytelling"
+      ]
+    },
+    "checagens": [
+      {
+        "nome": "arquivos da entrega existem",
+        "tipo": "arquivos"
+      }
+    ],
+    "entregas": "Entrega é documento ou apresentação na pasta do projeto, com cada afirmação ligada a uma evidência do ledger. O app confere que os arquivos existem.",
+    "revisao": {
+      "nome": "revisão de evidências",
+      "instrucao": "Confira que cada afirmação tem evidência rastreável no ledger (fonte, data, autor). Não aceite número sem fonte nem adjetivo sem fato."
+    }
+  }
+}

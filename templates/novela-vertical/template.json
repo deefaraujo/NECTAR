@@ -1,0 +1,336 @@
+{
+  "id": "novela-vertical",
+  "nome": "Novela Vertical",
+  "categoria": "audiovisual",
+  "descricao": "Produtora de novela vertical (9:16): da história que você conta até o storyboard animado de cada cena. Mantém a bíblia da série com a ficha e as referências aprovadas de cada personagem, gera os quadros pelo ChatGPT com essas referências e monta o GIF da cena.",
+  "rascunho": false,
+  "papeis": {
+    "lead": "showrunner",
+    "qa": "continuidade",
+    "creditos": "creditos"
+  },
+  "agentes": [
+    {
+      "id": "showrunner",
+      "nome": "Marta",
+      "cargo": "Showrunner",
+      "papel": "Recebe a história, organiza temporada, episódios e cenas, e conduz cada cena até o storyboard aprovado",
+      "cor": "#F4C540",
+      "sigla": "SR",
+      "glifo": "bussola",
+      "token": "showrunner",
+      "somenteLeitura": true,
+      "skills": [
+        "planning-and-task-breakdown",
+        "team-composition-patterns",
+        "plot-structure",
+        "pre-mortem",
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "roteiro",
+      "nome": "Caio",
+      "cargo": "Roteiro",
+      "papel": "Escreve episódios e cenas no ritmo de novela vertical: gancho nos primeiros segundos, virada, cliffhanger",
+      "cor": "#F2994A",
+      "sigla": "RO",
+      "glifo": "blocos",
+      "token": "roteiro",
+      "skills": [
+        "sw-story-structure",
+        "sw-scene-craft",
+        "sw-dialogue",
+        "sw-character-conflict",
+        "plot-structure",
+        "voice-style"
+      ]
+    },
+    {
+      "id": "continuidade",
+      "nome": "Lia",
+      "cargo": "Continuidade",
+      "papel": "Dona da bíblia da série: ficha e referências aprovadas de cada personagem e cenário; confere cada quadro contra a ficha",
+      "cor": "#B59BE8",
+      "sigla": "CT",
+      "glifo": "memoria",
+      "token": "continuidade",
+      "skills": [
+        "series-continuity",
+        "revision-continuity",
+        "art-consistency",
+        "character-design",
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "diretor_arte",
+      "nome": "Teo",
+      "cargo": "Direção de arte",
+      "papel": "Define o estilo visual da série e gera os quadros de cada cena com as referências da bíblia",
+      "cor": "#4FC3F7",
+      "sigla": "DA",
+      "glifo": "busca",
+      "token": "arte",
+      "skills": [
+        "art-direction",
+        "art-consistency",
+        "illustration-style",
+        "color-palette",
+        "character-design",
+        "cinematography"
+      ]
+    },
+    {
+      "id": "storyboard",
+      "nome": "Nina",
+      "cargo": "Storyboard e montagem",
+      "papel": "Quebra a cena em planos 9:16, define o tempo de cada quadro e monta o storyboard animado (GIF)",
+      "cor": "#81C784",
+      "sigla": "SB",
+      "glifo": "relogio",
+      "token": "storyboard",
+      "skills": [
+        "cinematography",
+        "animation-principles",
+        "sw-scene-craft",
+        "art-consistency"
+      ]
+    },
+    {
+      "id": "mcp",
+      "nome": "Max",
+      "cargo": "MCP",
+      "papel": "Conexões com outras ferramentas por MCP (Figma, geração de imagem e outras)",
+      "cor": "#26C6DA",
+      "sigla": "MC",
+      "glifo": "plug",
+      "token": "mcp",
+      "skills": []
+    },
+    {
+      "id": "creditos",
+      "nome": "Cris",
+      "cargo": "Créditos",
+      "papel": "Uso e orçamento",
+      "cor": "#E5B84B",
+      "sigla": "CR",
+      "glifo": "relogio",
+      "token": "creditos",
+      "somenteLeitura": true,
+      "sistema": true,
+      "skills": []
+    }
+  ],
+  "rotas": {
+    "showrunner": "showrunner",
+    "lider": "showrunner",
+    "roteiro": "roteiro",
+    "continuidade": "continuidade",
+    "biblia": "continuidade",
+    "arte": "diretor_arte",
+    "storyboard": "storyboard",
+    "montagem": "storyboard"
+  },
+  "aliases": {
+    "roteirista": "roteiro",
+    "biblia": "continuidade",
+    "ficha": "continuidade",
+    "diretordearte": "diretor_arte",
+    "montagem": "storyboard",
+    "gif": "storyboard"
+  },
+  "contrato": {
+    "fluxo": "leve",
+    "dominios": {
+      "roteiro": "roteiro",
+      "continuidade": "continuidade",
+      "arte": "diretor_arte",
+      "storyboard": "storyboard"
+    },
+    "palavras": {
+      "roteiro": [
+        "roteiro",
+        "episódio",
+        "episodio",
+        "diálogo",
+        "dialogo",
+        "cena escrita",
+        "cliffhanger",
+        "gancho",
+        "sinopse",
+        "temporada"
+      ],
+      "continuidade": [
+        "ficha",
+        "bíblia",
+        "biblia",
+        "referência",
+        "referencia",
+        "personagem",
+        "figurino",
+        "continuidade",
+        "aparência",
+        "aparencia"
+      ],
+      "arte": [
+        "estilo",
+        "imagem",
+        "quadro",
+        "paleta",
+        "visual",
+        "cenário",
+        "cenario",
+        "prompt"
+      ],
+      "storyboard": [
+        "storyboard",
+        "gif",
+        "plano",
+        "enquadramento",
+        "montagem",
+        "animado",
+        "timing"
+      ]
+    },
+    "checagens": [
+      {
+        "nome": "arquivos da entrega existem",
+        "tipo": "arquivos"
+      },
+      {
+        "nome": "imagens abrem e têm dimensões",
+        "tipo": "imagem"
+      }
+    ],
+    "entregas": "Entrega é arquivo na pasta do projeto: roteiro em episodios/epNN/roteiro.md, quadros em episodios/epNN/cenaNN/quadros/, GIF da cena anexado no chat com gif.montar, e ficha atualizada em biblia/. Descrição sem arquivo não é entrega.",
+    "revisao": {
+      "nome": "conferência de continuidade",
+      "instrucao": "Abra cada quadro entregue e compare com a ficha e as referências aprovadas de cada personagem em biblia/personagens/: rosto, cabelo, corpo, figurino da fase, paleta e estilo da série. Aponte o quadro e o que diverge. Não aprove por descrição: só pelo que você viu na imagem."
+    }
+  },
+  "registro": {
+    "vista": "Produção",
+    "tipos": {
+      "serie": {
+        "titulo": "Série",
+        "sempre": true,
+        "descricao": "logline, gênero, tom, público, formato",
+        "plural": "Série",
+        "pedidos": [
+          {
+            "rotulo": "Estruturar a temporada",
+            "agente": "showrunner",
+            "texto": "a partir da ficha da série {nome}, proponha a temporada: lista de episódios com o gancho de cada um, para eu aprovar antes de escrever."
+          },
+          {
+            "rotulo": "Propor o estilo visual",
+            "agente": "diretor_arte",
+            "texto": "proponha o estilo visual da série {nome} e anote na ficha Estilo visual; gere 2 testes de imagem para eu escolher."
+          }
+        ]
+      },
+      "estilo": {
+        "titulo": "Estilo visual",
+        "sempre": true,
+        "descricao": "prompt-base de estilo que entra em toda imagem",
+        "plural": "Estilo visual",
+        "pedidos": [
+          {
+            "rotulo": "Gerar um teste de estilo",
+            "agente": "diretor_arte",
+            "texto": "gere um teste de imagem com o estilo visual {nome} para eu aprovar como referência."
+          },
+          {
+            "rotulo": "Conferir as fichas contra o estilo",
+            "agente": "continuidade",
+            "texto": "confira se as fichas de personagem e cenário estão coerentes com o estilo visual {nome} e me diga o que destoa."
+          }
+        ]
+      },
+      "personagem": {
+        "titulo": "Personagem",
+        "descricao": "aparência, figurino, jeito, prompt-base e referências aprovadas",
+        "plural": "Personagens",
+        "pedidos": [
+          {
+            "rotulo": "Folha de personagem",
+            "agente": "diretor_arte",
+            "texto": "faça a folha de personagem de {nome}: frente, perfil e rosto, no estilo da série, usando as referências aprovadas da ficha."
+          },
+          {
+            "rotulo": "Completar a ficha",
+            "agente": "continuidade",
+            "texto": "complete a ficha de {nome} com o que falta (aparência, figurino, jeito, prompt-base) e me pergunte o que você não souber."
+          },
+          {
+            "rotulo": "Conferir continuidade",
+            "agente": "continuidade",
+            "texto": "confira os últimos quadros em que {nome} aparece contra a ficha e aponte o que fugiu."
+          }
+        ]
+      },
+      "cenario": {
+        "titulo": "Cenário",
+        "descricao": "lugar recorrente, luz, referências",
+        "plural": "Cenários",
+        "pedidos": [
+          {
+            "rotulo": "Imagem de referência",
+            "agente": "diretor_arte",
+            "texto": "gere a imagem de referência de {nome} (cenário), no estilo da série, para eu aprovar."
+          },
+          {
+            "rotulo": "Completar a ficha",
+            "agente": "continuidade",
+            "texto": "complete a ficha do cenário {nome}: luz, hora do dia, elementos fixos, prompt-base."
+          }
+        ]
+      },
+      "episodio": {
+        "titulo": "Episódio",
+        "descricao": "o que acontece, cenas, gancho",
+        "plural": "Episódios",
+        "pedidos": [
+          {
+            "rotulo": "Quebrar em cenas",
+            "agente": "roteiro",
+            "texto": "quebre {nome} em cenas (quem está, o que acontece, gancho) e anote cada cena no registro."
+          },
+          {
+            "rotulo": "Escrever o episódio",
+            "agente": "roteiro",
+            "texto": "escreva {nome} no ritmo de novela vertical: gancho nos primeiros segundos, virada, cliffhanger."
+          }
+        ]
+      },
+      "cena": {
+        "titulo": "Cena",
+        "descricao": "quem está, o que acontece, planos, estado dos quadros",
+        "plural": "Cenas",
+        "pedidos": [
+          {
+            "rotulo": "Escrever a cena",
+            "agente": "roteiro",
+            "texto": "escreva {nome} com ação e diálogo, pronta para virar storyboard."
+          },
+          {
+            "rotulo": "Gerar os quadros",
+            "agente": "diretor_arte",
+            "texto": "gere os quadros de {nome} (3 a 6, 9:16) com as referências aprovadas de quem aparece."
+          },
+          {
+            "rotulo": "Montar o storyboard animado",
+            "agente": "storyboard",
+            "texto": "monte o storyboard animado de {nome} com os quadros aprovados e me entregue o GIF."
+          },
+          {
+            "rotulo": "Conferir continuidade",
+            "agente": "continuidade",
+            "texto": "confira os quadros de {nome} contra as fichas de quem aparece e do cenário."
+          }
+        ]
+      }
+    }
+  }
+}

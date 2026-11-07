@@ -1,0 +1,2 @@
+#!/bin/sh
+node scripts/verificar-publicacao.mjs --head

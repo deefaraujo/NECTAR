@@ -1,0 +1,189 @@
+/* Perfil no estilo Discord: fontes e efeitos do nome, decoração do avatar, placa do nome, cartão de perfil com capa,
+   tema em duas cores e efeitos (VFX em vfx.js), editor com prévia ao vivo e recorte de foto e capa. Arte própria em CSS. */
+
+/* ---- fontes do nome (Google Fonts, OFL; licenças em /fonts) ---- */
+@font-face { font-family: 'WIA Tempo'; src: url(/fonts/bebas-neue-400-latin.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'WIA Sakura'; src: url(/fonts/pacifico-400-latin.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'WIA Jujuba'; src: url(/fonts/fredoka-500-latin.woff2) format('woff2'); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: 'WIA Moderna'; src: url(/fonts/orbitron-500-latin.woff2) format('woff2'); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: 'WIA Medieval'; src: url(/fonts/medievalsharp-400-latin.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'WIA 8bit'; src: url(/fonts/press-start-2p-400-latin.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'WIA Vampiro'; src: url(/fonts/creepster-400-latin.woff2) format('woff2'); font-display: swap; }
+
+.nm-st { --n1: currentColor; --n2: currentColor; display: inline-block; line-height: 1.15; }
+.nm-st[data-fonte="tempo"] { font-family: 'WIA Tempo', sans-serif; letter-spacing: .04em; font-size: 1.12em; font-weight: 400; }
+.nm-st[data-fonte="sakura"] { font-family: 'WIA Sakura', cursive; font-weight: 400; }
+.nm-st[data-fonte="jujuba"] { font-family: 'WIA Jujuba', sans-serif; font-weight: 600; }
+.nm-st[data-fonte="moderna"] { font-family: 'WIA Moderna', sans-serif; font-weight: 700; letter-spacing: .03em; }
+.nm-st[data-fonte="medieval"] { font-family: 'WIA Medieval', serif; font-weight: 400; }
+.nm-st[data-fonte="8bit"] { font-family: 'WIA 8bit', monospace; font-size: .74em; font-weight: 400; line-height: 1.5; }
+.nm-st[data-fonte="vampiro"] { font-family: 'WIA Vampiro', cursive; font-weight: 400; letter-spacing: .03em; font-size: 1.08em; }
+
+/* efeitos: só no cartão de perfil, no editor e nas DMs (como no Discord); no resto, só a fonte */
+.nm-st.efx[data-efeito="solido"] { color: var(--n1); }
+.nm-st.efx[data-efeito="degrade"] { background: linear-gradient(90deg, var(--n1), var(--n2), var(--n1)); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: nm-brilho 4s linear infinite; }
+.nm-st.efx[data-efeito="neon"] { color: color-mix(in srgb, var(--n1) 30%, #fff); text-shadow: 0 0 2px #fff, 0 0 6px var(--n1), 0 0 14px var(--n1), 0 0 26px var(--n2); animation: nm-neon 3.2s ease-in-out infinite; }
+.nm-st.efx[data-efeito="toon"] { color: var(--n1); -webkit-text-stroke: .06em #0b0d12; paint-order: stroke fill; text-shadow: .07em .09em 0 var(--n2); animation: nm-toon 2.6s ease-in-out infinite; }
+.nm-st.efx[data-efeito="pop"] { color: var(--n1); text-shadow: 1px 1px 0 var(--n2), 2px 2px 0 var(--n2), 3px 3px 0 color-mix(in srgb, var(--n2) 60%, #000); animation: nm-pop 3s cubic-bezier(.3, 1.6, .5, 1) infinite; }
+@keyframes nm-brilho { to { background-position: 200% 0; } }
+@keyframes nm-neon { 0%, 100% { opacity: 1; } 46% { opacity: 1; } 48% { opacity: .55; } 50% { opacity: 1; } 52% { opacity: .7; } 54% { opacity: 1; } }
+@keyframes nm-toon { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-1px) rotate(-1.2deg); } }
+@keyframes nm-pop { 0%, 80%, 100% { transform: scale(1); } 86% { transform: scale(1.12); } 92% { transform: scale(.97); } }
+
+/* ---- avatar: imagem recortada (zoom e posição) e decoração por fora do círculo ---- */
+.av .av-img { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
+.av .av-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; transform-origin: center; }
+.av .deco { position: absolute; inset: calc(var(--t) * -.16); border-radius: 50%; pointer-events: none; z-index: 2; }
+.av .deco::before, .av .deco::after { content: ''; position: absolute; pointer-events: none; }
+.av.p .deco { display: none; }
+
+.deco-aurora { background: conic-gradient(from 0deg, #7cf7ff, #9b6bff, #ff6bd5, #ffd36b, #7cf7ff); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px)); animation: deco-gira 4s linear infinite; filter: drop-shadow(0 0 4px rgba(155, 107, 255, .8)); }
+.deco-neon { border: 2px solid var(--c, #4ef); box-shadow: 0 0 6px var(--c, #4ef), 0 0 14px var(--c, #4ef), inset 0 0 6px var(--c, #4ef); animation: deco-pulso 2.2s ease-in-out infinite; }
+.deco-chamas { background: conic-gradient(from 180deg, #ff3d00, #ffb300, #ff6d00, #ffea00, #ff3d00); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); filter: blur(.4px) drop-shadow(0 0 6px #ff6d00); animation: deco-gira 2.6s linear infinite, deco-chama 0.18s steps(2) infinite alternate; }
+.deco-chamas::before { left: 50%; top: -18%; width: 34%; height: 34%; margin-left: -17%; background: radial-gradient(ellipse at 50% 80%, #fff3b0, #ff9800 45%, transparent 70%); border-radius: 50% 50% 40% 40%; animation: deco-labareda 0.9s ease-in-out infinite; -webkit-mask: none; }
+.deco-orbita { border: 1px dashed rgba(255, 255, 255, .28); animation: deco-gira 3.4s linear infinite; }
+.deco-orbita::before, .deco-orbita::after { width: 18%; height: 18%; border-radius: 50%; background: radial-gradient(circle, #fff, #8ef 50%, transparent 72%); box-shadow: 0 0 8px #8ef; top: -9%; left: 41%; }
+.deco-orbita::after { top: auto; bottom: -9%; background: radial-gradient(circle, #fff, #f8c 50%, transparent 72%); box-shadow: 0 0 8px #f8c; }
+.deco-sakura { border: 2px solid #ffb7d5; box-shadow: 0 0 10px rgba(255, 150, 200, .7); }
+.deco-sakura::before, .deco-sakura::after { width: 26%; height: 26%; background: radial-gradient(circle at 30% 30%, #ffe3ef, #ff8fbf 60%, transparent 62%); border-radius: 60% 0 60% 0; top: -6%; right: -4%; animation: deco-petala 3s ease-in-out infinite; }
+.deco-sakura::after { top: auto; right: auto; bottom: 2%; left: -6%; width: 20%; height: 20%; animation-delay: -1.5s; }
+.deco-pixel { inset: calc(var(--t) * -.12); border-radius: 18%; border: 3px solid transparent; background: linear-gradient(var(--bg-2, #111), var(--bg-2, #111)) padding-box, repeating-conic-gradient(#ff4d6d 0 12.5%, #ffd166 0 25%, #06d6a0 0 37.5%, #118ab2 0 50%) border-box; image-rendering: pixelated; animation: deco-pixel 1.2s steps(4) infinite; -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px)); mask: none; }
+.deco-pixel { background: none; outline: 3px dashed #ffd166; outline-offset: -3px; box-shadow: 0 0 0 3px #ff4d6d, 0 0 0 6px #06d6a0; }
+.deco-gelo { border: 2px solid #b3f0ff; box-shadow: 0 0 8px #7fdcff, inset 0 0 8px rgba(127, 220, 255, .6); background: conic-gradient(from 0deg, transparent 0 80%, rgba(255, 255, 255, .9) 88%, transparent 96%); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); animation: deco-gira 3s linear infinite; }
+.deco-gelo::before { inset: -3px; border-radius: 50%; border: 2px solid #b3f0ff; -webkit-mask: none; }
+.deco-raio { border: 2px dashed #ffe94d; box-shadow: 0 0 8px #ffe94d, 0 0 16px rgba(255, 233, 77, .5); animation: deco-gira 1.4s steps(8) infinite, deco-pulso 0.4s ease-in-out infinite alternate; }
+.deco-coroa { border: 2px solid #f5c542; box-shadow: 0 0 10px rgba(245, 197, 66, .6); }
+.deco-coroa::before { left: 50%; top: -26%; width: 46%; height: 30%; margin-left: -23%; background: linear-gradient(#ffe88a, #e0a21b); clip-path: polygon(0 100%, 0 25%, 22% 60%, 50% 0, 78% 60%, 100% 25%, 100% 100%); filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .5)); animation: deco-flutua 2.4s ease-in-out infinite; }
+@keyframes deco-gira { to { transform: rotate(360deg); } }
+@keyframes deco-pulso { 0%, 100% { opacity: .75; } 50% { opacity: 1; filter: brightness(1.3); } }
+@keyframes deco-chama { to { filter: blur(.6px) drop-shadow(0 0 9px #ff9100); } }
+@keyframes deco-labareda { 0%, 100% { transform: scaleY(1) translateY(0); } 50% { transform: scaleY(1.25) translateY(-8%); } }
+@keyframes deco-petala { 0%, 100% { transform: rotate(0) translateY(0); } 50% { transform: rotate(25deg) translateY(10%); } }
+@keyframes deco-pixel { to { filter: hue-rotate(360deg); } }
+@keyframes deco-flutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10%); } }
+
+/* ---- placa do nome (fundo atrás do nome na lista de membros) ---- */
+.membro.placa { position: relative; overflow: hidden; isolation: isolate; }
+.membro.placa::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .55; background-size: 200% 100%; animation: placa-anda 9s linear infinite; }
+.membro.placa:hover::before { opacity: .8; }
+.placa-aurora::before { background-image: linear-gradient(100deg, transparent 20%, rgba(124, 247, 255, .35), rgba(155, 107, 255, .45), rgba(255, 107, 213, .35), transparent 80%); }
+.placa-galaxia::before { background-image: radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #fff, transparent), radial-gradient(1.5px 1.5px at 45% 80%, #cdf, transparent), linear-gradient(90deg, #1a1040, #3b1d6e, #12245a); }
+.placa-oceano::before { background-image: linear-gradient(90deg, #04243b, #0a5e7a, #0b8aa0, #04243b); }
+.placa-por-do-sol::before { background-image: linear-gradient(90deg, #3a0f3f, #b3325b, #f57a3c, #3a0f3f); }
+.placa-floresta::before { background-image: linear-gradient(90deg, #0b2a17, #1f5e33, #3f8f4a, #0b2a17); }
+.placa-circuito::before { background-image: linear-gradient(90deg, rgba(0, 255, 170, .0), rgba(0, 255, 170, .25) 50%, rgba(0, 255, 170, 0)), repeating-linear-gradient(90deg, transparent 0 14px, rgba(0, 255, 170, .18) 14px 15px), repeating-linear-gradient(0deg, transparent 0 10px, rgba(0, 255, 170, .12) 10px 11px), linear-gradient(#071a14, #071a14); }
+.placa-sakura::before { background-image: radial-gradient(4px 3px at 15% 40%, #ffc1dc, transparent), radial-gradient(3px 2px at 60% 70%, #ffd6e8, transparent), radial-gradient(4px 3px at 85% 30%, #ffc1dc, transparent), linear-gradient(90deg, #3d1830, #7a2f55, #3d1830); }
+.placa-lava::before { background-image: radial-gradient(circle at 20% 80%, #ff5a1f 0, transparent 30%), radial-gradient(circle at 70% 20%, #ffb300 0, transparent 25%), linear-gradient(90deg, #2a0700, #5c1400, #2a0700); }
+@keyframes placa-anda { to { background-position: -200% 0; } }
+
+/* ---- cartão de perfil (popout e prévia do editor) ---- */
+.pcard { --p1: #2b2f3a; --p2: #1a1d24; position: relative; width: 320px; border-radius: 14px; overflow: hidden; color: var(--txt, #e8eaf0); background: linear-gradient(180deg, var(--p1), var(--p2)); box-shadow: 0 18px 50px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .06); isolation: isolate; }
+.pcard.tema { padding: 3px; background: linear-gradient(180deg, var(--p1), var(--p2)); }
+.pcard.tema .pcard-in { border-radius: 11px; background: linear-gradient(180deg, color-mix(in srgb, var(--p1) 35%, #111318), color-mix(in srgb, var(--p2) 35%, #0c0d11)); }
+.pcard-in { position: relative; overflow: hidden; border-radius: 14px; }
+.pcard-capa { position: relative; height: 112px; overflow: hidden; background: var(--capa, linear-gradient(120deg, var(--p1), var(--p2))); }
+.pcard-capa img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center; }
+.pcard-av { position: absolute; left: 16px; top: 64px; z-index: 3; border-radius: 50%; padding: 5px; background: color-mix(in srgb, var(--p2) 70%, #0c0d11); }
+.pcard-av .av { --t: 84px; }
+.pcard-av .av svg.ic { width: 42px; height: 42px; }
+.pcard-corpo { position: relative; z-index: 2; padding: 50px 16px 16px; }
+.pcard-nome { font-size: 20px; font-weight: 800; margin: 0; line-height: 1.2; overflow-wrap: anywhere; }
+.pcard-cargo { color: var(--mudo, #9aa3b5); font-size: 13px; margin-top: 2px; }
+.pcard-sec { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: rgba(0, 0, 0, .28); font-size: 13px; line-height: 1.45; }
+.pcard-sec h4 { margin: 0 0 4px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--mudo, #9aa3b5); }
+.pcard-acoes { display: flex; gap: 8px; margin-top: 12px; }
+.pcard-acoes button { flex: 1; }
+.pcard-vfx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; }
+.pcard-pop { position: fixed; z-index: 60; animation: pcard-entra .16s ease-out; }
+@keyframes pcard-entra { from { opacity: 0; transform: translateY(6px) scale(.98); } }
+
+/* ---- editor de perfil ---- */
+.modal.ped-modal { width: min(980px, 96vw); }
+.ped-abas { display: flex; gap: 4px; margin: 4px 0 14px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.ped-abas button { background: none; border: 0; color: var(--mudo, #9aa3b5); padding: 8px 12px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
+.ped-abas button.on { color: var(--txt, #fff); border-color: var(--azul-1, #7c9cff); }
+.ped { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+.ped-prev { position: sticky; top: 0; }
+.ped-sec { margin-bottom: 18px; }
+/* galeria de avatares da ferramenta: um clique troca a foto; o marcado é o que o agente está usando por padrão */
+.ped-galeria { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.ped-av { width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; overflow: hidden; background: var(--bg-4); cursor: pointer; box-shadow: 0 0 0 1px var(--linha-2); transition: transform .18s cubic-bezier(.22, 1, .36, 1), box-shadow .18s; }
+.ped-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ped-av:hover { transform: scale(1.08); box-shadow: 0 0 0 2px var(--suave); }
+.ped-av.on { box-shadow: 0 0 0 2px var(--bg-2), 0 0 0 4px var(--ambar); }
+.ped-sec > .rot { display: block; margin-bottom: 8px; }
+.ped-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+.ped-t { position: relative; display: grid; place-items: center; gap: 6px; padding: 10px 4px 8px; border-radius: 10px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .07); color: inherit; cursor: pointer; font-size: 11px; min-height: 74px; overflow: hidden; isolation: isolate; }
+.ped-t:hover { background: rgba(255, 255, 255, .08); }
+.ped-t.on { border-color: var(--azul-1, #7c9cff); box-shadow: 0 0 0 1px var(--azul-1, #7c9cff) inset; background: rgba(245, 166, 35, .12); }
+.ped-t .av { --t: 36px; }
+.ped-t .nm-st { font-size: 15px; }
+.ped-t.placa-t::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .8; background-size: 200% 100%; animation: placa-anda 9s linear infinite; }
+.ped-t canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.ped-cores { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ped-cores input[type=color] { width: 40px; height: 32px; border: 0; padding: 0; background: none; cursor: pointer; }
+.ped-cor { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .15); cursor: pointer; }
+.ped-rodape { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; position: sticky; bottom: -1px; padding-top: 10px; background: linear-gradient(transparent, var(--bg-2, #15171d) 30%); }
+@media (max-width: 760px) { .ped { grid-template-columns: 1fr; } .ped-prev { position: static; } }
+
+/* ---- recorte de foto e capa ---- */
+.recorte { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: rgba(5, 6, 9, .78); backdrop-filter: blur(4px); }
+.recorte-box { width: min(560px, 94vw); padding: 20px; border-radius: 14px; background: var(--bg-2, #15171d); box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+.recorte-box h3 { margin: 0 0 14px; }
+.recorte-area { position: relative; margin: 0 auto; overflow: hidden; background: #000; touch-action: none; cursor: grab; user-select: none; }
+.recorte-area:active { cursor: grabbing; }
+.recorte-area img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center; pointer-events: none; }
+.recorte-area.foto { width: 280px; height: 280px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(255, 255, 255, .15); }
+.recorte-area.capa { width: 100%; aspect-ratio: 320 / 112; border-radius: 10px; }
+.recorte-zoom { display: flex; align-items: center; gap: 10px; margin: 16px 0 6px; }
+.recorte-zoom input { flex: 1; accent-color: var(--azul-1, #7c9cff); }
+.recorte-box .acoes { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nm-st.efx, .av .deco, .av .deco::before, .av .deco::after, .membro.placa::before, .ped-t.placa-t::before { animation: none !important; }
+}
+
+/* GIF da comunidade na mensagem e aba Conversa do perfil */
+.gif-com { display: block; max-width: 260px; max-height: 200px; margin: 6px 0; border-radius: 8px; }
+.cv-tri { display: inline-flex; padding: 3px; border-radius: 8px; background: rgba(255, 255, 255, .05); }
+.cv-tri label { cursor: pointer; }
+.cv-tri input { display: none; }
+.cv-tri span { display: block; padding: 6px 12px; border-radius: 6px; font-size: 13px; color: var(--mudo, #9aa3b5); }
+.cv-tri input:checked + span { background: var(--azul-1, #5865f2); color: #fff; }
+
+/* editor: as abas rolam dentro da janela (o .modal corta o que passa) e têm respiro nas bordas */
+.ped-modal .ped-abas { padding: 0 22px; margin: 0; flex: none; }
+.ped-modal #ped-perfil, .ped-modal #ped-conversa, .ped-modal #ped-trabalho { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 22px 0; }
+.ped-modal .ped-rodape { margin: 8px -22px 0; padding: 12px 22px 16px; background: var(--bg-2, #15171d); box-shadow: 0 -1px 0 rgba(255, 255, 255, .06); }
+
+/* cartão como no Discord: o avatar fica no fluxo, sobre a borda da capa, e o nome vem logo abaixo dele (nunca por cima) */
+.pcard-av { position: relative; left: auto; top: auto; display: inline-block; margin: -48px 0 0 14px; }
+.pcard-corpo { padding: 6px 16px 16px; }
+.pcard-av .av .deco { inset: calc(var(--t) * -.13); }
+.pcard-falar { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; border-radius: 8px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(255, 255, 255, .06); }
+.pcard-falar input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: inherit; font: inherit; font-size: 13px; }
+.pcard-falar input::placeholder { color: var(--mudo, #9aa3b5); }
+
+/* avatar com decoração: a moldura fica fora do círculo, então ganha respiro para não encostar no nome */
+.av:has(> .deco) { margin: calc(var(--t) * .18); }
+.ped-t .av:has(> .deco), .pcard-av .av:has(> .deco) { margin: 0; }
+.pcard-av:has(.deco) { margin-left: 22px; margin-bottom: 6px; }
+
+/* chat: coluna do avatar mais larga (a moldura da decoração não encosta no nome), nome maior e mais afastado */
+.msg { grid-template-columns: 84px minmax(0, 1fr); }
+.msg .lado { padding: 4px 0 0 20px; }
+.msg .lado .av:has(> .deco) { margin: 6px 0 0 6px; }
+.msg .cab { gap: 10px; margin-bottom: 2px; }
+.msg .cab b { font-size: 17px; letter-spacing: .005em; }
+.msg .cab b .nm-st[data-fonte="8bit"] { font-size: .7em; }
+#membros .membro .info .nm { font-size: 15px; }
+#membros .membro { gap: 12px; }
+
+.cabeca > .av:has(> .deco) { margin: 0 6px 0 4px; }
+.cabeca h2 { margin-left: 4px; }
+
+/* personalidades prontas */
+.persona-lista { display: flex; flex-wrap: wrap; gap: 6px; }
+.persona-chip { padding: 6px 11px; border-radius: 999px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .09); color: inherit; font: inherit; font-size: 12.5px; cursor: pointer; }
+.persona-chip:hover { background: rgba(245, 166, 35, .16); border-color: rgba(245, 166, 35, .5); }
+.persona-chip.on { background: var(--azul-1, #5865f2); border-color: transparent; color: #fff; }

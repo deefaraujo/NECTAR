@@ -1,0 +1,523 @@
+{
+  "id": "software",
+  "nome": "Desenvolvimento de software",
+  "descricao": "Equipe de especialistas para qualquer projeto de software: arquitetura, front, UI/UX, back, dados, integrações, pipeline, segurança, QA, revisão e versionamento. É a base: o que é específico de um projeto (stack, convenções, armadilhas) fica na pasta template do próprio projeto.",
+  "rascunho": true,
+  "papeis": {
+    "lead": "po",
+    "qa": "qa",
+    "curador": "curador",
+    "creditos": "creditos",
+    "revisor": "revisor"
+  },
+  "agentes": [
+    {
+      "id": "po",
+      "nome": "Helena",
+      "cargo": "P.O.",
+      "papel": "Prioriza, estima e conduz o time",
+      "cor": "#F4C540",
+      "sigla": "PO",
+      "glifo": "bussola",
+      "token": "po",
+      "somenteLeitura": true,
+      "skills": [
+        "architecture-decision-records",
+        "domain-modeling",
+        "verification-before-completion",
+        "midia-de-entrega"
+      ]
+    },
+    {
+      "id": "architect",
+      "nome": "Rafa",
+      "cargo": "Arquiteto",
+      "papel": "Contratos, módulos e decisões",
+      "cor": "#62C2B0",
+      "sigla": "AR",
+      "glifo": "blocos",
+      "token": "arquiteto",
+      "skills": [
+        "improve-codebase-architecture",
+        "architecture-patterns",
+        "architecture-decision-records",
+        "domain-modeling",
+        "codebase-design",
+        "api-design-principles",
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "frontend",
+      "nome": "Bia",
+      "cargo": "Front-end",
+      "papel": "Telas, estado e testes de componente",
+      "cor": "#7DD68B",
+      "sigla": "FE",
+      "glifo": "globo",
+      "token": "front",
+      "skills": [
+        "verification-before-completion",
+        "systematic-debugging",
+        "test-driven-development",
+        "receiving-code-review",
+        "webapp-testing",
+        "frontend-design",
+        "vercel-react-best-practices",
+        "vercel-composition-patterns",
+        "javascript-testing-patterns",
+        "web-design-guidelines",
+        "midia-de-entrega"
+      ]
+    },
+    {
+      "id": "uiux",
+      "nome": "Marina",
+      "cargo": "UI/UX",
+      "papel": "Fluxos, design system e fidelidade",
+      "cor": "#63B8F0",
+      "sigla": "UI",
+      "glifo": "layout",
+      "token": "ui",
+      "skills": [
+        "frontend-design",
+        "web-design-guidelines",
+        "vercel-composition-patterns",
+        "midia-de-entrega"
+      ]
+    },
+    {
+      "id": "backend",
+      "nome": "Lucas",
+      "cargo": "Back-end",
+      "papel": "Serviços, APIs e regras de negócio",
+      "cor": "#8BA6E8",
+      "sigla": "BE",
+      "glifo": "servidor",
+      "token": "back",
+      "skills": [
+        "verification-before-completion",
+        "systematic-debugging",
+        "test-driven-development",
+        "receiving-code-review",
+        "supabase-postgres-best-practices",
+        "fastapi-templates",
+        "python-testing-patterns",
+        "api-design-principles",
+        "python-error-handling",
+        "python-type-safety",
+        "async-python-patterns"
+      ]
+    },
+    {
+      "id": "dados",
+      "nome": "Paulo",
+      "cargo": "Dados",
+      "papel": "Modelagem, migrações e consultas",
+      "cor": "#D9A15B",
+      "sigla": "DA",
+      "glifo": "banco",
+      "token": "dados",
+      "skills": [
+        "verification-before-completion",
+        "systematic-debugging",
+        "supabase-postgres-best-practices",
+        "postgresql-table-design",
+        "sql-optimization-patterns"
+      ]
+    },
+    {
+      "id": "integracoes",
+      "nome": "Caio",
+      "cargo": "Integrações",
+      "papel": "MCP, agentes de IA e APIs externas",
+      "cor": "#B58BE8",
+      "sigla": "IN",
+      "glifo": "plug",
+      "token": "integracoes",
+      "skills": [
+        "verification-before-completion",
+        "systematic-debugging",
+        "mcp-builder",
+        "openapi-spec-generation",
+        "api-design-principles",
+        "auth-implementation-patterns"
+      ]
+    },
+    {
+      "id": "pipeline",
+      "nome": "Davi",
+      "cargo": "Pipeline",
+      "papel": "CI/CD, imagens e deploy",
+      "cor": "#F0A06E",
+      "sigla": "PL",
+      "glifo": "fluxo",
+      "token": "pipeline",
+      "skills": [
+        "verification-before-completion",
+        "systematic-debugging",
+        "gitlab-ci-patterns",
+        "deployment-pipeline-design",
+        "gitops-workflow",
+        "k8s-manifest-generator",
+        "secrets-management"
+      ]
+    },
+    {
+      "id": "infra",
+      "nome": "Alex",
+      "cargo": "Infraestrutura e DevOps",
+      "papel": "Ambiente local, rede, servicos e resolucao de impedimentos",
+      "cor": "#66B9B0",
+      "sigla": "IF",
+      "glifo": "servidor",
+      "token": "infra",
+      "skills": [
+        "verification-before-completion",
+        "systematic-debugging",
+        "secrets-management"
+      ]
+    },
+    {
+      "id": "seguranca",
+      "nome": "Sofia",
+      "cargo": "Segurança",
+      "papel": "Permissões e modelo de ameaça",
+      "cor": "#E08AB8",
+      "sigla": "SE",
+      "glifo": "cadeado",
+      "token": "seguranca",
+      "skills": [
+        "verification-before-completion",
+        "stride-analysis-patterns",
+        "security-requirement-extraction",
+        "threat-mitigation-mapping",
+        "auth-implementation-patterns",
+        "secrets-management"
+      ]
+    },
+    {
+      "id": "qa",
+      "nome": "Nina",
+      "cargo": "QA",
+      "papel": "Testes, contrato e evidências",
+      "cor": "#EE7B74",
+      "sigla": "QA",
+      "glifo": "escudo",
+      "token": "qa",
+      "skills": [
+        "verification-before-completion",
+        "systematic-debugging",
+        "test-driven-development",
+        "webapp-testing",
+        "e2e-testing-patterns",
+        "playwright-best-practices",
+        "python-testing-patterns",
+        "javascript-testing-patterns",
+        "midia-de-entrega"
+      ]
+    },
+    {
+      "id": "revisor",
+      "nome": "Teo",
+      "cargo": "Revisão de código",
+      "papel": "O crivo antes do MR",
+      "cor": "#9FB4D9",
+      "sigla": "RV",
+      "glifo": "busca",
+      "token": "revisao",
+      "somenteLeitura": true,
+      "skills": [
+        "code-review",
+        "verification-before-completion",
+        "python-anti-patterns",
+        "api-design-principles",
+        "web-design-guidelines"
+      ]
+    },
+    {
+      "id": "versionamento",
+      "nome": "Vera",
+      "cargo": "Versionamento",
+      "papel": "Git, conflitos, commit e push",
+      "cor": "#F28C4B",
+      "sigla": "VG",
+      "glifo": "fluxo",
+      "token": "versionamento",
+      "skills": [
+        "versionamento-git",
+        "git-advanced-workflows",
+        "verification-before-completion",
+        "systematic-debugging"
+      ]
+    },
+    {
+      "id": "curador",
+      "nome": "Otávio",
+      "cargo": "Curador",
+      "papel": "Memória e organização",
+      "cor": "#9BD45A",
+      "sigla": "CU",
+      "glifo": "memoria",
+      "token": "curador",
+      "somenteLeitura": true,
+      "skills": [
+        "architecture-decision-records",
+        "domain-modeling"
+      ]
+    },
+    {
+      "id": "mcp",
+      "nome": "Max",
+      "cargo": "MCP",
+      "papel": "Conexões com outras ferramentas por MCP",
+      "cor": "#26C6DA",
+      "sigla": "MC",
+      "glifo": "plug",
+      "token": "mcp",
+      "skills": []
+    },
+    {
+      "id": "creditos",
+      "nome": "Cris",
+      "cargo": "Créditos",
+      "papel": "Uso e orçamento",
+      "cor": "#E5B84B",
+      "sigla": "CR",
+      "glifo": "relogio",
+      "token": "creditos",
+      "somenteLeitura": true,
+      "sistema": true,
+      "skills": []
+    }
+  ],
+  "rotas": {
+    "arquitetura": "architect",
+    "front": "frontend",
+    "ui": "uiux",
+    "back": "backend",
+    "dados": "dados",
+    "integracao": "integracoes",
+    "pipeline": "pipeline",
+    "infra": "infra",
+    "seguranca": "seguranca",
+    "testes": "qa",
+    "revisao": "revisor",
+    "curadoria": "curador",
+    "equipe": "po",
+    "git": "versionamento",
+    "versao": "versionamento",
+    "versionamento": "versionamento",
+    "mcp": "mcp"
+  },
+  "aliases": {
+    "frontend": "frontend",
+    "backend": "backend",
+    "api": "integracoes",
+    "apis": "integracoes",
+    "mcp": "mcp",
+    "agente": "integracoes",
+    "integracao": "integracoes",
+    "devops": "infra",
+    "ci": "pipeline",
+    "infra": "infra",
+    "deploy": "pipeline",
+    "banco": "dados",
+    "db": "dados",
+    "migracao": "dados",
+    "seg": "seguranca",
+    "permissoes": "seguranca",
+    "teste": "qa",
+    "testes": "qa",
+    "review": "revisor",
+    "pr": "revisor",
+    "mr": "revisor",
+    "ux": "uiux",
+    "design": "uiux",
+    "arquitetura": "architect",
+    "memoria": "curador",
+    "credito": "creditos",
+    "uso": "creditos",
+    "orcamento": "creditos",
+    "git": "versionamento",
+    "versionamento": "versionamento",
+    "commit": "versionamento",
+    "push": "versionamento",
+    "pull": "versionamento",
+    "merge": "versionamento",
+    "conflito": "versionamento",
+    "conflitos": "versionamento",
+    "branch": "versionamento",
+    "conexao": "mcp",
+    "conexoes": "mcp",
+    "figma": "mcp",
+    "higgsfield": "mcp"
+  },
+  "contrato": {
+    "fluxo": "tecnico",
+    "dominios": {
+      "banco": "dados",
+      "git": "versionamento",
+      "ambiente": "infra",
+      "pipeline": "pipeline",
+      "backend": "backend",
+      "frontend": "frontend",
+      "ui": "uiux",
+      "seguranca": "seguranca",
+      "arquitetura": "architect",
+      "integracoes": "integracoes",
+      "testes": "qa",
+      "revisao": "revisor"
+    },
+    "palavras": {
+      "banco": [
+        "postgres",
+        "postgresql",
+        "sql",
+        "migration",
+        "alembic",
+        "banco",
+        "database",
+        "tabela",
+        "query",
+        "schema",
+        "índice",
+        "indice",
+        "psql",
+        "porta 5432"
+      ],
+      "git": [
+        "git",
+        "branch",
+        "merge",
+        "commit",
+        "worktree",
+        "conflito",
+        "rebase",
+        "push",
+        "tag",
+        "cherry-pick",
+        "develop"
+      ],
+      "ambiente": [
+        "venv",
+        "docker",
+        "porta ocupada",
+        "endereco em uso",
+        "servico indisponivel",
+        "rede local",
+        "localhost",
+        "dependência",
+        "dependencia",
+        "instalar",
+        "build",
+        "ambiente",
+        "variável de ambiente",
+        "poetry",
+        "uv",
+        "npm install",
+        "pip install"
+      ],
+      "pipeline": [
+        "pipeline",
+        "ci",
+        "deploy",
+        "release",
+        "gitlab ci",
+        "github actions"
+      ],
+      "backend": [
+        "api",
+        "endpoint",
+        "service",
+        "controller",
+        "backend",
+        "back-end",
+        "regra de negócio",
+        "regra de negocio",
+        "rota",
+        "handler"
+      ],
+      "frontend": [
+        "tela",
+        "componente",
+        "react",
+        "css",
+        "front",
+        "página",
+        "pagina",
+        "frontend",
+        "front-end",
+        "botão",
+        "botao",
+        "layout"
+      ],
+      "ui": [
+        "figma",
+        "ux",
+        "design system",
+        "fluxo de tela",
+        "wireframe",
+        "protótipo",
+        "prototipo"
+      ],
+      "seguranca": [
+        "auth",
+        "token",
+        "senha",
+        "permissão",
+        "permissao",
+        "segurança",
+        "seguranca",
+        "csrf",
+        "xss",
+        "chave de api",
+        "secret",
+        "credencial"
+      ],
+      "arquitetura": [
+        "arquitetura",
+        "contrato",
+        "módulo",
+        "modulo",
+        "domínio",
+        "dominio",
+        "adr",
+        "acoplamento"
+      ],
+      "integracoes": [
+        "webhook",
+        "integração",
+        "integracao",
+        "terceiro",
+        "sdk",
+        "oauth",
+        "api externa"
+      ],
+      "testes": [
+        "qa",
+        "teste manual",
+        "validação",
+        "validacao",
+        "cenário",
+        "cenario",
+        "regressão",
+        "regressao"
+      ],
+      "revisao": [
+        "revisão",
+        "revisao",
+        "code review",
+        "achado",
+        "pull request",
+        "pr"
+      ]
+    },
+    "checagens": [],
+    "entregas": "Entrega é diff commitado na branch do card, com as verificações do plano rodadas pelo app (job.rodar ou validação automática) e o resultado medido na ficha de fatos. Relato sem comando e sem saída não é evidência; passou-na-minha-máquina não é evidência.",
+    "revisao": {
+      "nome": "revisão de código",
+      "instrucao": ""
+    }
+  }
+}

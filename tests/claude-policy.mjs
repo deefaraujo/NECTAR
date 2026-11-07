@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {createRequire} from 'node:module';import {spawnSync} from 'node:child_process';
+const require=createRequire(import.meta.url),{avaliar}=require('../lib/claude-policy-hook.cjs');
+const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'nectar-hook-')),root=path.join(tmp,'scope');fs.mkdirSync(root);fs.writeFileSync(path.join(root,'.env'),'SYNTHETIC');fs.writeFileSync(path.join(root,'code.mjs'),'export const n=1');
+const policy={cwd:root,readPaths:[root],writePaths:[root],denyPaths:[path.join(root,'.env')],expiresAt:new Date(Date.now()+60000).toISOString()};
+for(const name of ['Read','Edit','Write'])assert.equal(avaliar({tool_name:name,tool_input:{file_path:path.join(root,'code.mjs')}},policy),null);
+for(const name of ['Read','Edit','Write'])assert(avaliar({tool_name:name,tool_input:{file_path:path.join(tmp,'outside')}},policy));
+assert(avaliar({tool_name:'Read',tool_input:{file_path:path.join(root,'.env')}},policy));assert(avaliar({tool_name:'Bash',tool_input:{command:'echo unsafe'}},policy));
+assert(avaliar({tool_name:'Grep',tool_input:{path:root}},policy));assert.equal(avaliar({tool_name:'Grep',tool_input:{path:path.join(root,'code.mjs')}},policy),null);
+assert(avaliar({tool_name:'Glob',tool_input:{path:root,pattern:'../**/*'}},policy));assert(avaliar({tool_name:'Write',tool_input:{file_path:path.join(root,'new')}},{...policy,writePaths:[]}));
+const outside=path.join(tmp,'private');fs.mkdirSync(outside);fs.symlinkSync(outside,path.join(root,'escape'),'junction');assert(avaliar({tool_name:'Write',tool_input:{file_path:path.join(root,'escape','new')}},policy));
+const file=path.join(tmp,'policy.json');fs.writeFileSync(file,JSON.stringify(policy));
+const result=spawnSync(process.execPath,[path.join(import.meta.dirname,'../lib/claude-policy-hook.cjs'),file],{input:JSON.stringify({tool_name:'Read',tool_input:{file_path:path.join(root,'.env')}}),encoding:'utf8',windowsHide:true});
+assert.equal(JSON.parse(result.stdout).hookSpecificOutput.permissionDecision,'deny');
+console.log('PASS: guard Claude em processo real, escopo, segredos, modo leitura, shell/MCP desconhecido e escape por junction recusados.');
+fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});

@@ -1,0 +1,21 @@
+// Prova do sandbox do SO sem inferência/modelos e sem tocar dados reais.
+import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {spawnSync} from 'node:child_process';
+const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'nectar-sandbox-')),cwd=path.join(tmp,'workspace');fs.mkdirSync(cwd);
+process.env.STUDIO_DATA=path.join(tmp,'data');
+const {infoCodex,configPerfilCodex,comandoIsolado}=await import('../lib/runner.mjs');const bin=(await infoCodex()).opcoes.find(x=>!x.shell);
+if(!bin)throw new Error('CLI nativo indisponível; sandbox não validado');
+const script=path.join(cwd,'probe.cjs'),outside=path.join(tmp,'outside.txt');fs.writeFileSync(outside,'SYNTHETIC_MARKER');
+fs.writeFileSync(script,`const fs=require('fs');let r={};for(const [k,p] of [['inside',${JSON.stringify(path.join(cwd,'inside.txt'))}],['outside',${JSON.stringify(outside)}]]){try{fs.writeFileSync(p,'changed');r[k]='allowed'}catch(e){r[k]='denied'}}console.log(JSON.stringify(r));`);
+fs.writeFileSync(path.join(cwd,'.env'),'SYNTHETIC_SECRET');
+fs.appendFileSync(script,`let reads={};for(const [k,p] of [['secret',${JSON.stringify(path.join(cwd,'.env'))}],['outside',${JSON.stringify(outside)}]]){try{fs.readFileSync(p);reads[k]='allowed'}catch(e){reads[k]='denied'}}console.log(JSON.stringify(reads));`);
+const result=spawnSync(bin.cmd,['sandbox','--permission-profile','nectar','-C',cwd,...configPerfilCodex({cwd}),process.execPath,'--preserve-symlinks','--preserve-symlinks-main',script],{cwd,encoding:'utf8',windowsHide:true,timeout:60000});
+console.log(JSON.stringify({cli:bin.versao,exitCode:result.status,stdout:result.stdout,stderr:result.stderr?.slice(-1800),outsideIntact:fs.readFileSync(outside,'utf8')==='SYNTHETIC_MARKER'}));
+const readonly=spawnSync(bin.cmd,['sandbox','--permission-profile','nectar','-C',cwd,...configPerfilCodex({cwd,somenteLeitura:true}),process.execPath,'--preserve-symlinks','--preserve-symlinks-main',script],{cwd,encoding:'utf8',windowsHide:true,timeout:60000});
+console.log(JSON.stringify({mode:'read-only',exitCode:readonly.status,stdout:readonly.stdout,stderr:readonly.stderr?.slice(-1000)}));
+const ok=result.status===0&&result.stdout.includes('"inside":"allowed"')&&result.stdout.includes('"secret":"denied"')&&result.stdout.includes('"outside":"denied"')&&readonly.status===0&&readonly.stdout.includes('"inside":"denied"')&&fs.readFileSync(outside,'utf8')==='SYNTHETIC_MARKER';
+const job=await new Promise(resolve=>{const proc=comandoIsolado(`"${process.execPath}" "${script}"`,{cwd});let out='',err='';proc.stdout.on('data',d=>out+=d);proc.stderr.on('data',d=>err+=d);proc.on('error',e=>err+=e.message);proc.on('close',code=>resolve({code,out,err}));});
+console.log(JSON.stringify({job}));
+fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});
+if(!ok)throw new Error('Sandbox real não demonstrou a política esperada. Não habilitar autonomia elevada.');
+if(job.code!==0||!job.out.includes('"outside":"denied"'))throw new Error('Job não respeitou sandbox ou não conseguiu iniciar');
+console.log('PASS: sandbox real Windows permitiu escrita no workspace e recusou escrita fora. Sem modelo.');

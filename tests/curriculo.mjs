@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { lerCurriculoPdf } from '../lib/curriculo.mjs';
+const pdf=fs.readFileSync(new URL('./fixtures/amostra.pdf',import.meta.url));
+const resultado=await lerCurriculoPdf(pdf.toString('base64'));
+assert.match(resultado.texto,/NECTAR PDF test fixture/);
+assert.ok(resultado.paginas>0);
+const maior=Buffer.concat([pdf,Buffer.alloc(180000,32)]);
+assert.match((await lerCurriculoPdf(maior.toString('base64'))).texto,/NECTAR PDF test fixture/);
+await assert.rejects(()=>lerCurriculoPdf(Buffer.from('não é um PDF').toString('base64')),/PDF válido/);
+await assert.rejects(()=>lerCurriculoPdf('a'.repeat(14000000)),/10 MB/);
+await assert.rejects(()=>lerCurriculoPdf(Buffer.from('%PDF-1.4\ncorrompido').toString('base64')),/íntegro/);
+console.log('Currículo: extração de PDF real, arquivo acima de 160 KB, limites e PDF inválido validados.');

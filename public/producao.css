@@ -1,0 +1,141 @@
+/* Vista do registro do projeto (Produção / Registro): árvore de fichas, a ficha aberta e o painel de pedidos. */
+.reg-v { grid-template-columns: 300px minmax(0, 1fr) 272px; }
+.reg-v.gerados { grid-template-columns: 300px minmax(0, 1fr); }
+.reg-abas { display: inline-flex; gap: 2px; padding: 3px; border-radius: 8px; background: rgba(0, 0, 0, .28); box-shadow: inset 0 0 0 1px var(--linha-2); margin-left: 6px; }
+.reg-abas button { height: 28px; padding: 0 12px; border-radius: 6px; font: 600 12.5px/1 var(--fonte); color: var(--mudo); }
+.reg-abas button small { font-weight: 600; opacity: .7; margin-left: 2px; }
+.reg-abas button.on { background: var(--bg-4); color: #fff; }
+.reg-abas button:hover:not(.on) { color: var(--texto); }
+
+/* árvore */
+.reg-grupo .btn-ic { margin-left: 2px; width: 22px; height: 22px; opacity: 0; transition: opacity .12s; }
+.reg-grupo:hover .btn-ic { opacity: 1; }
+.reg-grupo .n { margin-left: auto; }
+.reg-item { display: flex; align-items: center; gap: 10px; padding: 6px 8px; }
+.reg-thumb { flex: none; width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; overflow: hidden; background: color-mix(in srgb, var(--c) 35%, transparent); color: #fff; font: 700 14px/1 var(--fonte-tit); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.reg-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.reg-txt { min-width: 0; flex: 1; }
+.reg-item.fixa .t { font-weight: 600; }
+
+/* ficha */
+.reg-ficha { padding: 22px 36px 40px; }
+.reg-cab { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.reg-cab .espaco { flex: 1; }
+.reg-loz { background: rgba(108, 155, 255, .16); color: #B9CEFF; }
+.reg-nome { margin: 0 0 6px; font: 700 28px/1.15 var(--fonte-tit); letter-spacing: -.015em; }
+.reg-meta { color: var(--mudo); font-size: 12.5px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.reg-chave { font: 12px/1 'Cascadia Code', ui-monospace, Consolas, monospace; padding: 3px 7px; border-radius: 5px; background: rgba(0, 0, 0, .3); color: var(--suave); }
+.reg-apelidos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.reg-resumo { margin: 18px 0 10px; max-width: 760px; font-size: 15px; }
+.reg-resumo p { margin: 0 0 10px; }
+.reg-acrescentar textarea { max-width: 760px; resize: none; min-height: 38px; }
+.reg-acrescentar textarea:focus { min-height: 72px; }
+.reg-ficha .sec { margin-top: 24px; max-width: 760px; }
+.reg-ficha .sec h4 .espaco { flex: 1; }
+.reg-ficha .sec h4 .btn-sec { height: 28px; padding: 0 11px; font-size: 12.5px; }
+.reg-refs { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; min-height: 60px; padding: 8px; border-radius: 10px; border: 1px dashed transparent; transition: border-color .12s, background .12s; }
+.reg-refs.sobre { border-color: var(--azul-1); background: rgba(108, 155, 255, .08); }
+.reg-ref { position: relative; margin: 0; aspect-ratio: 9 / 12; border-radius: 8px; overflow: hidden; background: rgba(0, 0, 0, .3); box-shadow: inset 0 0 0 1px var(--linha-2); }
+.reg-ref img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.reg-ref .btn-ic { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; background: rgba(0, 0, 0, .6); opacity: 0; transition: opacity .12s; }
+.reg-ref:hover .btn-ic { opacity: 1; }
+.reg-ref-arq { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 100%; padding: 8px; color: var(--suave); font-size: 12px; text-align: center; overflow-wrap: anywhere; }
+.reg-solta { grid-column: 1 / -1; padding: 14px; color: var(--mudo); font-size: 13px; text-align: center; border-radius: 8px; border: 1px dashed var(--linha-2); }
+.reg-doc { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, .05); color: var(--suave); font: 12.5px/1.3 'Cascadia Code', ui-monospace, Consolas, monospace; overflow-wrap: anywhere; text-align: left; }
+.reg-doc:hover { background: rgba(255, 255, 255, .09); color: #fff; }
+.reg-usos { display: flex; flex-direction: column; gap: 6px; }
+.reg-uso { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; background: rgba(255, 255, 255, .04); color: var(--texto); text-align: left; font-size: 13.5px; }
+.reg-uso:hover { background: rgba(255, 255, 255, .08); }
+.reg-hist { margin-top: 24px; max-width: 760px; color: var(--mudo); font-size: 13px; }
+.reg-hist summary { cursor: pointer; }
+.reg-hist-i { margin: 12px 0 0 12px; padding-left: 12px; border-left: 2px solid var(--linha-2); }
+.reg-hist-i .m { font-size: 12px; margin-bottom: 4px; }
+.reg-hist-i .texto { font-size: 13.5px; color: var(--suave); }
+
+/* vazio e tipos */
+.reg-vazio { max-width: 640px; margin: 40px auto; }
+.reg-vazio h2 { margin: 0 0 8px; font: 700 24px/1.2 var(--fonte-tit); }
+.reg-vazio p { color: var(--mudo); margin: 0 0 20px; }
+.reg-tipos { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.reg-tipo { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 10px; background: rgba(255, 255, 255, .05); text-align: left; color: var(--texto); box-shadow: inset 0 0 0 1px var(--linha-2); }
+.reg-tipo:hover { background: rgba(255, 255, 255, .09); }
+.reg-tipo b { font: 600 14px/1.2 var(--fonte); }
+.reg-tipo small { color: var(--mudo); font-size: 12px; line-height: 1.35; }
+
+/* painel lateral */
+.reg-lado { padding: 22px 18px; overflow-y: auto; box-shadow: inset 1px 0 0 var(--linha); background: rgba(8, 12, 19, .3); }
+.reg-pedidos { display: flex; flex-direction: column; gap: 6px; }
+.reg-pedido { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; background: rgba(255, 255, 255, .05); text-align: left; color: var(--texto); box-shadow: inset 0 0 0 1px var(--linha-2); transition: background .12s; }
+.reg-pedido:hover { background: rgba(255, 255, 255, .1); }
+.reg-pedido span { display: flex; flex-direction: column; min-width: 0; }
+.reg-pedido b { font: 600 13px/1.25 var(--fonte); }
+.reg-pedido small { color: var(--mudo); font-size: 11.5px; }
+.reg-largo { width: 100%; justify-content: center; display: inline-flex; align-items: center; gap: 6px; }
+.reg-info { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 13px; color: var(--mudo); box-shadow: 0 1px 0 var(--linha); }
+.reg-info b { color: var(--suave); font-weight: 600; text-align: right; }
+.reg-dica { color: var(--mudo); font-size: 12px; line-height: 1.4; padding: 6px 0; }
+
+/* gerados */
+.reg-gerados { padding: 18px 28px 40px; }
+.reg-ger-t { margin: 10px 0 10px; font: 700 14px/1.2 var(--fonte-tit); display: flex; align-items: center; gap: 8px; }
+.reg-ger-t .mudo { color: var(--mudo); font-weight: 600; font-size: 12.5px; }
+.reg-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 26px; }
+.reg-ger { position: relative; margin: 0; border-radius: 10px; overflow: hidden; background: rgba(0, 0, 0, .3); box-shadow: inset 0 0 0 1px var(--linha-2); cursor: pointer; transition: transform .12s, box-shadow .12s; }
+.reg-ger:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px var(--linha-2), 0 8px 24px rgba(0, 0, 0, .35); }
+.reg-ger img { width: 100%; aspect-ratio: 9 / 13; object-fit: cover; display: block; }
+.reg-ger figcaption { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; }
+.reg-ger .n { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reg-ger .m { font-size: 11.5px; color: var(--mudo); display: flex; align-items: center; gap: 4px; }
+.reg-ger .m svg.ic { width: 12px; height: 12px; color: var(--verde-1); }
+.reg-ger.aprovada .m { color: var(--verde-1); }
+.reg-ger.gif::before { content: 'GIF'; position: absolute; top: 8px; left: 8px; z-index: 1; padding: 2px 6px; border-radius: 4px; background: rgba(0, 0, 0, .65); color: #fff; font: 700 10px/1.4 var(--fonte); letter-spacing: .08em; }
+
+/* modais */
+.reg-modal { width: 620px; }
+.reg-modal textarea.in { resize: vertical; font-size: 14px; line-height: 1.45; }
+.reg-modal-ver { width: min(1040px, 94vw); }
+.reg-ver { display: grid; grid-template-columns: minmax(0, 1fr) 300px; max-height: calc(100vh - 80px); }
+.reg-ver > a { display: grid; place-items: center; background: #05080d; min-height: 420px; }
+.reg-ver img { max-width: 100%; max-height: calc(100vh - 80px); object-fit: contain; display: block; }
+.reg-ver-lado { display: flex; flex-direction: column; padding: 22px 20px; overflow-y: auto; }
+.reg-ver-nome { font: 700 17px/1.25 var(--fonte-tit); margin-bottom: 4px; overflow-wrap: anywhere; }
+.reg-ver-cam { margin-top: 10px; color: var(--mudo); font: 11.5px/1.4 'Cascadia Code', ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+.reg-aprovada { margin-top: 12px; display: flex; align-items: center; gap: 6px; color: var(--verde-1); font-size: 13px; }
+.reg-aprovada svg.ic { width: 14px; height: 14px; }
+.reg-doc-modal { display: flex; flex-direction: column; min-height: 0; width: min(900px, 94vw); }
+.reg-doc-modal .mem-leitor { padding: 20px 32px 32px; }
+.reg-ctx { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.reg-ctx .chip-cam .btn-ic { width: 18px; height: 18px; margin: -2px -4px -2px 0; }
+.reg-ctx .chip-cam svg.ic { width: 13px; height: 13px; }
+
+/* Telas menores: nada some. Ficha e painel de pedidos viram uma coluna só, que rola junta; a árvore encolhe e, no
+   celular, vai para cima. No desktop o .reg-main não existe para o grid (display: contents). */
+.reg-main { display: contents; }
+@media (max-width: 1280px) { .reg-v { grid-template-columns: 250px minmax(0, 1fr) 232px; } .reg-ficha { padding: 20px 24px 36px; } }
+@media (max-width: 1040px) {
+  .reg-v { grid-template-columns: 230px minmax(0, 1fr); }
+  .reg-main { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+  .reg-ficha, .reg-lado { overflow: visible; flex: none; }
+  .reg-lado { box-shadow: inset 0 1px 0 var(--linha); padding: 16px 24px 28px; background: rgba(8, 12, 19, .3); }
+  .reg-pedidos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .reg-lado .reg-largo { width: auto; }
+}
+@media (max-width: 760px) {
+  .reg-v { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .reg-v .mem-arvore { max-height: 26vh; box-shadow: inset 0 -1px 0 var(--linha); }
+  .reg-v .mem-arvore .busca { margin: 8px 12px 4px; }
+  .reg-ficha { padding: 16px 16px 24px; }
+  .reg-lado { padding: 14px 16px 24px; }
+  .reg-nome { font-size: 22px; }
+  .planner-linha { flex-wrap: wrap; row-gap: 8px; }
+  .reg-abas { margin-left: 0; }
+  .reg-refs { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+  .reg-grade { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .reg-gerados { padding: 14px 16px 28px; }
+  .reg-modal { width: min(620px, 94vw); }
+  .reg-modal .dois { grid-template-columns: 1fr; }
+  .reg-ver { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+  .reg-ver > a { min-height: 0; height: 44vh; }
+  .reg-ver img { max-height: 44vh; }
+  .reg-ver-lado { overflow-y: auto; }
+}

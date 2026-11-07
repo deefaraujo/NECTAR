@@ -1,0 +1,375 @@
+{
+  "schema": "nectar.skills-opcionais.v1",
+  "skills": [
+    {
+      "id": "accessibility",
+      "origem": "https://github.com/addyosmani/web-quality-skills",
+      "distribuido": false
+    },
+    {
+      "id": "ai-behavior-trees-utility-ai",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "architecture-decision-records",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "architecture-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "art-consistency",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "art-direction",
+      "origem": "https://github.com/rampstackco/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "audio-design",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "auditing-game-screen-readability",
+      "origem": "https://github.com/abagames/agentic-gamedev-skills",
+      "distribuido": false
+    },
+    {
+      "id": "camera-systems",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "character-arc",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "character-design",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "code-review",
+      "origem": "https://github.com/mattpocock/skills",
+      "distribuido": false
+    },
+    {
+      "id": "codebase-design",
+      "origem": "https://github.com/mattpocock/skills",
+      "distribuido": false
+    },
+    {
+      "id": "color-palette",
+      "origem": "https://github.com/jezweb/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "create-game-assets",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "designing-mini-games",
+      "origem": "https://github.com/abagames/agentic-gamedev-skills",
+      "distribuido": false
+    },
+    {
+      "id": "dialogue",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "dialogue-systems",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "direcao-de-experiencia",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "directing-game-visuals",
+      "origem": "https://github.com/abagames/agentic-gamedev-skills",
+      "distribuido": false
+    },
+    {
+      "id": "documentation",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "game-balance-economy",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-design-docs",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-feel",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-interface-feedback",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-jam",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-mechanics-design",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-playtest-planning",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-prototype-loop",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "game-ui-ux",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "godot-2d-movement",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "godot-gdscript-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "godot-nodes-scenes",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "godot-signals-groups",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "godot-ui-control",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "input-systems",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "interactive-fiction",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "itch-publish",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "knowledge-synthesis",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "level-design",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "line-editing",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "maximizing-game-feel",
+      "origem": "https://github.com/abagames/agentic-gamedev-skills",
+      "distribuido": false
+    },
+    {
+      "id": "performance-optimization",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "physics-tuning",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "pixel-art-sprites",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "planning-and-task-breakdown",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "player-experience-modeling",
+      "origem": "https://github.com/lvtd-llc/skills",
+      "distribuido": false
+    },
+    {
+      "id": "plot-structure",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "pre-mortem",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "procedural-gen",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "prototype-fast",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "renpy-recursos",
+      "origem": "https://github.com/Matsuka/dsh-renpy-dev",
+      "distribuido": false
+    },
+    {
+      "id": "renpy-vn",
+      "origem": "https://github.com/williamrstrebe/renpy-skills",
+      "distribuido": false
+    },
+    {
+      "id": "revision-continuity",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "save-systems",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "series-continuity",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "story-analysis",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-character-conflict",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-dialogue",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-scene-craft",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-story-structure",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "systematic-debugging",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "test-driven-development",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "test-scenarios",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "unity-csharp-scripting",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "unity-ecs-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "unity-input-system",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "unreal-blueprints",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "unreal-cpp-gameplay",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "ux-sound-design",
+      "origem": "https://github.com/guia-matthieu/clawfu-skills",
+      "distribuido": false
+    },
+    {
+      "id": "verification-before-completion",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "visual-novel",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "voice-style",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "worldbuilding",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    }
+  ]
+}

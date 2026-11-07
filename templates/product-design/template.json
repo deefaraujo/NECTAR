@@ -1,0 +1,923 @@
+{
+  "id": "product-design",
+  "nome": "Product Designer",
+  "descricao": "Equipe multidisciplinar para product design: da descoberta do problema ao protótipo funcional, testes e documentação, com um núcleo de narrativa para os projetos criativos.",
+  "rascunho": false,
+  "papeis": {
+    "lead": "orquestrador",
+    "qa": "qualidade",
+    "curador": "conhecimento",
+    "creditos": "creditos"
+  },
+  "agentes": [
+    {
+      "id": "orquestrador",
+      "nome": "Iris",
+      "cargo": "Orquestradora",
+      "papel": "Interpreta o pedido, divide em etapas e coordena",
+      "cor": "#F4C540",
+      "sigla": "OR",
+      "glifo": "bussola",
+      "token": "orquestra",
+      "somenteLeitura": true,
+      "skills": [
+        "verification-before-completion",
+        "planning-and-task-breakdown",
+        "team-composition-patterns",
+        "pre-mortem"
+      ]
+    },
+    {
+      "id": "conhecimento",
+      "nome": "Theo",
+      "cargo": "Conhecimento",
+      "papel": "Fontes, decisões, versões e contexto de cada projeto",
+      "cor": "#B59BE8",
+      "sigla": "KM",
+      "glifo": "memoria",
+      "token": "conhecimento",
+      "somenteLeitura": true,
+      "skills": [
+        "knowledge-synthesis",
+        "research-repository"
+      ]
+    },
+    {
+      "id": "qualidade",
+      "nome": "Vânia",
+      "cargo": "Qualidade",
+      "papel": "Confere se a entrega bate com o pedido e as evidências",
+      "cor": "#E07A7A",
+      "sigla": "QR",
+      "glifo": "escudo",
+      "token": "qualidade",
+      "somenteLeitura": true,
+      "skills": [
+        "verification-before-completion",
+        "code-review-and-quality"
+      ]
+    },
+    {
+      "id": "pesquisa",
+      "nome": "Lia",
+      "cargo": "UX Research",
+      "papel": "Discovery, entrevistas, dores e oportunidades",
+      "cor": "#63B8F0",
+      "sigla": "UR",
+      "glifo": "busca",
+      "token": "pesquisa",
+      "skills": [
+        "interview-script",
+        "summarize-interview",
+        "customer-research",
+        "user-personas",
+        "job-stories"
+      ]
+    },
+    {
+      "id": "requisitos",
+      "nome": "Otávio",
+      "cargo": "Requisitos",
+      "papel": "Regras de negócio, planilhas e requisitos funcionais",
+      "cor": "#8BA6E8",
+      "sigla": "BA",
+      "glifo": "fluxo",
+      "token": "requisitos",
+      "skills": [
+        "create-prd",
+        "user-stories",
+        "spec-driven-development",
+        "stakeholder-map",
+        "test-scenarios"
+      ]
+    },
+    {
+      "id": "ux_architect",
+      "nome": "Bruna",
+      "cargo": "Arquitetura UX",
+      "papel": "Arquitetura da informação, fluxos, jornadas e estados",
+      "cor": "#62C2B0",
+      "sigla": "UA",
+      "glifo": "blocos",
+      "token": "arquiteturaux",
+      "skills": [
+        "information-architecture",
+        "card-sort-analysis",
+        "journey-map"
+      ]
+    },
+    {
+      "id": "ux_writer",
+      "nome": "Caio",
+      "cargo": "UX Writing",
+      "papel": "Microcopy, nomenclatura, mensagens e guia de linguagem",
+      "cor": "#F2A65A",
+      "sigla": "UW",
+      "glifo": "pena",
+      "token": "writer",
+      "skills": [
+        "ux-copy",
+        "ux-writing"
+      ]
+    },
+    {
+      "id": "ui_system",
+      "nome": "Marina",
+      "cargo": "UI e Design System",
+      "papel": "Componentes, tokens, variantes e especificação",
+      "cor": "#7DD68B",
+      "sigla": "UI",
+      "glifo": "layout",
+      "token": "ui",
+      "skills": [
+        "design-tokens",
+        "design-system-patterns",
+        "design-handoff",
+        "refactoring-ui",
+        "frontend-design",
+        "web-design-guidelines",
+        "vercel-composition-patterns"
+      ]
+    },
+    {
+      "id": "auditor",
+      "nome": "Rui",
+      "cargo": "UX Audit",
+      "papel": "Avaliação crítica de interfaces e fluxos",
+      "cor": "#D98CC4",
+      "sigla": "AU",
+      "glifo": "escudo",
+      "token": "auditor",
+      "somenteLeitura": true,
+      "skills": [
+        "ux-heuristics",
+        "heuristic-evaluation",
+        "web-design-guidelines",
+        "accessibility-review"
+      ]
+    },
+    {
+      "id": "architect",
+      "nome": "Rafa",
+      "cargo": "Arquitetura técnica",
+      "papel": "Viabilidade, dependências, integrações e riscos",
+      "cor": "#5FA8D3",
+      "sigla": "TA",
+      "glifo": "servidor",
+      "token": "tecnico",
+      "somenteLeitura": true,
+      "skills": [
+        "architecture-decision-records",
+        "architecture-patterns",
+        "api-design-principles",
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "frontend",
+      "nome": "Bia",
+      "cargo": "Front-end",
+      "papel": "Protótipos funcionais, componentes e provas de conceito",
+      "cor": "#4FC08D",
+      "sigla": "FE",
+      "glifo": "globo",
+      "token": "front",
+      "skills": [
+        "frontend-design",
+        "vercel-react-best-practices",
+        "vercel-composition-patterns",
+        "webapp-testing",
+        "web-design-guidelines",
+        "verification-before-completion",
+        "systematic-debugging"
+      ]
+    },
+    {
+      "id": "qa_teste",
+      "nome": "Nina",
+      "cargo": "QA e Testes",
+      "papel": "Cenários, casos de teste, automação e defeitos",
+      "cor": "#9CCC65",
+      "sigla": "QA",
+      "glifo": "raio",
+      "token": "testes",
+      "skills": [
+        "webapp-testing",
+        "playwright-best-practices",
+        "e2e-testing-patterns",
+        "javascript-testing-patterns",
+        "test-scenarios",
+        "verification-before-completion"
+      ]
+    },
+    {
+      "id": "narrative",
+      "nome": "Helô",
+      "cargo": "Narrativa",
+      "papel": "Estrutura, arcos, conflitos e integração com gameplay",
+      "cor": "#C792EA",
+      "sigla": "ND",
+      "glifo": "livro",
+      "token": "narrativa",
+      "skills": [
+        "plot-structure",
+        "interactive-fiction",
+        "sw-story-structure",
+        "story-analysis"
+      ]
+    },
+    {
+      "id": "script_doctor",
+      "nome": "Davi",
+      "cargo": "Script Doctor",
+      "papel": "Revisão de cenas e diálogos: ritmo, naturalidade e humor",
+      "cor": "#F78C6C",
+      "sigla": "SD",
+      "glifo": "dialogos",
+      "token": "roteiro",
+      "skills": [
+        "sw-dialogue",
+        "sw-scene-craft",
+        "dialogue",
+        "line-editing"
+      ]
+    },
+    {
+      "id": "lore_keeper",
+      "nome": "Selene",
+      "cargo": "Lore Keeper",
+      "papel": "Guardiã do cânone e da continuidade",
+      "cor": "#A1887F",
+      "sigla": "LK",
+      "glifo": "memoria",
+      "token": "lore",
+      "somenteLeitura": true,
+      "skills": [
+        "series-continuity",
+        "revision-continuity",
+        "knowledge-synthesis"
+      ]
+    },
+    {
+      "id": "workflow",
+      "nome": "Fábio",
+      "cargo": "Workflows",
+      "papel": "Desenha e otimiza o fluxo entre agentes",
+      "cor": "#4DB6AC",
+      "sigla": "WA",
+      "glifo": "fluxo",
+      "token": "workflow",
+      "somenteLeitura": true,
+      "skills": [
+        "team-composition-patterns",
+        "spec-driven-development",
+        "planning-and-task-breakdown"
+      ]
+    },
+    {
+      "id": "documentacao",
+      "nome": "Clara",
+      "cargo": "Documentação",
+      "papel": "Relatórios, especificações, atas e registros de decisão",
+      "cor": "#90A4AE",
+      "sigla": "DS",
+      "glifo": "livro",
+      "token": "docs",
+      "skills": [
+        "documentation",
+        "documentation-and-adrs",
+        "summarize-meeting",
+        "architecture-decision-records"
+      ]
+    },
+    {
+      "id": "produtor",
+      "nome": "Gui",
+      "cargo": "Produção",
+      "papel": "Prioridades, cronograma, dependências e entregas",
+      "cor": "#FFB74D",
+      "sigla": "PP",
+      "glifo": "relogio",
+      "token": "producao",
+      "somenteLeitura": true,
+      "skills": [
+        "sprint-plan",
+        "outcome-roadmap",
+        "prioritize-features",
+        "pre-mortem",
+        "stakeholder-map"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "nome": "Paula",
+      "cargo": "Estratégia de produto",
+      "papel": "Problema, valor, escopo, priorização e métricas",
+      "cor": "#F06292",
+      "sigla": "PS",
+      "glifo": "bussola",
+      "token": "estrategia",
+      "skills": [
+        "product-strategy",
+        "product-vision",
+        "north-star-metric",
+        "opportunity-solution-tree",
+        "identify-assumptions-new",
+        "prioritize-features"
+      ]
+    },
+    {
+      "id": "servico",
+      "nome": "Sofia",
+      "cargo": "Service Design",
+      "papel": "Jornada completa, bastidores e pontos de contato",
+      "cor": "#7986CB",
+      "sigla": "SV",
+      "glifo": "plug",
+      "token": "servico",
+      "skills": [
+        "service-blueprint",
+        "customer-journey-map",
+        "journey-map"
+      ]
+    },
+    {
+      "id": "interacao",
+      "nome": "Léo",
+      "cargo": "Interação e Protótipo",
+      "papel": "Comportamento, transições, estados e microinterações",
+      "cor": "#4FC3F7",
+      "sigla": "IX",
+      "glifo": "raio",
+      "token": "interacao",
+      "skills": [
+        "interaction-design",
+        "microinteractions",
+        "micro-interaction-spec",
+        "prototype-strategy"
+      ]
+    },
+    {
+      "id": "usabilidade",
+      "nome": "Duda",
+      "cargo": "Testes de usabilidade",
+      "papel": "Planejamento e análise de testes com pessoas reais",
+      "cor": "#AED581",
+      "sigla": "UT",
+      "glifo": "busca",
+      "token": "usabilidade",
+      "skills": [
+        "usability-test-plan",
+        "usability-testing",
+        "summarize-interview"
+      ]
+    },
+    {
+      "id": "acessibilidade",
+      "nome": "Tati",
+      "cargo": "Acessibilidade",
+      "papel": "WCAG 2.2, teclado, leitor de tela, contraste e foco",
+      "cor": "#FF8A65",
+      "sigla": "A11",
+      "glifo": "escudo",
+      "token": "acessibilidade",
+      "somenteLeitura": true,
+      "skills": [
+        "accessibility",
+        "wcag-audit-patterns",
+        "accessibility-compliance",
+        "accessibility-review"
+      ]
+    },
+    {
+      "id": "dados",
+      "nome": "Igor",
+      "cargo": "Dados de produto",
+      "papel": "Funis, métricas, CSAT, experimentos",
+      "cor": "#64B5F6",
+      "sigla": "DA",
+      "glifo": "banco",
+      "token": "dados",
+      "skills": [
+        "metrics-dashboard",
+        "kpi-dashboard-design",
+        "startup-metrics-framework",
+        "ab-testing",
+        "north-star-metric"
+      ]
+    },
+    {
+      "id": "backend",
+      "nome": "Lucas",
+      "cargo": "Back-end e APIs",
+      "papel": "Serviços, regras de negócio, dados e integrações",
+      "cor": "#8BA6E8",
+      "sigla": "BE",
+      "glifo": "servidor",
+      "token": "back",
+      "skills": [
+        "api-design-principles",
+        "nodejs-backend-patterns",
+        "fastapi-templates",
+        "python-testing-patterns",
+        "verification-before-completion",
+        "systematic-debugging"
+      ]
+    },
+    {
+      "id": "seguranca",
+      "nome": "Jonas",
+      "cargo": "Segurança e Privacidade",
+      "papel": "Permissões, dados pessoais, riscos e LGPD",
+      "cor": "#E57373",
+      "sigla": "SP",
+      "glifo": "cadeado",
+      "token": "seguranca",
+      "somenteLeitura": true,
+      "skills": [
+        "security-and-hardening",
+        "stride-analysis-patterns",
+        "security-requirement-extraction",
+        "threat-mitigation-mapping",
+        "secrets-management"
+      ]
+    },
+    {
+      "id": "devops",
+      "nome": "Edu",
+      "cargo": "DevOps e Integração",
+      "papel": "Ambientes, builds, CI e demonstrações",
+      "cor": "#A1887F",
+      "sigla": "DO",
+      "glifo": "fluxo",
+      "token": "devops",
+      "skills": [
+        "ci-cd-and-automation",
+        "deployment-pipeline-design",
+        "gitlab-ci-patterns"
+      ]
+    },
+    {
+      "id": "game_systems",
+      "nome": "Mateus",
+      "cargo": "Sistemas de jogo",
+      "papel": "Mecânicas, regras, progressão e loops",
+      "cor": "#BA68C8",
+      "sigla": "GS",
+      "glifo": "blocos",
+      "token": "sistemas",
+      "skills": [
+        "game-mechanics-design",
+        "game-prototype-loop",
+        "player-experience-modeling"
+      ]
+    },
+    {
+      "id": "player_xp",
+      "nome": "Lara",
+      "cargo": "Experiência do jogador",
+      "papel": "Onboarding, tutoriais, HUD, menus e feedback",
+      "cor": "#4DD0E1",
+      "sigla": "PX",
+      "glifo": "layout",
+      "token": "jogador",
+      "skills": [
+        "player-experience-modeling",
+        "game-interface-feedback",
+        "game-ui-ux",
+        "game-playtest-planning"
+      ]
+    },
+    {
+      "id": "level",
+      "nome": "Pedro",
+      "cargo": "Level Design",
+      "papel": "Mapas, missões, puzzles e ritmo de exploração",
+      "cor": "#81C784",
+      "sigla": "LD",
+      "glifo": "globo",
+      "token": "level",
+      "skills": [
+        "level-design",
+        "game-playtest-planning"
+      ]
+    },
+    {
+      "id": "economia",
+      "nome": "Gabi",
+      "cargo": "Economia e Balanceamento",
+      "papel": "Recompensas, moedas, curvas e simulações",
+      "cor": "#FFD54F",
+      "sigla": "EB",
+      "glifo": "banco",
+      "token": "economia",
+      "skills": [
+        "game-balance-economy",
+        "game-mechanics-design"
+      ]
+    },
+    {
+      "id": "gameplay",
+      "nome": "Vitor",
+      "cargo": "Gameplay Programmer",
+      "papel": "Protótipos jogáveis em Unreal, Unity ou Godot",
+      "cor": "#9575CD",
+      "sigla": "GP",
+      "glifo": "codigo",
+      "token": "gameplay",
+      "skills": [
+        "unreal-blueprints",
+        "unreal-cpp-gameplay",
+        "unity-ecs-patterns",
+        "godot-gdscript-patterns",
+        "game-feel",
+        "systematic-debugging"
+      ]
+    },
+    {
+      "id": "gdd",
+      "nome": "Alice",
+      "cargo": "GDD",
+      "papel": "Game Design Document vivo e especificações",
+      "cor": "#F48FB1",
+      "sigla": "GD",
+      "glifo": "livro",
+      "token": "gdd",
+      "skills": [
+        "game-design-docs",
+        "documentation"
+      ]
+    },
+    {
+      "id": "worldbuilding",
+      "nome": "Yuri",
+      "cargo": "Worldbuilding",
+      "papel": "Universos, culturas, cronologias e sistemas do mundo",
+      "cor": "#26A69A",
+      "sigla": "WB",
+      "glifo": "globo",
+      "token": "mundo",
+      "skills": [
+        "worldbuilding",
+        "systemic-worldbuilding",
+        "belief-systems",
+        "governance-systems"
+      ]
+    },
+    {
+      "id": "personagens",
+      "nome": "Joana",
+      "cargo": "Personagens",
+      "papel": "Quem o personagem é e como ele aparece: psicologia, voz e sprites",
+      "cor": "#EC407A",
+      "sigla": "CS",
+      "glifo": "dialogos",
+      "token": "personagens",
+      "skills": [
+        "character-arc",
+        "sw-character-conflict",
+        "voice-style",
+        "dialogue",
+        "character-design",
+        "create-game-assets",
+        "art-consistency"
+      ]
+    },
+    {
+      "id": "storyboard",
+      "nome": "Nico",
+      "cargo": "Storyboard e Cinemática",
+      "papel": "Planos, enquadramentos, câmera e ritmo visual",
+      "cor": "#FFA726",
+      "sigla": "SB",
+      "glifo": "imagem",
+      "token": "storyboard",
+      "skills": [
+        "cinematography",
+        "sw-scene-craft"
+      ]
+    },
+    {
+      "id": "arte",
+      "nome": "Luna",
+      "cargo": "Direção de Arte",
+      "papel": "Estilo, referências, paletas, personagens e briefs",
+      "cor": "#AB47BC",
+      "sigla": "AD",
+      "glifo": "imagem",
+      "token": "arte",
+      "skills": [
+        "art-direction",
+        "color-palette",
+        "art-consistency",
+        "create-game-assets",
+        "pixel-art-sprites"
+      ]
+    },
+    {
+      "id": "som",
+      "nome": "Tom",
+      "cargo": "Música e Som",
+      "papel": "Conceito musical, identidade sonora, voz e efeitos",
+      "cor": "#5C6BC0",
+      "sigla": "MS",
+      "glifo": "raio",
+      "token": "som",
+      "skills": [
+        "sound-design-film",
+        "ux-sound-design",
+        "sonic-branding",
+        "voiceover-direction"
+      ]
+    },
+    {
+      "id": "localizacao",
+      "nome": "Ingrid",
+      "cargo": "Localização",
+      "papel": "Adaptação entre idiomas preservando tom e cultura",
+      "cor": "#26C6DA",
+      "sigla": "LC",
+      "glifo": "dialogos",
+      "token": "localizacao",
+      "skills": [
+        "translation",
+        "localization-strategy",
+        "voice-style"
+      ]
+    },
+    {
+      "id": "mcp",
+      "nome": "Max",
+      "cargo": "MCP",
+      "papel": "Conexões com outras ferramentas por MCP",
+      "cor": "#26C6DA",
+      "sigla": "MC",
+      "glifo": "plug",
+      "token": "mcp",
+      "skills": []
+    },
+    {
+      "id": "creditos",
+      "nome": "Cris",
+      "cargo": "Créditos",
+      "papel": "Uso e orçamento",
+      "cor": "#E5B84B",
+      "sigla": "CR",
+      "glifo": "relogio",
+      "token": "creditos",
+      "somenteLeitura": true,
+      "sistema": true,
+      "skills": []
+    }
+  ],
+  "rotas": {
+    "equipe": "orquestrador",
+    "conhecimento": "conhecimento",
+    "curadoria": "conhecimento",
+    "qualidade": "qualidade",
+    "pesquisa": "pesquisa",
+    "requisitos": "requisitos",
+    "arquiteturaux": "ux_architect",
+    "writing": "ux_writer",
+    "ui": "ui_system",
+    "auditoria": "auditor",
+    "tecnico": "architect",
+    "front": "frontend",
+    "testes": "qa_teste",
+    "narrativa": "narrative",
+    "roteiro": "script_doctor",
+    "lore": "lore_keeper",
+    "workflow": "workflow",
+    "docs": "documentacao",
+    "producao": "produtor",
+    "estrategia": "estrategia",
+    "servico": "servico",
+    "interacao": "interacao",
+    "usabilidade": "usabilidade",
+    "acessibilidade": "acessibilidade",
+    "dados": "dados",
+    "back": "backend",
+    "seguranca": "seguranca",
+    "devops": "devops",
+    "sistemas": "game_systems",
+    "jogador": "player_xp",
+    "level": "level",
+    "economia": "economia",
+    "gameplay": "gameplay",
+    "gdd": "gdd",
+    "mundo": "worldbuilding",
+    "personagens": "personagens",
+    "storyboard": "storyboard",
+    "arte": "arte",
+    "som": "som",
+    "localizacao": "localizacao",
+    "mcp": "mcp"
+  },
+  "aliases": {
+    "orquestradora": "orquestrador",
+    "lead": "orquestrador",
+    "knowledge": "conhecimento",
+    "memoria": "conhecimento",
+    "fontes": "conhecimento",
+    "quality": "qualidade",
+    "revisao": "qualidade",
+    "research": "pesquisa",
+    "researcher": "pesquisa",
+    "discovery": "pesquisa",
+    "ux": "ux_architect",
+    "ia": "ux_architect",
+    "fluxo": "ux_architect",
+    "fluxos": "ux_architect",
+    "negocio": "requisitos",
+    "regras": "requisitos",
+    "ba": "requisitos",
+    "texto": "ux_writer",
+    "copy": "ux_writer",
+    "microcopy": "ux_writer",
+    "writer": "ux_writer",
+    "design": "ui_system",
+    "ds": "ui_system",
+    "componente": "ui_system",
+    "figma": "ui_system",
+    "audit": "auditor",
+    "arquitetura": "architect",
+    "processo": "workflow",
+    "fluxos-agentes": "workflow",
+    "documento": "documentacao",
+    "ata": "documentacao",
+    "relatorio": "documentacao",
+    "cronograma": "produtor",
+    "prazo": "produtor",
+    "produto": "estrategia",
+    "metricas": "dados",
+    "metrica": "dados",
+    "funil": "dados",
+    "jornada": "servico",
+    "blueprint": "servico",
+    "microinteracao": "interacao",
+    "animacao": "interacao",
+    "a11y": "acessibilidade",
+    "wcag": "acessibilidade",
+    "api": "backend",
+    "backend": "backend",
+    "lgpd": "seguranca",
+    "privacidade": "seguranca",
+    "ci": "devops",
+    "build": "devops",
+    "ambiente": "devops",
+    "mecanica": "game_systems",
+    "mecanicas": "game_systems",
+    "hud": "player_xp",
+    "onboarding": "player_xp",
+    "tutorial": "player_xp",
+    "mapa": "level",
+    "fase": "level",
+    "balanceamento": "economia",
+    "loot": "economia",
+    "unreal": "gameplay",
+    "unity": "gameplay",
+    "godot": "gameplay",
+    "universo": "worldbuilding",
+    "cultura": "worldbuilding",
+    "personagem": "personagens",
+    "camera": "storyboard",
+    "planos": "storyboard",
+    "visual": "arte",
+    "paleta": "arte",
+    "musica": "som",
+    "audio": "som",
+    "traducao": "localizacao",
+    "idioma": "localizacao",
+    "viabilidade": "architect",
+    "frontend": "frontend",
+    "prototipo": "frontend",
+    "poc": "frontend",
+    "qa": "qa_teste",
+    "teste": "qa_teste",
+    "narrative": "narrative",
+    "historia": "narrative",
+    "dialogo": "script_doctor",
+    "dialogos": "script_doctor",
+    "cena": "script_doctor",
+    "canon": "lore_keeper",
+    "canone": "lore_keeper",
+    "continuidade": "lore_keeper",
+    "credito": "creditos",
+    "uso": "creditos",
+    "orcamento": "creditos",
+    "mcp": "mcp",
+    "conexao": "mcp",
+    "conexoes": "mcp",
+    "higgsfield": "mcp"
+  },
+  "contrato": {
+    "fluxo": "leve",
+    "dominios": {
+      "pesquisa": "pesquisa",
+      "requisitos": "requisitos",
+      "ui": "ui_system",
+      "frontend": "frontend",
+      "backend": "backend",
+      "dados": "dados",
+      "seguranca": "seguranca",
+      "devops": "devops",
+      "acessibilidade": "acessibilidade",
+      "usabilidade": "usabilidade",
+      "interacao": "interacao"
+    },
+    "palavras": {
+      "pesquisa": [
+        "entrevista",
+        "pesquisa",
+        "persona",
+        "descoberta",
+        "insight"
+      ],
+      "requisitos": [
+        "requisito",
+        "história de usuário",
+        "historia de usuario",
+        "critério",
+        "criterio",
+        "escopo"
+      ],
+      "ui": [
+        "design system",
+        "componente",
+        "token",
+        "tela",
+        "figma"
+      ],
+      "frontend": [
+        "react",
+        "css",
+        "front",
+        "página",
+        "pagina"
+      ],
+      "backend": [
+        "api",
+        "endpoint",
+        "backend",
+        "service"
+      ],
+      "dados": [
+        "métrica",
+        "metrica",
+        "evento",
+        "analytics",
+        "funil",
+        "dado"
+      ],
+      "seguranca": [
+        "privacidade",
+        "lgpd",
+        "segurança",
+        "seguranca",
+        "auth",
+        "token"
+      ],
+      "devops": [
+        "deploy",
+        "ci",
+        "pipeline",
+        "infra",
+        "docker"
+      ],
+      "acessibilidade": [
+        "acessibilidade",
+        "wcag",
+        "contraste",
+        "leitor de tela",
+        "a11y"
+      ],
+      "usabilidade": [
+        "teste de usabilidade",
+        "tarefa",
+        "sucesso",
+        "erro do usuário",
+        "erro do usuario"
+      ],
+      "interacao": [
+        "protótipo",
+        "prototipo",
+        "interação",
+        "interacao",
+        "fluxo",
+        "transição",
+        "transicao"
+      ]
+    },
+    "checagens": [
+      {
+        "nome": "arquivos da entrega existem",
+        "tipo": "arquivos"
+      }
+    ],
+    "entregas": "Entrega é artefato na pasta do projeto (protótipo, especificação, fluxo, documento) com caminho listado no card. O app confere que os arquivos existem.",
+    "revisao": {
+      "nome": "revisão de UX",
+      "instrucao": "Revise contra o fluxo e o requisito: percorra o protótipo ou a tela como usuária, confira acessibilidade, consistência com o design system e se cada critério de aceite é observável. Aponte o que diverge com o arquivo e o passo."
+    }
+  }
+}

@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {execFileSync} from 'node:child_process';
+import {prepararEscrita,verificarIntegracao,integrarIsolado} from '../lib/worktree.mjs';
+const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'nectar-git-')),root=path.join(tmp,'repo'),pasta=path.join(tmp,'runtime');fs.mkdirSync(root);
+const git=(cwd,args)=>execFileSync('git',['-C',cwd,...args],{encoding:'utf8',windowsHide:true,stdio:['ignore','pipe','pipe']}).trim();
+git(root,['init','-b','main']);git(root,['config','user.name','Nectar Test']);git(root,['config','user.email','nectar@example.invalid']);
+fs.writeFileSync(path.join(root,'service.txt'),'baseline\n');git(root,['add','service.txt']);git(root,['commit','-m','baseline']);const baseline=git(root,['rev-parse','HEAD']);
+fs.writeFileSync(path.join(root,'user-dirty.txt'),'preserve');
+const a=prepararEscrita({root,pasta,taskId:'A'}),b=prepararEscrita({root,pasta,taskId:'B'});assert.notEqual(a.cwd,b.cwd);
+assert(prepararEscrita({root,pasta,taskId:'A'}).resumed);
+for(const [env,text]of [[a,'implementation A\n'],[b,'implementation B\n']]){fs.writeFileSync(path.join(env.cwd,'service.txt'),text);git(env.cwd,['add','service.txt']);git(env.cwd,['commit','-m',text.trim()]);}
+const tests=env=>[{status:'passed',exitCode:0,commit:git(env.cwd,['rev-parse','HEAD']),evidence:'independent fixture check'}];
+assert.throws(()=>verificarIntegracao({root,branch:a.branch,baseCommit:baseline,allowedPaths:['other'],requiredTests:tests(a)}),/scope_violation/);
+assert.throws(()=>verificarIntegracao({root,branch:a.branch,baseCommit:baseline,allowedPaths:['service.txt'],requiredTests:[]}),/tests_missing/);
+const merged=integrarIsolado({root,pasta,taskId:'A',branch:a.branch,target:'main',expectedTarget:baseline,allowedPaths:['service.txt'],requiredTests:tests(a)});assert(merged.ok);assert.equal(merged.published,false);
+assert.throws(()=>integrarIsolado({root,pasta,taskId:'B',branch:b.branch,target:'main',expectedTarget:'000',allowedPaths:['service.txt'],requiredTests:tests(b)}),/version_conflict/);
+const conflict=integrarIsolado({root,pasta,taskId:'B',branch:b.branch,target:merged.branch,expectedTarget:merged.commit,allowedPaths:['service.txt'],requiredTests:tests(b)});
+assert(!conflict.ok);assert.equal(conflict.failure,'integration_conflict');assert(conflict.conflicts.includes('service.txt'));assert(fs.existsSync(conflict.cwd));
+assert.equal(fs.readFileSync(path.join(root,'user-dirty.txt'),'utf8'),'preserve');assert.equal(git(root,['rev-parse','HEAD']),baseline);assert.equal(git(root,['branch','--show-current']),'main');
+console.log('PASS: Git real, writers isolados, retomada, escopo/testes/versão, conflito preservado e checkout sujo intacto.');
+fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});

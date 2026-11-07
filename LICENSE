@@ -1,0 +1,112 @@
+LICENÇA NECTAR — USO PESSOAL E ESTUDO NÃO COMERCIAL
+Versão 1.0 — 7 de novembro de 2026
+
+Copyright (c) 2026 Déborah Fernandes. Todos os direitos reservados.
+Titular e contato para licenciamento: https://github.com/deefaraujo
+
+1. OBJETO E TITULARIDADE
+
+Esta licença rege apenas o código original, a documentação e os materiais da
+ferramenta NECTAR sobre os quais Déborah Fernandes detenha os direitos necessários
+("Software"). A disponibilização do código não transfere sua titularidade e não
+o coloca em domínio público. Todos os direitos não concedidos expressamente
+permanecem reservados à titular. Esta é uma licença de código disponível para
+consulta (source-available), não uma licença open source irrestrita.
+
+2. PERMISSÃO LIMITADA
+
+Desde que você cumpra integralmente estes termos, a titular concede a uma pessoa
+física permissão gratuita, não exclusiva, não sublicenciável e não transferível
+para visualizar, baixar, executar e modificar privadamente o Software somente
+para uso pessoal, estudo individual, aprendizado e experimentação não comercial,
+sem prestação de serviços a terceiros e sem finalidade profissional, empresarial
+ou de geração de receita direta ou indireta. Uso por organizações, em benefício
+de organizações ou para treinamento profissional remunerado requer licença
+separada. A titular pode conceder autorizações e licenças diferentes a seu critério.
+
+3. ATIVIDADES QUE EXIGEM AUTORIZAÇÃO COMERCIAL PRÉVIA
+
+Sem contrato de licença separado, prévio e escrito, não é permitido, entre outros:
+
+a) vender, alugar, sublicenciar, cobrar pelo acesso ou monetizar o Software,
+   versões modificadas, trechos substanciais ou obras derivadas;
+b) incorporar o Software ou seus trechos em produtos, aplicativos, plataformas,
+   serviços, bibliotecas ou soluções destinados à comercialização;
+c) oferecê-lo como serviço hospedado, SaaS, API, plataforma, white-label ou parte
+   de um pacote, inclusive quando o acesso for gratuito mas houver publicidade,
+   patrocínio, venda associada ou outro benefício econômico;
+d) empregá-lo em atividades profissionais, trabalho remunerado, consultoria,
+   prestação de serviços, operações empresariais ou execução de projetos para
+   clientes ou empregadores, mesmo sem revenda direta do próprio Software;
+e) utilizar modificações, integrações ou derivações para contornar estas
+   restrições, inclusive mudar o nome, a aparência ou a forma de distribuição;
+f) utilizar o Software em pesquisa, ensino, treinamento, avaliação ou produção
+   com finalidade comercial ou profissional sem a autorização aplicável.
+
+O fato de uma atividade não cobrar diretamente pelo Software não a torna
+automaticamente pessoal ou não comercial. Se a finalidade não estiver coberta
+expressamente pela seção 2, solicite uma licença antes do uso.
+
+4. CÓPIAS, FORKS E REDISTRIBUIÇÃO
+
+Preserve esta licença, os avisos de autoria e os avisos de terceiros em toda
+cópia permitida. Os direitos de visualizar e realizar forks dentro da plataforma
+de hospedagem são respeitados na medida exigida pelos termos aplicáveis dessa
+plataforma; eles não autorizam uso comercial. Modificações e forks não ampliam
+as permissões desta licença. Fora dos direitos obrigatórios da plataforma e da
+legislação, publicar cópias, versões modificadas ou executáveis, redistribuir a
+terceiros ou sublicenciar o Software requer autorização prévia e escrita da
+titular. Não substitua esta licença por outra nem remova suas restrições.
+
+5. PROJETOS E DADOS EXTERNOS
+
+Os projetos, arquivos, dados, credenciais e trabalhos processados com a ferramenta
+não fazem parte desta distribuição e não recebem esta licença automaticamente.
+Seus titulares mantêm seus próprios direitos. Esta licença não concede qualquer
+direito sobre projetos da titular, de clientes, de empregadores ou de terceiros.
+Resultados produzidos com auxílio de serviços ou modelos de terceiros também
+podem estar sujeitos a direitos e condições próprios. Nada aqui autoriza acesso
+a dados ou serviços para os quais você não tenha permissão.
+
+6. DEPENDÊNCIAS E COMPONENTES DE TERCEIROS
+
+As restrições desta licença não alteram os direitos independentes concedidos
+pelos titulares de dependências, fontes, ferramentas ou outros componentes de
+terceiros. Esses itens permanecem sob suas próprias licenças e avisos, quando
+aplicáveis. Esta licença não reivindica autoria sobre eles. Consulte
+THIRD_PARTY_NOTICES.md e os avisos que acompanham cada componente. A existência
+de dependências permissivas não concede licença comercial para o código
+original da NECTAR.
+
+7. MARCAS E CONTRIBUIÇÕES
+
+Não é concedido direito de usar o nome, logotipo ou identidade visual NECTAR para
+identificar outro produto, sugerir associação ou anunciar endosso. Contribuições
+de terceiros não transferem direitos automaticamente; sua incorporação poderá
+depender de acordo específico com seus titulares, inclusive para permitir o
+licenciamento comercial pela titular da NECTAR.
+
+8. DESCUMPRIMENTO E DIREITOS LEGAIS
+
+As permissões concedidas por esta licença cessam em caso de descumprimento de
+suas condições, na extensão permitida pela legislação aplicável. Cesse o uso não
+autorizado e procure a titular para regularização. Nenhuma cláusula elimina
+direitos obrigatórios ou exceções legais que não possam ser excluídos por contrato.
+
+9. AUSÊNCIA DE GARANTIAS E LIMITAÇÃO DE RESPONSABILIDADE
+
+Na máxima extensão permitida pela legislação aplicável, o Software é fornecido
+no estado em que se encontra, sem garantia de adequação, disponibilidade,
+segurança, desempenho ou ausência de erros. Você é responsável por avaliar os
+riscos de execução de agentes, acesso a arquivos, integrações e chamadas a
+serviços externos, bem como por manter backups e obter as autorizações
+necessárias. A titular não assume responsabilidade por danos decorrentes do uso,
+salvo quando a legislação aplicável não permitir essa exclusão.
+
+10. CONTATO
+
+Para uso comercial, profissional, institucional ou qualquer autorização não
+coberta expressamente, entre em contato com Déborah Fernandes pelo perfil
+https://github.com/deefaraujo e obtenha autorização escrita antes do uso.
+A ausência de resposta, a existência de um repositório público ou o silêncio da
+titular não constituem autorização.

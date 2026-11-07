@@ -1,0 +1,100 @@
+{
+  "schema": "nectar.skills-opcionais.v1",
+  "skills": [
+    {
+      "id": "animation-principles",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "art-consistency",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "art-direction",
+      "origem": "https://github.com/rampstackco/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "character-design",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "cinematography",
+      "origem": "https://github.com/fal-ai-community/skills",
+      "distribuido": false
+    },
+    {
+      "id": "color-palette",
+      "origem": "https://github.com/jezweb/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "illustration-style",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "planning-and-task-breakdown",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "plot-structure",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "pre-mortem",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "revision-continuity",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "series-continuity",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-character-conflict",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-dialogue",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-scene-craft",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-story-structure",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "team-composition-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "verification-before-completion",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "voice-style",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "schema": "nectar.skills-opcionais.v1",
+  "skills": [
+    {
+      "id": "brand-presentation-registry",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "brand-review",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "contribution-attribution",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "cross-source-correlation",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "data-visualization",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "digest",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "documentos-editaveis",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "enterprise-data-governance",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "enterprise-source-discovery",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "enterprise-sync-health",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "fluxos-assessoria",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "internal-comms",
+      "origem": "https://github.com/anthropics/skills",
+      "distribuido": false
+    },
+    {
+      "id": "jira-work-history",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "knowledge-synthesis",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "metrics-review",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "notion-project-knowledge",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "performance-review",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "ppt-template-creator",
+      "origem": "https://github.com/anthropics/financial-services",
+      "distribuido": false
+    },
+    {
+      "id": "presentation-evidence-qa",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "presentation-rehearsal",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "report-builder",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "research-synthesis",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "review-intelligence",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "risk-assessment",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "search-strategy",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "source-management",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "sprint-planning",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "stakeholder-update",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "standup",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "status-report",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "teams-project-context",
+      "origem": null,
+      "distribuido": true
+    },
+    {
+      "id": "theme-factory",
+      "origem": "https://github.com/anthropics/skills",
+      "distribuido": false
+    },
+    {
+      "id": "validate-data",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "work-activity-ledger",
+      "origem": null,
+      "distribuido": true
+    }
+  ]
+}

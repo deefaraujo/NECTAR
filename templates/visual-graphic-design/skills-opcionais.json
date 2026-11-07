@@ -1,0 +1,260 @@
+{
+  "schema": "nectar.skills-opcionais.v1",
+  "skills": [
+    {
+      "id": "3d-modeling",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "accessibility",
+      "origem": "https://github.com/addyosmani/web-quality-skills",
+      "distribuido": false
+    },
+    {
+      "id": "animation-principles",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "art-consistency",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "art-direction",
+      "origem": "https://github.com/rampstackco/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "brand-positioning",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "brand-review",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "brand-storytelling",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "brand-strategy",
+      "origem": "https://github.com/guia-matthieu/clawfu-skills",
+      "distribuido": false
+    },
+    {
+      "id": "branding",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "campaign-plan",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "character-design",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "cinematography",
+      "origem": "https://github.com/fal-ai-community/skills",
+      "distribuido": false
+    },
+    {
+      "id": "color-palette",
+      "origem": "https://github.com/jezweb/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "color-system",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "color-theory",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "content-strategy",
+      "origem": "https://github.com/coreyhaines31/marketingskills",
+      "distribuido": false
+    },
+    {
+      "id": "copywriting",
+      "origem": "https://github.com/coreyhaines31/marketingskills",
+      "distribuido": false
+    },
+    {
+      "id": "create-game-assets",
+      "origem": "https://github.com/gamedev-skills/awesome-gamedev-agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "customer-research",
+      "origem": "https://github.com/coreyhaines31/marketingskills",
+      "distribuido": false
+    },
+    {
+      "id": "data-visualization",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "design-tokens",
+      "origem": "https://github.com/julianoczkowski/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "documentation",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "icon-design",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "icon-system",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "identify-assumptions-new",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "illustration-style",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "interview-script",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "journey-map",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "knowledge-synthesis",
+      "origem": "https://github.com/anthropics/knowledge-work-plugins",
+      "distribuido": false
+    },
+    {
+      "id": "layout-grid",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "motion-design",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "motion-graphics",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "motion-system",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "opportunity-solution-tree",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "packaging-print-production",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "pixel-art-sprites",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "planning-and-task-breakdown",
+      "origem": "https://github.com/addyosmani/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "pre-mortem",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "presentation-deck",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "presentation-design",
+      "origem": "https://github.com/jwynia/agent-skills",
+      "distribuido": false
+    },
+    {
+      "id": "prototype-strategy",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "refactoring-ui",
+      "origem": "https://github.com/wondelai/skills",
+      "distribuido": false
+    },
+    {
+      "id": "research-repository",
+      "origem": "https://github.com/owl-listener/designer-skills",
+      "distribuido": false
+    },
+    {
+      "id": "social-media-posts",
+      "origem": "https://github.com/jezweb/claude-skills",
+      "distribuido": false
+    },
+    {
+      "id": "sw-scene-craft",
+      "origem": "https://github.com/jtydhr88/screenwriting-skills",
+      "distribuido": false
+    },
+    {
+      "id": "team-composition-patterns",
+      "origem": "https://github.com/wshobson/agents",
+      "distribuido": false
+    },
+    {
+      "id": "typography",
+      "origem": "https://github.com/omer-metin/skills-for-antigravity",
+      "distribuido": false
+    },
+    {
+      "id": "user-personas",
+      "origem": "https://github.com/phuryn/pm-skills",
+      "distribuido": false
+    },
+    {
+      "id": "verification-before-completion",
+      "origem": "https://github.com/obra/superpowers",
+      "distribuido": false
+    },
+    {
+      "id": "voice-style",
+      "origem": "https://github.com/danjdewhurst/story-skills",
+      "distribuido": false
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import { configurarDesafio, instrucoesProgramacao, validarObservacaoProgramacao, validarLinguagemObservada } from '../lib/entrevista-programacao.mjs';
+import { validarAcao } from '../lib/entrevista-acoes.mjs';
+for(const dificuldade of ['easy','medium','hard']){
+  const c=configurarDesafio({modo:'programacao',plataforma:'leetcode',dificuldade,linguagem:'Python 3'});
+  const texto=instrucoesProgramacao(c);
+  assert.ok(texto.includes(dificuldade));assert.match(texto,/assinatura/);assert.match(texto,/Run\/Run Code/);assert.match(texto,/Submit\/Submit Code/);
+}
+assert.throws(()=>configurarDesafio({dificuldade:'impossivel'}));
+for(const tecla of ['CTRL+A','CTRL+HOME','CTRL+END','CTRL+Z','SHIFT+HOME','SHIFT+END','ESC','DELETE'])assert.equal(validarAcao({tipo:'tecla',tecla}).tecla,tecla);
+for(const tecla of ['CTRL+C','CTRL+V','ALT+F4','WIN+R'])assert.throws(()=>validarAcao({tipo:'tecla',tecla}));
+assert.equal(validarAcao({tipo:'codigo',texto:'class Solution:\n    def solve(self):\n        return 1\n'}).tipo,'codigo');
+assert.throws(()=>validarAcao({tipo:'codigo',texto:'x'.repeat(24001)}));
+const c=configurarDesafio({modo:'programacao'});
+const linguagem={disponiveis:['Python 3','C++17','Java 17'],selecionada:'C++17',obrigatoria:'',confirmada:true,evidencia:'Seletor do editor: C++17',motivo:'Disponível no teste e compatível com o currículo e limites'};
+const editar={tipo:'codigo',texto:'return 1;',observacao:{etapa:'editar',veredito:'nao_verificado',evidencia:'Editor disponível'}};
+assert.throws(()=>validarObservacaoProgramacao(editar,c),/não confirmada/);
+assert.equal(validarObservacaoProgramacao({...editar,linguagem},c).tipo,'codigo');
+assert.equal(validarObservacaoProgramacao(editar,c,[],linguagem).tipo,'codigo');
+assert.throws(()=>validarObservacaoProgramacao({...editar,linguagem:{...linguagem,confirmada:false}},c),/não confirmada/);
+assert.throws(()=>validarObservacaoProgramacao({...editar,linguagem:{...linguagem,evidencia:''}},c),/não confirmada/);
+assert.throws(()=>validarObservacaoProgramacao({...editar,linguagem:{...linguagem,selecionada:'Rust'}},c),/incompatível/);
+assert.throws(()=>validarLinguagemObservada({confirmada:'sim'}),/inválida/);
+const descoberta={...linguagem,disponiveis:['Ruby 3.2'],selecionada:'Ruby 3.2'};
+assert.equal(validarObservacaoProgramacao({...editar,linguagem:descoberta},c).linguagem.selecionada,'Ruby 3.2');
+const observacao={etapa:'finalizado',veredito:'aceito',evidencia:'Accepted; todas as questões concluídas'};
+const final={tipo:'concluir',observacao};
+assert.throws(()=>validarObservacaoProgramacao(final,c,[]),/submissão aceita/);
+const historico=[{acao:{tipo:'clicar',observacao:{etapa:'submeter'}}}];
+assert.equal(validarObservacaoProgramacao(final,c,historico),final);
+assert.throws(()=>validarObservacaoProgramacao({...final,observacao:{...observacao,veredito:'exemplos_ok'}},c,historico),/submissão aceita/);
+assert.throws(()=>validarObservacaoProgramacao({...final,observacao:{...observacao,evidencia:''}},c,historico));
+assert.throws(()=>validarObservacaoProgramacao({tipo:'aguardar'},c));
+assert.throws(()=>validarObservacaoProgramacao({...final,memoria:'x'.repeat(24001)},c,historico));
+console.log('Programação: easy/medium/hard, protocolo, teclas sem clipboard, código multilinha e conclusão após submissão validados.');

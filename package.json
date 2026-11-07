@@ -1,0 +1,78 @@
+{
+  "name": "work-ia",
+  "productName": "NECTAR",
+  "version": "1.0.0",
+  "description": "Equipe de agentes de IA com chat, planner e memória, por projeto",
+  "private": true,
+  "main": "electron/main.mjs",
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "test:ui": "python tests/interface.py && python tests/producao.py",
+    "test:packaged": "python tests/empacotado.py",
+    "start": "node scripts/iniciar.mjs",
+    "web": "node server.mjs",
+    "pack": "electron-builder --win --dir",
+    "pack:teamwork": "electron-builder --win --dir --config.directories.output=dist-teamwork-review",
+    "test:teamwork": "node tests/teamwork.mjs && node tests/claude-policy.mjs && node tests/worktree-teamwork.mjs && node tests/teamwork-metrics.mjs && node tests/benchmark-harness.mjs",
+    "test:sandbox": "node tests/sandbox-real.mjs",
+    "build": "electron-builder --win",
+    "check:publicacao": "node scripts/verificar-publicacao.mjs"
+  },
+  "build": {
+    "appId": "ai.work.app",
+    "productName": "NECTAR",
+    "copyright": "NECTAR",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**",
+      "lib/**",
+      "public/**",
+      "marca.json",
+      "templates/**",
+      "vozes/**",
+      "server.mjs",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "electron/entrevista-input.ps1",
+      "lib/claude-policy-hook.cjs",
+      "lib/voz_worker.py",
+      "vozes/**"
+    ],
+    "electronDist": "node_modules/electron/dist",
+    "afterPack": "scripts/exe-intacto.cjs",
+    "win": {
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "NECTAR.zip"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0"
+  },
+  "dependencies": {
+    "pdf-parse": "^1.1.1"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Déborah Fernandes",
+    "url": "https://github.com/deefaraujo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deefaraujo/NECTAR.git"
+  }
+}
