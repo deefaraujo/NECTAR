@@ -1,5 +1,5 @@
-// Pedido de trabalho a outra equipe (equipe.pedir): sai da liderança daqui com o arquivo, chega na liderança de lá com
-// a cópia do arquivo, e a entrega de lá volta anexada na mesma conversa. Antes, a ponte só levava texto.
+// Work request to another team (equipe.pedir): it leaves this team's leadership with the file, reaches the other leadership with
+// a copy of the file, and their delivery comes back attached in the same conversation. Before, the bridge only carried text.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -21,26 +21,26 @@ const ass = projetos.adicionarEquipe(pid, { template: 'professional-operations' 
 const cidAss = projetos.colegasExternos(pid).find((x) => x.lider).cid;
 const la = projetos.ctx(cidAss).equipe;
 
-// a P.O. usa o id interno da equipe, como no print: tem que funcionar
+// the P.O. uses the team's internal id, as in the screenshot: it must work
 sw.enviar({ canal: 'dm:po', texto: '[teste:equipe-pedir:professional_operations:entregas/relatorio.pdf] pede pra assessoria' });
 const salaLa = () => la.grupos().find((g) => g.ponte);
-assert(await espera(() => salaLa() && la.historico(salaLa().canal).some((m) => m.externa && m.anexos?.some((a) => /relatorio\.pdf$/.test(a.nome)))), 'o pedido chega lá com o arquivo anexado');
+assert(await espera(() => salaLa() && la.historico(salaLa().canal).some((m) => m.externa && m.anexos?.some((a) => /relatorio\.pdf$/.test(a.nome)))), 'the request arrives there with the file attached');
 const pastaLa = path.join(projetos.ctx(cidAss).pasta, 'anexos');
 const copias = fs.readdirSync(pastaLa, { recursive: true }).filter((f) => /relatorio\.pdf$/.test(String(f)));
-assert(copias.length && fs.readFileSync(path.join(pastaLa, String(copias[0])), 'utf8') === '%PDF original', 'a outra equipe tem a sua cópia do arquivo para os agentes lerem');
+assert(copias.length && fs.readFileSync(path.join(pastaLa, String(copias[0])), 'utf8') === '%PDF original', 'the other team has its own copy of the file for its agents to read');
 
-// a liderança de lá responde na conversa com o arquivo pronto: volta anexado para cá
+// the other leadership replies in the conversation with the finished file: it comes back attached here
 const salaAqui = () => sw.grupos().find((g) => g.ponte);
-assert(await espera(() => salaAqui() && sw.historico(salaAqui().canal).some((m) => m.externa && m.anexos?.some((a) => a.pid && /bonito\.pdf$/.test(a.nome)))), 'a entrega da outra equipe volta anexada');
-assert(!sw.historico('dm:po').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /não achei|não achou|precisa/.test(x.texto))), 'sem aviso de equipe não encontrada');
+assert(await espera(() => salaAqui() && sw.historico(salaAqui().canal).some((m) => m.externa && m.anexos?.some((a) => a.pid && /bonito\.pdf$/.test(a.nome)))), 'the other team delivery comes back attached');
+assert(!sw.historico('dm:po').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /não achei|não achou|precisa/.test(x.texto))), 'no team-not-found warning');
 
-// só a liderança pede a outra equipe; equipe inexistente diz quais existem
+// only leadership asks another team; a nonexistent team reports which ones exist
 sw.enviar({ canal: 'dm:backend', texto: '[teste:equipe-pedir:assessoria:entregas/relatorio.pdf] eu mesmo peço' });
-assert(await espera(() => sw.historico('dm:backend').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /é da liderança/.test(x.texto)))), 'especialista não pede direto a outra equipe');
+assert(await espera(() => sw.historico('dm:backend').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /é da liderança/.test(x.texto)))), 'a specialist does not ask another team directly');
 sw.enviar({ canal: 'dm:po', texto: '[teste:equipe-pedir:marketing:entregas/relatorio.pdf] e essa?' });
-assert(await espera(() => sw.historico('dm:po').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /não achei a equipe "marketing".*Assessoria/.test(x.texto)))), 'equipe que não existe: o aviso lista as que existem');
+assert(await espera(() => sw.historico('dm:po').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /não achei a equipe "marketing".*Assessoria/.test(x.texto)))), 'nonexistent team: the warning lists the existing ones');
 
 await dorme(300);
-try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* pasta temporária */ }
-console.log('PASS: equipe.pedir (pelo id interno da equipe, arquivo vai e entrega volta anexada, só a liderança pede, equipe inexistente lista as que existem).');
+try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* temp folder */ }
+console.log('PASS: equipe.pedir (by internal team id, the file goes and the delivery comes back attached, only leadership asks, a nonexistent team lists the existing ones).');
 process.exit(0);

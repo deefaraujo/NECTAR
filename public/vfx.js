@@ -1,10 +1,10 @@
-// Efeitos do perfil (VFX) em canvas: partículas que cobrem o cartão inteiro, como os efeitos de perfil do Discord.
-// VFX.iniciar(canvas, tipo) começa; o efeito para sozinho quando o canvas sai da tela.
+// Profile effects (VFX) on canvas: particles covering the whole card, like Discord's profile effects.
+// VFX.iniciar(canvas, tipo) starts it; the effect stops on its own when the canvas leaves the screen.
 (() => {
   const R = (a, b) => a + Math.random() * (b - a);
   const reduzido = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  // cada tipo: quantas partículas, como nasce e como anda/desenha
+  // each type: how many particles, how they spawn and how they move/draw
   const TIPOS = {
     estrelas: {
       n: 46,
@@ -14,7 +14,7 @@
         ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.28); ctx.fill();
         if (p.r > 1.3 && a > .9) { ctx.strokeStyle = `rgba(200,220,255,${a * .6})`; ctx.lineWidth = .6; ctx.beginPath(); ctx.moveTo(p.x - 4, p.y); ctx.lineTo(p.x + 4, p.y); ctx.moveTo(p.x, p.y - 4); ctx.lineTo(p.x, p.y + 4); ctx.stroke(); }
       },
-      extra(ctx, w, h, t, st) {      // estrela cadente de vez em quando
+      extra(ctx, w, h, t, st) {      // shooting star every now and then
         if (!st.cad && Math.random() < .006) st.cad = { x: R(w * .3, w), y: R(0, h * .3), vida: 1 };
         const c = st.cad; if (!c) return;
         const g = ctx.createLinearGradient(c.x, c.y, c.x + 40, c.y - 20); g.addColorStop(0, `rgba(255,255,255,${c.vida})`); g.addColorStop(1, 'rgba(255,255,255,0)');
@@ -68,7 +68,7 @@
     },
     codigo: {
       n: 0,
-      extra(ctx, w, h, t, st) {     // chuva de código
+      extra(ctx, w, h, t, st) {     // code rain
         const tam = 11; const cols = Math.ceil(w / tam);
         if (!st.y || st.y.length !== cols) st.y = Array.from({ length: cols }, () => R(-h, 0));
         ctx.font = `${tam}px monospace`;
@@ -115,13 +115,13 @@
       def.extra?.(ctx, w, h, t, st);
       requestAnimationFrame(quadro);
     };
-    if (reduzido()) { quadro(); vivo = false; }   // movimento reduzido: um quadro parado
+    if (reduzido()) { quadro(); vivo = false; }   // reduced motion: a single still frame
     else requestAnimationFrame(quadro);
     canvas._vfxParar = () => { vivo = false; };
     return canvas._vfxParar;
   }
 
-  /** Liga os efeitos de todos os canvas [data-vfx] dentro de `raiz` ainda não iniciados. */
+  /** Turns on the effects of all not-yet-started [data-vfx] canvases inside `raiz`. */
   function ligar(raiz = document) {
     raiz.querySelectorAll('canvas[data-vfx]').forEach((c) => { if (c.dataset.vfxOn !== c.dataset.vfx) { c.dataset.vfxOn = c.dataset.vfx; iniciar(c, c.dataset.vfx); } });
   }

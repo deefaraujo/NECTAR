@@ -1,4 +1,4 @@
-// Contratos reais em disco, corrupção, replay, CAS, gates e isolamento de dados.
+// Real contracts on disk, corruption, replay, CAS, gates and data isolation.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -51,7 +51,7 @@ assert.throws(()=>b.aceitar(t.taskId,t.version),/domain_gate_failed/);
 t=tw.authority.revisar({taskId:t.taskId,executionId:attempt.executionId,domain:'security',actor:'seguranca',outcome:'passed',evidence:[art.artifactId]});
 t=b.aceitar(t.taskId,t.version);t=b.concluir(t.taskId,t.version);assert.equal(t.status,'completed');
 assert.throws(()=>b.transicionar(t.taskId,'running',t.version),/invalid_transition/);
-// Duas instâncias leem do disco em toda transação: CAS detecta resposta velha.
+// Two instances read from disk on every transaction: CAS detects a stale response.
 const reloaded=criarTeamwork(options);assert.equal(reloaded.tasks.obter(t.taskId).status,'completed');
 const lease=b.claim(o.taskId,o.version,'backend',{leaseMs:100});now+=200;
 assert.equal(reloaded.tasks.recuperar(),1);assert.equal(b.obter(o.taskId).status,'blocked');
@@ -81,8 +81,8 @@ const args=argsClaude({cwd:tmp,somenteLeitura:true,total:false});assert(!args.so
 const codex=argsCodex({cwd:tmp,total:false});assert(codex.some(x=>x.includes('permissions.nectar.filesystem=')&&x.includes('"."="write"')));assert(codex.includes('--ignore-user-config'));
 assert.equal(hashAcao({a:1,b:2}),hashAcao({b:2,a:1}));
 const outbox=Object.keys(tw.db.snapshot().outbox).length;let delivered=0;assert.equal(tw.db.publicar(()=>delivered++),outbox);assert.equal(delivered,outbox);assert.equal(tw.db.publicar(()=>delivered++),0);
-// A alteração do objeto em disco é detectada antes de aceitá-lo novamente.
+// Tampering with the object on disk is detected before it is accepted again.
 fs.writeFileSync(path.join(options.pasta,'artifacts-v1',art.sha256),'tampered');assert.throws(()=>tw.artifacts.verificar(art.artifactId),/integrity/);
 assert(events.some(e=>e.evento?.type==='task.complete'));
-console.log('PASS: Teamwork contratos, CAS, lease/recovery, budget, artefatos/hash, handoff/ack, autoridade/veto, aprovação/replay, DAGs, liderança, proatividade e isolamento.');
-try{fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:200});}catch{ /* Windows segura arquivo aberto; a pasta é temporária */ }
+console.log('PASS: Teamwork contracts, CAS, lease/recovery, budget, artifacts/hash, handoff/ack, authority/veto, approval/replay, DAGs, leadership, proactivity and isolation.');
+try{fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:200});}catch{ /* Windows holds open files; the folder is temporary */ }

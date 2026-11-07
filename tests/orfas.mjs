@@ -1,4 +1,4 @@
-// Mensagem que ficou "trabalhando" porque o app fechou no meio da chamada não pode ficar para sempre "começando" ao reabrir.
+// A message left "working" because the app closed mid-call must not stay "starting" forever after reopening.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -6,7 +6,7 @@ import path from 'node:path';
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'work-ia-orfas-'));
 Object.assign(process.env, { STUDIO_DATA: path.join(tmp, 'data'), STUDIO_PROJETOS: path.join(tmp, 'projetos'), STUDIO_FAKE: '1' });
 fs.mkdirSync(path.join(tmp, 'alvo'));
-// projeto já existente, com conversas gravadas no meio de uma chamada (como ficam quando o app é fechado)
+// existing project, with chats saved mid-call (as they are when the app is closed)
 fs.mkdirSync(path.join(tmp, 'data'), { recursive: true });
 const pasta = path.join(tmp, 'projetos', 'Orfas'); fs.mkdirSync(pasta, { recursive: true });
 fs.writeFileSync(path.join(tmp, 'data', 'projetos.json'), JSON.stringify({ ativo: 'orfas-1', lista: [{ id: 'orfas-1', nome: 'Orfas', raiz: path.join(tmp, 'alvo'), pasta: 'Orfas', template: 'software', extras: [], criado: new Date().toISOString() }] }));
@@ -17,11 +17,11 @@ fs.writeFileSync(path.join(pasta, 'chats.json'), JSON.stringify({ seq: 3, canais
 const p = await import('../lib/projetos.mjs');
 const c = p.ctx('orfas-1');
 const todas = [...c.equipe.historico('equipe'), ...c.equipe.historico('grp-1')];
-assert(!todas.some((m) => m.status === 'trabalhando'), 'nenhuma mensagem fica "trabalhando" depois de reabrir');
+assert(!todas.some((m) => m.status === 'trabalhando'), 'no message stays "working" after reopening');
 const m2 = todas.find((m) => m.id === 'm2');
-assert.equal(m2.status, 'erro'); assert.match(m2.erro, /app foi fechado/, 'a mensagem diz o que aconteceu');
-assert.equal(todas.find((m) => m.id === 'm1').status, 'ok', 'as mensagens normais não mudam');
-assert(!JSON.parse(fs.readFileSync(path.join(pasta, 'chats.json'), 'utf8')).canais.equipe.some((m) => m.status === 'trabalhando'), 'e a correção fica gravada');
+assert.equal(m2.status, 'erro'); assert.match(m2.erro, /app foi fechado/, 'the message says what happened');
+assert.equal(todas.find((m) => m.id === 'm1').status, 'ok', 'normal messages do not change');
+assert(!JSON.parse(fs.readFileSync(path.join(pasta, 'chats.json'), 'utf8')).canais.equipe.some((m) => m.status === 'trabalhando'), 'and the fix is persisted');
 c.equipe.cancelar();
-console.log('PASS: mensagens órfãs (chamada interrompida pelo fechamento do app não fica "começando" para sempre).');
+console.log('PASS: orphan messages (a call interrupted by the app closing does not stay "starting" forever).');
 process.exit(0);

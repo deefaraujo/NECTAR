@@ -1,18 +1,18 @@
-// Conexões plug and play: Jira e Notion com um clique (registro automático + login oficial), "conectado" só depois de uma consulta real,
-// token cifrado, login vencido aparece como "reconecte" e erro em linguagem de quem não programa. Servidores simulados (fetch trocado).
+// Plug-and-play connections: Jira and Notion in one click (automatic registration + official login), "connected" only after a real query,
+// encrypted token, an expired login shows as "reconnect" and errors read in non-programmer language. Simulated servers (fetch replaced).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'work-ia-cx-'));
 process.env.STUDIO_DATA = path.join(tmp, 'data');
-// cofre de teste (o app real usa o do Windows): cifra = inverte o base64
+// test vault (the real app uses the Windows one): encryption = reversed base64
 globalThis.studioCofre = { disponivel: () => true, cifrar: (t) => Buffer.from(t).toString('base64').split('').reverse().join(''), decifrar: (b) => Buffer.from(b.split('').reverse().join(''), 'base64').toString() };
 
 let mcpResponde = 200, refreshOk = true; const chamadas = [];
 const resp = (status, corpo, headers = {}) => new Response(typeof corpo === 'string' ? corpo : JSON.stringify(corpo), { status, headers: { 'content-type': 'application/json', ...headers } });
-// O Atlassian v2 publica (no 401) os metadados do recurso, que apontam para outro servidor de autorização (auth.atlassian.com);
-// o Notion não publica nada e cai no jeito antigo (metadados na base). Os dois caminhos ficam cobertos.
+// Atlassian v2 publishes (on 401) the resource metadata, which points to a different authorization server (auth.atlassian.com);
+// Notion publishes nothing and falls back to the old way (metadata at the base). Both paths are covered.
 const AS_JIRA = 'https://auth.atlassian.com/ABC';
 globalThis.fetch = async (url, op = {}) => {
   const u = String(url); chamadas.push(u);
@@ -33,7 +33,7 @@ globalThis.fetch = async (url, op = {}) => {
     if (corpo.method === 'tools/list') return resp(200, `event: message\ndata: ${JSON.stringify({ jsonrpc: '2.0', id: 2, result: { tools: [{ name: 'search' }, { name: 'getIssue' }] } })}\n\n`, { 'content-type': 'text/event-stream' });
     return resp(202, '');
   }
-  // GitHub: device flow, API e MCP oficial
+  // GitHub: device flow, API and official MCP
   if (u === 'https://github.com/login/device/code') return resp(200, { device_code: 'dev-1', user_code: 'ABCD-1234', verification_uri: 'https://github.com/login/device', interval: 0.01, expires_in: 5 });
   if (u === 'https://github.com/login/oauth/access_token') { githubPolls++; return githubPolls < 2 ? resp(200, { error: 'authorization_pending' }) : resp(200, { access_token: 'gho_tokenGithubSecreto1234567890', token_type: 'bearer' }); }
   if (u === 'https://api.github.com/user') return (op.headers?.Authorization || '').includes('gho_') || (op.headers?.Authorization || '').includes('ghp_') ? resp(200, { login: 'deborah', name: 'Déborah' }) : resp(401, { message: 'Bad credentials' });
@@ -45,92 +45,92 @@ let githubPolls = 0;
 const cx = await import('../lib/conexoes.mjs');
 const redirect = 'http://127.0.0.1:5555/api/conexoes/jira/retorno';
 
-// ---- antes de tudo: nada conectado, e Jira/Notion não pedem configuração nenhuma
+// ---- first: nothing connected, and Jira/Notion need no configuration at all
 let st = cx.status();
 for (const a of ['jira', 'notion', 'teams', 'trello']) { assert.equal(st[a].conectado, false); assert.equal(st[a].estado, 'not_configured'); }
-assert.equal(st.jira.precisaConfig, false); assert.equal(st.notion.precisaConfig, false, 'Jira e Notion: só clicar');
+assert.equal(st.jira.precisaConfig, false); assert.equal(st.notion.precisaConfig, false, 'Jira and Notion: just click');
 assert.equal(st.teams.precisaConfig, true); assert.equal(st.trello.precisaConfig, true);
 
-// ---- Teams sem o aplicativo da empresa: explica, não abre formulário nem quebra
+// ---- Teams without the company app: explains, opens no form and does not break
 const te = await cx.conectar('teams', redirect);
 assert.equal(te.ok, false); assert.equal(te.precisaConfig, true); assert.match(te.erro, /TI/);
 
-// ---- Jira: um clique gera o link oficial com registro automático e PKCE
+// ---- Jira: one click builds the official link with automatic registration and PKCE
 const cj = await cx.conectar('jira', redirect);
-assert(cj.ok && cj.url.startsWith(`${AS_JIRA}/authorize?`), `o login é no servidor que o recurso protegido indica, não na base do MCP: ${cj.url}`);
+assert(cj.ok && cj.url.startsWith(`${AS_JIRA}/authorize?`), `login happens on the server the protected resource points to, not at the MCP base: ${cj.url}`);
 const pj = new URL(cj.url).searchParams;
 assert.equal(pj.get('client_id'), 'cli-jira'); assert.equal(pj.get('code_challenge_method'), 'S256'); assert.equal(pj.get('redirect_uri'), redirect);
-assert.equal(pj.get('resource'), 'https://mcp.atlassian.com/v2/mcp', 'o token é pedido para o endereço v2');
-assert(pj.get('scope').split(' ').includes('offline_access') && pj.get('scope').includes('read:jira:agent-interface'), 'pede offline_access (refresh) e os escopos do Jira');
-assert(chamadas.some((u) => u === `${AS_JIRA}/register`), 'registra o aplicativo no servidor de autorização certo');
+assert.equal(pj.get('resource'), 'https://mcp.atlassian.com/v2/mcp', 'the token is requested for the v2 address');
+assert(pj.get('scope').split(' ').includes('offline_access') && pj.get('scope').includes('read:jira:agent-interface'), 'requests offline_access (refresh) and the Jira scopes');
+assert(chamadas.some((u) => u === `${AS_JIRA}/register`), 'registers the app on the right authorization server');
 assert.equal(cx.status().jira.estado, 'pending_authorization');
 
-// ---- login recusado no site: mensagem clara, nada fica "conectado"
+// ---- login refused on the site: clear message, nothing becomes "connected"
 await assert.rejects(cx.retorno('jira', { error: 'access_denied', state: pj.get('state') }), /recusado ou cancelado/);
 assert.equal(cx.status().jira.conectado, false); assert.match(cx.status().jira.erro.texto, /recusado/);
 
-// ---- login aceito: token cifrado, verificação real e só então "conectado"
+// ---- login accepted: encrypted token, real verification and only then "connected"
 const cj2 = await cx.conectar('jira', redirect);
 await cx.retorno('jira', { code: 'abc', state: new URL(cj2.url).searchParams.get('state') });
 st = cx.status().jira;
 assert.equal(st.conectado, true); assert.equal(st.estado, 'healthy'); assert.equal(st.ferramentas, 2);
 const disco = fs.readFileSync(path.join(tmp, 'data', 'conexoes.json'), 'utf8');
-assert(!disco.includes('token-secreto-123') && !disco.includes('refresh-secreto'), 'o token nunca fica em texto no disco');
+assert(!disco.includes('token-secreto-123') && !disco.includes('refresh-secreto'), 'the token is never stored as plain text on disk');
 assert.equal(cx.mcpsDasConexoes()[0].nome, 'jira'); assert.match(cx.mcpsDasConexoes()[0].headers.Authorization, /^Bearer token-secreto-123$/);
-assert(!JSON.stringify(cx.status()).includes('token-secreto'), 'a tela nunca recebe o token');
+assert(!JSON.stringify(cx.status()).includes('token-secreto'), 'the UI never receives the token');
 
-// ---- Notion: mesmo clique, com o indicador de recurso que o Notion pede
+// ---- Notion: same click, with the resource indicator Notion requires
 const cn = await cx.conectar('notion', redirect.replace('jira', 'notion'));
 assert.equal(new URL(cn.url).searchParams.get('resource'), 'https://mcp.notion.com/mcp');
 await cx.retorno('notion', { code: 'xyz', state: new URL(cn.url).searchParams.get('state') });
 assert.equal(cx.status().notion.conectado, true);
-assert.deepEqual(cx.mcpsDasConexoes().map((m) => m.nome), ['jira', 'notion'], 'a liderança recebe os dois MCPs');
+assert.deepEqual(cx.mcpsDasConexoes().map((m) => m.nome), ['jira', 'notion'], 'leadership receives both MCPs');
 
-// ---- token recém-emitido recusado NÃO é "login venceu": a tela diz que o servidor não aceitou e o app refaz a descoberta do login
+// ---- a freshly issued token being refused is NOT "login expired": the UI says the server did not accept it and the app redoes login discovery
 mcpResponde = 401; refreshOk = true;
 const r0 = await cx.verificar('jira');
 assert.equal(r0.estado, 'sync_error'); assert.match(r0.detalhe, /não aceitou/);
-assert(!JSON.parse(fs.readFileSync(path.join(tmp, 'data', 'conexoes.json'), 'utf8')).jira.descoberta, 'a descoberta é refeita na próxima tentativa');
-// ---- login vence (conexão antiga): renova sozinho quando dá; quando não dá, a tela pede para reconectar e o MCP sai da chamada dos agentes
+assert(!JSON.parse(fs.readFileSync(path.join(tmp, 'data', 'conexoes.json'), 'utf8')).jira.descoberta, 'discovery is redone on the next attempt');
+// ---- login expires (old connection): it renews on its own when possible; when not, the UI asks to reconnect and the MCP leaves the agents' calls
 { const arq = path.join(tmp, 'data', 'conexoes.json'); const j = JSON.parse(fs.readFileSync(arq, 'utf8')); const antes = new Date(Date.now() - 3600_000).toISOString(); j.jira.desde = antes; j.notion.desde = antes; fs.writeFileSync(arq, JSON.stringify(j)); }
 const r1 = await cx.verificar('jira');
-assert.equal(r1.estado, 'authentication_expired', 'servidor recusando mesmo com token novo');
+assert.equal(r1.estado, 'authentication_expired', 'server refusing even with a new token');
 refreshOk = false;
 const r2 = await cx.verificar('notion');
 assert.equal(r2.conectado, false); assert.equal(r2.estado, 'authentication_expired'); assert.match(r2.detalhe, /Reconectar/);
-assert.equal(cx.mcpsDasConexoes().length, 0, 'conexão vencida não vai para os agentes (evita chamadas que só falham)');
+assert.equal(cx.mcpsDasConexoes().length, 0, 'an expired connection does not go to agents (avoids calls that only fail)');
 mcpResponde = 200; refreshOk = true;
-assert.equal((await cx.verificar('jira')).conectado, true, 'voltou a responder: volta a conectado');
+assert.equal((await cx.verificar('jira')).conectado, true, 'responding again: back to connected');
 
-// ---- erro de rede vira frase simples
+// ---- a network error becomes a plain sentence
 assert.match(cx.explicar('jira', 'fetch failed'), /internet|rede/);
 assert.match(cx.explicar('teams', 'AADSTS65001: The user or administrator has not consented'), /TI aprove/);
 
-// ---- GitHub sem o OAuth App registrado: explica e aponta o token pessoal como saída
+// ---- GitHub without a registered OAuth App: explains and points to a personal token as the way out
 assert.equal(cx.status().github.precisaConfig, true);
 const g0 = await cx.conectar('github', redirect);
 assert.equal(g0.ok, false); assert.match(g0.erro, /token pessoal/);
-// token pessoal com formato errado não entra; com formato certo, só fica conectado depois da leitura real de /user
+// a personal token with the wrong format is rejected; with the right format, it is connected only after a real read of /user
 assert.equal((await cx.configurar('github', { token: 'abc' })).ok, false);
 const gp = await cx.configurar('github', { token: 'ghp_' + 'x'.repeat(36) });
 assert.equal(gp.ok, true); assert.equal(gp.status.github.conectado, true); assert.match(gp.status.github.conta, /@deborah/);
-assert.equal(gp.status.github.estado, 'healthy'); assert.equal(gp.status.github.ferramentas, 3, 'o MCP oficial aceitou o token');
-assert.deepEqual(cx.mcpsDasConexoes().map((m) => m.nome), ['jira', 'github'], 'o Notion continua vencido do passo anterior');
+assert.equal(gp.status.github.estado, 'healthy'); assert.equal(gp.status.github.ferramentas, 3, 'the official MCP accepted the token');
+assert.deepEqual(cx.mcpsDasConexoes().map((m) => m.nome), ['jira', 'github'], 'Notion is still expired from the previous step');
 assert.equal(cx.mcpsDasConexoes()[1].url, 'https://api.githubcopilot.com/mcp/');
-assert((await cx.proxy('github', '/user/repos')).ok, 'leitura pela API com o token posto pelo app');
+assert((await cx.proxy('github', '/user/repos')).ok, 'API read with the token injected by the app');
 cx.desconectar('github');
-// com o Client ID configurado: login por código, igual ao Teams, e o app espera a pessoa digitar
+// with the Client ID configured: login by code, like Teams, and the app waits for the user to type it
 await cx.configurar('github', { clientId: 'Iv1.cliente' });
 const g1 = await cx.conectar('github', redirect);
 assert.equal(g1.ok, true); assert.equal(g1.codigo, 'ABCD-1234'); assert.equal(g1.url, 'https://github.com/login/device');
 assert.equal(cx.status().github.estado, 'pending_authorization'); assert.equal(cx.status().github.codigo.usuario, 'ABCD-1234');
 await new Promise((r) => setTimeout(r, 300));
-assert.equal(cx.status().github.conectado, true, 'digitou o código: conectado');
-assert(!fs.readFileSync(path.join(tmp, 'data', 'conexoes.json'), 'utf8').includes('gho_tokenGithub'), 'token do GitHub cifrado no disco');
+assert.equal(cx.status().github.conectado, true, 'code entered: connected');
+assert(!fs.readFileSync(path.join(tmp, 'data', 'conexoes.json'), 'utf8').includes('gho_tokenGithub'), 'GitHub token encrypted on disk');
 assert.match(cx.explicar('github', 'expired_token'), /venceu/);
 
-// ---- desconectar apaga o token
+// ---- disconnecting deletes the token
 cx.desconectar('jira');
 assert.equal(cx.status().jira.conectado, false); assert(!fs.readFileSync(path.join(tmp, 'data', 'conexoes.json'), 'utf8').includes('"jira":{"tokenCifrado"'));
-console.log('PASS: conexões plug and play (Jira e Notion com um clique, GitHub por código ou token pessoal com MCP oficial, conectado só após consulta real, token cifrado, login vencido pede reconectar, erros em linguagem simples, Teams/Trello explicam a liberação da TI).');
+console.log('PASS: plug-and-play connections (Jira and Notion in one click, GitHub by code or personal token with official MCP, connected only after a real query, encrypted token, expired login asks to reconnect, errors in plain language, Teams/Trello explain IT approval).');
 process.exit(0);

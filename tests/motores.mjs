@@ -1,4 +1,4 @@
-// Equilíbrio entre Claude e Codex e controles de motor do painel. Nenhum modelo é chamado.
+// Balancing between Claude and Codex, and the panel's engine controls. No model is called.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -8,63 +8,63 @@ process.env.STUDIO_DATA = tmp;
 const c = await import('../lib/creditos.mjs');
 const agora = Math.floor(Date.now() / 1000);
 
-// Cenário real: Claude quase sem uso (janela de 5 h renovada e estimada em 0), Codex alto. O Claude tem que receber o trabalho.
+// Real scenario: Claude barely used (5 h window reset and estimated at 0), Codex high. Claude must get the work.
 c.registrar({ unifiedWindows: { five_hour: { utilization: 0.95, resetsAt: agora - 600 }, seven_day: { utilization: 0.44, resetsAt: agora + 5 * 86400 } } });
 c.registrarCodex({ rateLimits: { primary: { usedPercent: 51, resetsAt: agora + 3600, windowDurationMins: 300 }, secondary: { usedPercent: 78, resetsAt: agora + 4 * 86400, windowDurationMins: 10080 } } });
-assert.equal(c.pctEfetivo('claude'), 44, 'janela que já renovou conta como zero');
+assert.equal(c.pctEfetivo('claude'), 44, 'a window that already reset counts as zero');
 assert.equal(c.pctEfetivo('codex'), 78);
-assert.equal(c.escolherMotor('codex', true), 'claude', 'Codex a 78% e Claude a 44%: o trabalho vai para o Claude, mesmo com a leitura dele estimada');
+assert.equal(c.escolherMotor('codex', true), 'claude', 'Codex at 78% and Claude at 44%: work goes to Claude, even with its reading estimated');
 assert.equal(c.escolherMotor('claude', true), 'claude');
-assert.equal(c.escolherMotor('codex', false), 'codex', 'sem a troca automática, fica no motor pedido');
+assert.equal(c.escolherMotor('codex', false), 'codex', 'without auto-switch, stays on the requested engine');
 
-// diferença pequena não troca (evita ficar pulando de um para o outro)
+// a small difference does not switch (avoids flip-flopping between them)
 c.registrarCodex({ rateLimits: { primary: { usedPercent: 40, resetsAt: agora + 3600, windowDurationMins: 300 }, secondary: { usedPercent: 50, resetsAt: agora + 4 * 86400, windowDurationMins: 10080 } } });
-assert.equal(c.escolherMotor('codex', true), 'codex', '50% contra 44% não justifica trocar');
+assert.equal(c.escolherMotor('codex', true), 'codex', '50% vs 44% does not justify switching');
 
-// equilíbrio também abaixo de 50%: quem está bem mais folgado recebe
+// balancing also below 50%: the one with much more headroom gets the work
 c.registrarCodex({ rateLimits: { primary: { usedPercent: 10, resetsAt: agora + 3600, windowDurationMins: 300 }, secondary: { usedPercent: 12, resetsAt: agora + 4 * 86400, windowDurationMins: 10080 } } });
-assert.equal(c.escolherMotor('claude', true), 'codex', 'Claude a 44% e Codex a 12%: vai para o Codex');
+assert.equal(c.escolherMotor('claude', true), 'codex', 'Claude at 44% and Codex at 12%: goes to Codex');
 
-// motor desligado nunca roda, mesmo sem a troca automática
+// a disabled engine never runs, even without auto-switch
 assert.equal(c.escolherMotor('claude', false, ['claude']), 'codex');
 assert.equal(c.escolherMotor('codex', false, ['codex']), 'claude');
 assert.equal(c.escolherMotor('claude', true, ['claude', 'codex']), null);
 
-// os botões do painel não podem usar data-motor (é o seletor de motor do chat e engolia o clique)
+// panel buttons must not use data-motor (that is the chat's engine selector and it swallowed the click)
 const app = fs.readFileSync(new URL('../public/app.js', import.meta.url), 'utf8');
 for (const acao of ['motor-ativo', 'motor-teto']) {
   const linha = app.split('\n').find((l) => l.includes(`data-acao="${acao}"`));
-  assert(linha, `botão ${acao} existe`);
-  assert(!/data-motor=/.test(linha), `${acao} não usa data-motor`);
-  assert(/data-eng=/.test(linha), `${acao} usa data-eng`);
+  assert(linha, `button ${acao} exists`);
+  assert(!/data-motor=/.test(linha), `${acao} does not use data-motor`);
+  assert(/data-eng=/.test(linha), `${acao} uses data-eng`);
 }
-// ---- piso de modelo por cargo: arquitetura, revisão e segurança nunca descem, nem com uso alto, teto baixo ou pedido do próprio agente
+// ---- model floor per role: architecture, review and security never go lower, not with high usage, a low cap, or the agent's own request
 const { escolher } = await import('../lib/roteador.mjs');
 const cx = { leve: 'luna', medio: 'terra', forte: 'sol' };
-assert.equal(escolher({ engine: 'claude', tipo: 'pedido', modo: 'conversar' }).modelo, 'claude-haiku-4-5', 'sem piso, conversa simples é barata');
-assert.equal(escolher({ engine: 'claude', tipo: 'pedido', modo: 'conversar', piso: 'forte' }).modelo, 'claude-opus-5', 'com piso forte, até a conversa usa modelo forte');
-assert.equal(escolher({ engine: 'claude', tipo: 'revisao', card: { pontos: 1 }, teto: 'low', piso: 'forte' }).modelo, 'claude-opus-5', 'o teto baixo da conta não rebaixa o revisor');
-assert.equal(escolher({ engine: 'claude', tipo: 'revisao', card: { pontos: 3 }, pref: 'minimo', piso: 'forte' }).modelo, 'claude-opus-5', 'o próprio agente não desce abaixo do piso');
+assert.equal(escolher({ engine: 'claude', tipo: 'pedido', modo: 'conversar' }).modelo, 'claude-haiku-4-5', 'without a floor, a simple chat is cheap');
+assert.equal(escolher({ engine: 'claude', tipo: 'pedido', modo: 'conversar', piso: 'forte' }).modelo, 'claude-opus-5', 'with a strong floor, even chat uses a strong model');
+assert.equal(escolher({ engine: 'claude', tipo: 'revisao', card: { pontos: 1 }, teto: 'low', piso: 'forte' }).modelo, 'claude-opus-5', 'the account low cap does not downgrade the reviewer');
+assert.equal(escolher({ engine: 'claude', tipo: 'revisao', card: { pontos: 3 }, pref: 'minimo', piso: 'forte' }).modelo, 'claude-opus-5', 'the agent itself cannot go below the floor');
 assert.equal(escolher({ engine: 'claude', tipo: 'qa', card: { pontos: 1 }, teto: 'low', piso: 'medio' }).modelo, 'claude-sonnet-5-5');
-assert.equal(escolher({ engine: 'claude', tipo: 'execucao', card: { pontos: 1 }, teto: 'low' }).modelo, 'claude-haiku-4-5', 'cargo sem piso continua economizando');
-assert.equal(escolher({ engine: 'codex', tipo: 'pedido', modo: 'conversar', teto: 'low', piso: 'forte', codex: cx }).modelo, 'sol', 'no Codex também');
-assert.equal(escolher({ engine: 'claude', tipo: 'execucao', card: { pontos: 13 }, piso: 'medio' }).modelo, 'claude-opus-5-5', 'o piso não rebaixa o que já é maior');
+assert.equal(escolher({ engine: 'claude', tipo: 'execucao', card: { pontos: 1 }, teto: 'low' }).modelo, 'claude-haiku-4-5', 'a role without a floor keeps saving');
+assert.equal(escolher({ engine: 'codex', tipo: 'pedido', modo: 'conversar', teto: 'low', piso: 'forte', codex: cx }).modelo, 'sol', 'on Codex too');
+assert.equal(escolher({ engine: 'claude', tipo: 'execucao', card: { pontos: 13 }, piso: 'medio' }).modelo, 'claude-opus-5-5', 'the floor does not downgrade what is already higher');
 const { CONFIG_PADRAO } = await import('../lib/store.mjs');
 assert.equal(CONFIG_PADRAO.creditos.pisos.architect, 'forte'); assert.equal(CONFIG_PADRAO.creditos.pisos.revisor, 'forte'); assert.equal(CONFIG_PADRAO.creditos.pisos.seguranca, 'forte');
-// ---- o Claude Code hoje informa só o limite dos créditos extras (rateLimitType "overage"): a leitura entra, avisa a tela e só pausa se os extras já estão em uso
-let avisos = 0; const parar = c.aoMudar((u) => { assert(u && typeof u === 'object' && 'motores' in u, 'o ouvinte recebe o uso atual'); avisos++; });
+// ---- Claude Code currently reports only the extra-credit limit (rateLimitType "overage"): the reading is recorded, notifies the UI, and only pauses if extras are already in use
+let avisos = 0; const parar = c.aoMudar((u) => { assert(u && typeof u === 'object' && 'motores' in u, 'the listener receives current usage'); avisos++; });
 const antes = c.atual().cinco?.pct;
 c.registrar({ status: 'allowed_warning', resetsAt: agora + 86400, rateLimitType: 'overage', utilization: 0.96, overageStatus: 'allowed_warning', overageResetsAt: agora + 86400, isUsingOverage: false, surpassedThreshold: 0.95 });
-assert.equal(avisos, 1, 'o painel é avisado a cada leitura do Claude');
+assert.equal(avisos, 1, 'the panel is notified on every Claude reading');
 assert.equal(c.atual().extra.pct, 96); assert.equal(c.atual().extra.emUso, false);
-assert.equal(c.atual().cinco?.pct, antes, 'a leitura dos extras não mexe nas janelas de 5 h e semana');
-assert.equal(c.pctEfetivo('claude'), 44, 'extras ainda não usados não contam no uso do Claude');
-assert.equal(c.pausas().claude, undefined, 'plano ainda cobre: o Claude não pausa');
+assert.equal(c.atual().cinco?.pct, antes, 'the extras reading does not touch the 5 h and weekly windows');
+assert.equal(c.pctEfetivo('claude'), 44, 'unused extras do not count toward Claude usage');
+assert.equal(c.pausas().claude, undefined, 'plan still covers it: Claude does not pause');
 c.registrar({ status: 'allowed', rateLimitType: 'overage', overageStatus: 'allowed' });
-assert.equal(avisos, 1, 'evento sem número não finge leitura nova');
+assert.equal(avisos, 1, 'an event without a number does not fake a new reading');
 c.registrar({ status: 'allowed_warning', resetsAt: agora + 86400, rateLimitType: 'overage', utilization: 0.96, overageResetsAt: agora + 86400, isUsingOverage: true });
-assert.equal(c.atual().extra.emUso, true); assert.equal(c.pctEfetivo('claude'), 96, 'gastando os extras a 96%, o uso do Claude é alto');
+assert.equal(c.atual().extra.emUso, true); assert.equal(c.pctEfetivo('claude'), 96, 'spending extras at 96%, Claude usage is high');
 parar();
-console.log('PASS: equilíbrio entre motores com leitura estimada, motor desligado e botões do painel de motores.');
-try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* o Windows ainda segura a pasta */ }
+console.log('PASS: engine balancing with estimated reading, disabled engine, and engine panel buttons.');
+try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* Windows may still hold the folder */ }
 process.exit(0);

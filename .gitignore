@@ -1,4 +1,4 @@
-# Dependências e distribuições geradas
+# Dependencies and generated distributions
 node_modules/
 /dist/
 /dist-*/
@@ -8,7 +8,7 @@ node_modules/
 *.asar
 *.asar.unpacked/
 
-# Estado local, conversas, currículos, projetos e relatórios de uso
+# Local state, conversations, resumes, projects and usage reports
 /data/
 /projetos/
 /relatorios/
@@ -25,7 +25,7 @@ node_modules/
 /WORKFLOW-TECNICO.md
 /scripts/_*.py
 
-# Complementos copiados/locais não pertencem à distribuição pública do código.
+# Copied/local add-ons do not belong in the public code distribution.
 /templates/*/skills/*/
 !/templates/jogos/skills/assets-abertos/
 !/templates/jogos/skills/renpy-codigo/
@@ -59,7 +59,7 @@ node_modules/
 **/.gamestudio/
 **/.nectar/
 
-# Credenciais e configurações locais
+# Credentials and local settings
 .env
 .env.*
 !.env.example
@@ -76,7 +76,7 @@ node_modules/
 .aws/
 .ssh/
 
-# Caches, logs e temporários
+# Caches, logs and temporary files
 __pycache__/
 *.py[cod]
 *.log

@@ -36,4 +36,4 @@ let cancelou=false;
 const c=new AbortController();
 const pendente=executarVisaoCli({engine:'codex',bin:{cmd:'cli'},quadro,signal:c.signal,spawnImpl:()=>{const p=new EventEmitter();p.stdin=new PassThrough();p.stdout=new PassThrough();p.stderr=new PassThrough();p.abort=()=>{cancelou=true;};return p;}});
 c.abort();await assert.rejects(()=>pendente,/cancelada/);assert.ok(cancelou);
-console.log('Contas visuais: imagens em stdin/RPC, sessões efêmeras, ferramentas desabilitadas, fallback, seleção explícita e cancelamento validados (simulados).');
+console.log('Vision accounts: images over stdin/RPC, ephemeral sessions, tools disabled, fallback, explicit selection and cancellation validated (simulated).');

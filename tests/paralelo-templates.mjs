@@ -1,5 +1,5 @@
-// Ponta a ponta nos templates sem workflow técnico (Product Design, Visual Design, Jogos): o time toca os cards sozinho, em paralelo, com
-// o fluxo leve (dono produz, liderança revisa, QA do template valida), usando os papéis de cada template, sem etapa duplicada.
+// End to end on the templates without a technical workflow (Product Design, Visual Design, Games): the team runs the cards on its own, in parallel, with
+// the light flow (owner produces, lead reviews, the template's QA validates), using each template's roles, with no duplicated step.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -28,21 +28,21 @@ for (const tpl of ['product-design', 'visual-graphic-design', 'jogos']) {
   }
   for (let i = 0; i < 40 && c.equipe.ocupada(); i++) await new Promise((r) => setTimeout(r, 250));
   if (!fim()) { const av = {}; for (const m of c.equipe.historico('equipe')) for (const x of m.resumo || []) if (x.tipo === 'aviso') av[x.texto.slice(0, 120)] = (av[x.texto.slice(0, 120)] || 0) + 1; console.log('RECUSAS', JSON.stringify(av, null, 1)); console.log('HIST', c.quadro.obter(cards[0]).historico.map((h) => h.quem + ': ' + h.txt).join(' | ').slice(0, 900)); }
-  assert(fim(), `${tpl}: todos concluídos (${cards.map((id) => `${id}:${c.quadro.obter(id).coluna}${c.quadro.obter(id).bloqueio ? ' BLOQ' : ''}`).join(' ')})`);
-  assert(maxSim >= 2, `${tpl}: cards em paralelo (máximo ${maxSim})`);
+  assert(fim(), `${tpl}: all done (${cards.map((id) => `${id}:${c.quadro.obter(id).coluna}${c.quadro.obter(id).bloqueio ? ' BLOQ' : ''}`).join(' ')})`);
+  assert(maxSim >= 2, `${tpl}: cards in parallel (max ${maxSim})`);
   const etapas = {}; const quem = {};
   for (const n of fs.readdirSync(dump)) {
     const [, ag, tipo] = n.replace('.txt', '').split('-'); const txt = fs.readFileSync(path.join(dump, n), 'utf8');
     const id = (txt.split('## Pedido agora')[1] || '').match(/card (T-\d+)/)?.[1] || 'sem-card';
     etapas[`${id}/${tipo}`] = (etapas[`${id}/${tipo}`] || 0) + 1; quem[tipo] = new Set([...(quem[tipo] || []), ag]);
-    assert(c.elenco.IDS.has(ag), `${tpl}: só agentes que existem no template são chamados (${ag})`);
+    assert(c.elenco.IDS.has(ag), `${tpl}: only agents that exist in the template are called (${ag})`);
   }
-  for (const id of cards) for (const tipo of ['produzir', 'revisao', 'qa']) assert.equal(etapas[`${id}/${tipo}`], 1, `${tpl}: ${id} passou uma vez por ${tipo}`);
-  assert.deepEqual([...quem.revisao], [lead], `${tpl}: a revisão é da liderança do template (${lead})`);
-  assert.deepEqual([...quem.qa], [qa], `${tpl}: o QA é o do template (${qa})`);
-  resumo.push(`${tpl} ${cards.length} cards, até ${maxSim} juntos`);
+  for (const id of cards) for (const tipo of ['produzir', 'revisao', 'qa']) assert.equal(etapas[`${id}/${tipo}`], 1, `${tpl}: ${id} went through ${tipo} once`);
+  assert.deepEqual([...quem.revisao], [lead], `${tpl}: review belongs to the template lead (${lead})`);
+  assert.deepEqual([...quem.qa], [qa], `${tpl}: QA is the template's own (${qa})`);
+  resumo.push(`${tpl} ${cards.length} cards, up to ${maxSim} at once`);
   c.equipe.cancelar();
 }
 await store.descarregar();
-console.log(`PASS: paralelo nos outros templates (${resumo.join('; ')}; fluxo leve com os papéis de cada template e nenhuma etapa duplicada).`);
+console.log(`PASS: parallel on the other templates (${resumo.join('; ')}; light flow with each template's roles and no duplicated step).`);
 process.exit(0);

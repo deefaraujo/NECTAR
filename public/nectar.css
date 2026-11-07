@@ -1,8 +1,8 @@
 /* =====================================================================
-   NECTAR: identidade visual. Carrega por último e só troca cor, forma e luz;
-   a estrutura das telas continua a mesma. Dark mode sempre.
-   Paleta (do guia da marca): creme #F6E9D2 para texto, âmbar #F5A623 → laranja #FF8A00
-   para o que pede ação, violeta #A66BFF como acento secundário, fundos quase pretos quentes.
+   NECTAR: visual identity. Loads last and only changes color, shape and light;
+   the screen structure stays the same. Always dark mode.
+   Palette (from the brand guide): cream #F6E9D2 for text, amber #F5A623 → orange #FF8A00
+   for what calls for action, violet #A66BFF as a secondary accent, warm near-black backgrounds.
    ===================================================================== */
 :root {
   --bg-0: #0A090C;
@@ -21,7 +21,7 @@
   --ambar: #F5A623;
   --laranja: #FF8A00;
   --violeta: #A66BFF;
-  --azul-1: #B48CFF;       /* o que era azul (links, informação) vira o violeta da marca */
+  --azul-1: #B48CFF;       /* what was blue (links, information) becomes the brand violet */
   --azul-2: #6A3FB8;
   --roxo: #A66BFF;
   --verm: #FF6B6B;
@@ -42,15 +42,15 @@ body {
 ::selection { background: rgba(245, 166, 35, .35); }
 ::-webkit-scrollbar-thumb { background: #2E2833; }
 
-/* ---------- barra de título: logo da marca e um filete âmbar que vai ao violeta ---------- */
+/* ---------- title bar: brand logo and an amber strip that fades to violet ---------- */
 .titulo-app { background: rgba(8, 7, 10, .85); backdrop-filter: blur(10px); padding-left: 12px; gap: 12px; }
 .titulo-app::after { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(245, 166, 35, .7) 30%, rgba(166, 107, 255, .55) 70%, transparent 100%); opacity: 1; }
-.marca-mini { display: none; }   /* o logotipo já traz o símbolo: não repete */
+.marca-mini { display: none; }   /* the logotype already includes the symbol: do not repeat it */
 .marca-mini img, .logo { display: block; width: 100%; height: 100%; object-fit: contain; }
 .nome-app { display: flex; align-items: center; height: 100%; }
 .nome-app .logo-nome { height: 24px; width: auto; display: block; image-rendering: -webkit-optimize-contrast; }
 
-/* ---------- trilho e navegação: o ativo é âmbar, com brilho quente ---------- */
+/* ---------- rail and navigation: the active item is amber, with a warm glow ---------- */
 .rail-btn.ativo { background: var(--g-marca); color: #1B1200; box-shadow: 0 8px 22px -8px rgba(245, 166, 35, .75); }
 .rail-btn.ativo::before { background: var(--ambar); }
 .rail-btn.marca { background: var(--g-marca); }
@@ -62,7 +62,7 @@ body {
 .aj-nav button.on { background: linear-gradient(90deg, rgba(245, 166, 35, .2), rgba(245, 166, 35, .04)); }
 .tag { background: rgba(245, 166, 35, .18); color: var(--ouro-1); }
 
-/* ---------- botões, campos e foco ---------- */
+/* ---------- buttons, fields and focus ---------- */
 .btn-primario { background: var(--g-marca); color: #1B1200; font-weight: 700; box-shadow: 0 10px 24px -12px rgba(245, 166, 35, .8); }
 .btn-primario:hover { filter: brightness(1.06); }
 .enviar { background: var(--g-marca); color: #1B1200; }
@@ -80,7 +80,7 @@ input.faixa { accent-color: var(--ambar); }
 .msg.para-voce { background: rgba(245, 166, 35, .05); box-shadow: inset 3px 0 0 var(--ambar); }
 .aviso { border-left-color: var(--ambar); background: #1A1620; }
 
-/* ---------- cards, quadro e marcadores ---------- */
+/* ---------- cards, board and markers ---------- */
 .card:hover { box-shadow: 0 0 0 1px rgba(245, 166, 35, .35), var(--sombra); }
 .loz.andamento { background: rgba(245, 166, 35, .18); color: var(--ouro-1); }
 .loz.revisao, .loz.qa { background: rgba(166, 107, 255, .18); color: #D7BFFF; }
@@ -89,13 +89,13 @@ input.faixa { accent-color: var(--ambar); }
 .ag-dia.hoje b { background: var(--g-marca); color: #1B1200; }
 .ag-col.hoje { background: rgba(245, 166, 35, .04); }
 
-/* ---------- chamada: o verde de "falando" continua (é convenção de chamada), o resto segue a marca ---------- */
+/* ---------- call: the "speaking" green stays (it is a call convention), the rest follows the brand ---------- */
 #chamada .ch-tit svg { color: var(--ambar); }
 #chamada .ch-btn.on { background: var(--ambar); color: #1B1200; }
 .voz-painel .vp-info b { color: var(--ambar); }
 .voz-painel .btn-ic.on { background: var(--ambar); color: #1B1200; }
 
-/* ---------- colmeia: o projeto ao vivo, num canvas infinito (desenho em colmeia.js) ---------- */
+/* ---------- hive: the live project, on an infinite canvas (drawn in colmeia.js) ---------- */
 .colmeia { display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 14px 18px 14px; gap: 10px; }
 .co-topo { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .co-topo h2 { display: flex; align-items: center; gap: 8px; margin: 0 8px 0 0; font: 700 18px/1 var(--fonte-tit); }
@@ -143,12 +143,12 @@ input.faixa { accent-color: var(--ambar); }
 @keyframes co-entra { from { opacity: 0; transform: translateY(6px); } }
 
 /* =====================================================================
-   Identidade "abelha robô": o que o mascote e os avatares têm e a tela passa a ter.
-   - Placa: superfície creme (armadura) com borda viva; a aba ativa, o botão secundário e o rodapé são placas.
-   - Visor: painel escuro profundo onde a informação acende (compositor, campos, modais).
-   - LED: âmbar em matriz de pontos; rótulos de seção, contadores e estados "acesos" usam esse brilho.
-   - Hexágono: emblema do favo; vira forma do trilho, dos contadores, do marcador de aba e da caixa de marcar.
-   - Favo: trama de hexágonos quase invisível no fundo dos painéis, como a asa do mascote.
+   "Robot bee" identity: what the mascot and avatars have, the screen now has too.
+   - Plate: cream surface (armor) with a bright border; the active tab, the secondary button and the footer are plates.
+   - Visor: deep dark panel where information lights up (composer, fields, modals).
+   - LED: amber dot matrix; section labels, counters and "lit" states use this glow.
+   - Hexagon: the honeycomb emblem; becomes the shape of the rail, counters, tab marker and checkbox.
+   - Honeycomb: an almost invisible hexagon pattern behind the panels, like the mascot's wing.
    ===================================================================== */
 :root {
   --hex: polygon(50% 0, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
@@ -168,7 +168,7 @@ input.faixa { accent-color: var(--ambar); }
 ::-webkit-scrollbar-thumb { background: #3A3140; }
 ::-webkit-scrollbar-thumb:hover { background: #4A3F52; background-clip: content-box; border: 3px solid transparent; }
 
-/* ---------- trilho: botões hexagonais; o ativo acende em âmbar ---------- */
+/* ---------- rail: hexagonal buttons; the active one lights up in amber ---------- */
 .rail-btn, .rail-btn:hover, .rail-btn.ativo, .rail-btn.marca, .rail-proj { border-radius: 0; clip-path: var(--hex); width: 50px; height: 54px; box-shadow: none; }
 .rail-btn { background: var(--bg-3); }
 .rail-btn:hover { background: var(--bg-5); transform: translateY(-1px); }
@@ -181,10 +181,10 @@ input.faixa { accent-color: var(--ambar); }
 .rail-proj.trabalhando::after { inset: 0; border: 0; clip-path: var(--hex); background: linear-gradient(160deg, rgba(255, 211, 77, .0), rgba(255, 211, 77, .35)); animation: co-pisca 1.6s ease-in-out infinite; transform: none; }
 .rail .pip, .rail-proj .pip, .rail-btn.sino .pip { right: 4px; bottom: 4px; box-shadow: none; }
 .rail .sep { width: 22px; height: 2px; background: rgba(243, 234, 217, .14); }
-/* o halo do ativo fica fora do recorte: um marcador hexagonal atrás do botão */
+/* the active halo sits outside the clip: a hexagonal marker behind the button */
 .rail-btn.ativo, .rail-proj.ativo { filter: drop-shadow(0 0 10px rgba(245, 166, 35, .55)); }
 
-/* ---------- painéis laterais: cabeçalho com filete de LED, seções em matriz ---------- */
+/* ---------- side panels: header with LED strip, sections in dot matrix ---------- */
 .lista-topo, .cabeca { position: relative; box-shadow: none; }
 .lista-topo::after, .cabeca::after, .planner-topo::after, .mem-barra::after, .issue-topo::after, .inbox-topo::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
@@ -203,14 +203,14 @@ input.faixa { accent-color: var(--ambar); }
 .canal .tag, .msg .cab .tag, .membro .nm .tag { background: var(--placa); color: var(--placa-texto); border-radius: 3px; }
 .usuario { background: var(--bg-0); box-shadow: inset 0 1px 0 var(--placa-rim); }
 
-/* ---------- avatar: ponto de estado vira LED ---------- */
+/* ---------- avatar: status dot becomes an LED ---------- */
 .av .dot { border-color: var(--bg-1); }
 .av .dot.trab { background: var(--led); box-shadow: 0 0 6px var(--led); }
 .av .dot.fila { background: var(--violeta); }
 .av.padrao { background: #1A1420; }
 .pilha .av { box-shadow: 0 0 0 2px var(--bg-2); }
 
-/* ---------- placas: aba ativa, botão secundário, segmentos ---------- */
+/* ---------- plates: active tab, secondary button, segments ---------- */
 .seg button.on, .uso-tabs button.on, .motor-teto button.on, .ativ-abas button.on, .aj-nav button.on, .ped-abas button.on, .chip-filtro.on, .troca button.sel {
   background: var(--placa); color: var(--placa-texto); box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .12), 0 1px 0 rgba(255, 255, 255, .06);
 }
@@ -224,7 +224,7 @@ input.faixa { accent-color: var(--ambar); }
 .btn-ic.on { background: var(--placa); color: var(--placa-texto); }
 kbd { background: var(--placa-fraca); box-shadow: inset 0 0 0 1px var(--placa-rim); }
 
-/* ---------- visor: compositor, campos, busca ---------- */
+/* ---------- visor: composer, fields, search ---------- */
 .caixa { background: var(--visor); border-radius: 14px; box-shadow: inset 0 0 0 1px var(--placa-rim), inset 0 1px 0 rgba(243, 234, 217, .05); }
 .caixa:focus-within { box-shadow: inset 0 0 0 1px rgba(245, 166, 35, .6), 0 0 0 4px rgba(245, 166, 35, .08), 0 14px 34px -20px rgba(245, 166, 35, .7); }
 .caixa .barra { padding-top: 6px; }
@@ -234,7 +234,7 @@ kbd { background: var(--placa-fraca); box-shadow: inset 0 0 0 1px var(--placa-ri
 select.in option { background: #15131A; }
 .sugestoes { background: var(--visor); box-shadow: var(--sombra), inset 0 0 0 1px var(--placa-rim); }
 
-/* ---------- mensagens e embeds ---------- */
+/* ---------- messages and embeds ---------- */
 .msg .texto code { color: var(--ouro-1); background: rgba(0, 0, 0, .45); }
 .texto pre { background: var(--visor); border-color: var(--placa-rim); border-radius: 10px; }
 .texto a.ref { color: var(--violeta); background: rgba(166, 107, 255, .12); }
@@ -246,7 +246,7 @@ select.in option { background: #15131A; }
 .corpo.vivo > :last-child::after { background: var(--led); box-shadow: 0 0 8px var(--led); }
 .pontos i { background: var(--led); box-shadow: 0 0 6px var(--led); }
 
-/* ---------- painel de andamento e membros ---------- */
+/* ---------- progress and members panel ---------- */
 .mini, .membro { border-radius: 10px; }
 .mini.vivo { box-shadow: inset 0 0 0 1px rgba(245, 166, 35, .18); }
 .mini.vivo::before { background: var(--led); box-shadow: 0 0 8px var(--led); border-radius: 0; clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%); }
@@ -256,7 +256,7 @@ select.in option { background: #15131A; }
 .barra-prog i { background: var(--listras); background-size: 32px 100%; }
 .co-colheita em i { background: var(--listras); background-size: 32px 100%; }
 
-/* ---------- quadro ---------- */
+/* ---------- board ---------- */
 .coluna { background: rgba(17, 15, 19, .72); border-radius: 12px; box-shadow: inset 0 0 0 1px var(--placa-fraca); }
 .coluna::before { height: 2px; box-shadow: 0 0 10px color-mix(in srgb, var(--c) 60%, transparent); }
 .coluna[data-col=pronto] { --c: #B48CFF; } .coluna[data-col=andamento] { --c: #F5A623; } .coluna[data-col=revisao] { --c: #A66BFF; } .coluna[data-col=qa] { --c: #5BD8A0; } .coluna[data-col=impedimento] { --c: #FF6B6B; }
@@ -268,7 +268,7 @@ select.in option { background: #15131A; }
 .loz { letter-spacing: .08em; }
 .add-card { border-radius: 8px; }
 
-/* ---------- modais e janelas: visor com filete de LED no topo ---------- */
+/* ---------- modals and windows: visor with LED strip on top ---------- */
 .modal { background: var(--bg-2); border-radius: 18px; box-shadow: var(--sombra), inset 0 0 0 1px var(--placa-rim), inset 0 1px 0 rgba(243, 234, 217, .06); position: relative; }
 .modal::before { content: ''; position: absolute; left: 24px; right: 24px; top: 0; height: 2px; border-radius: 0 0 2px 2px; background: linear-gradient(90deg, transparent, var(--ambar) 25%, var(--ouro-1) 50%, var(--violeta) 80%, transparent); opacity: .8; pointer-events: none; z-index: 1; }
 .modal-fundo { background: rgba(5, 4, 7, .72); backdrop-filter: blur(8px) saturate(.9); }
@@ -286,7 +286,7 @@ select.in option { background: #15131A; }
 .interruptor input::after { background: var(--placa); }
 input[type=range].faixa { accent-color: var(--ambar); }
 
-/* ---------- avisos, dicas e toasts: placas escuras com filete ---------- */
+/* ---------- notices, tips and toasts: dark plates with a strip ---------- */
 .aviso, .toast { background: var(--bg-3); border-radius: 12px; box-shadow: var(--sombra), inset 0 0 0 1px var(--placa-rim); }
 .aviso { border-left: 0; box-shadow: var(--sombra), inset 3px 0 0 var(--led), inset 0 0 0 1px var(--placa-rim); }
 .toast .ic-n, .notif-i .ic-n { border-radius: 0; clip-path: var(--hex); width: 30px; height: 32px; color: var(--ouro-1); }
@@ -295,13 +295,13 @@ input[type=range].faixa { accent-color: var(--ambar); }
 .pedido-i, .bast { border-radius: 12px; box-shadow: inset 0 0 0 1px var(--placa-fraca); }
 .pedido-i { background: linear-gradient(90deg, rgba(245, 166, 35, .10), rgba(243, 234, 217, .02)); box-shadow: inset 3px 0 0 var(--led), inset 0 0 0 1px var(--placa-fraca); }
 
-/* ---------- memória e agenda ---------- */
+/* ---------- memory and calendar ---------- */
 .nota { border-radius: 8px; }
 .nota.ativa { background: var(--placa-fraca); color: var(--texto); box-shadow: inset 0 0 0 1px rgba(243, 234, 217, .10); }
 .mem-leitor .texto h1, .mem-leitor .texto h2 { color: var(--texto); }
 .lista-t th { background: var(--bg-1); letter-spacing: .12em; }
 
-/* ---------- assessor por conta própria (painel da Assessoria) ---------- */
+/* ---------- advisor on its own (Advisory panel) ---------- */
 .piloto.assessor.on .chave-p { background: linear-gradient(135deg, var(--violeta), #6A3FB8); }
 .membros .btn-sec.ronda { width: 100%; margin: 2px 0 8px; height: 28px; font-size: 12px; }
 
@@ -326,7 +326,7 @@ input[type=range].faixa { accent-color: var(--ambar); }
 .desde-l.voce { color: var(--texto); } .desde-l.ok a.ref { color: #7EE2B8; } .desde-l.erro { color: #FFB4B4; }
 .desde-l small { color: var(--mudo); margin-left: 6px; }
 
-/* ---------- arquivos da equipe (Ajustes > Projeto) ---------- */
+/* ---------- team files (Settings > Project) ---------- */
 .arquivos-painel { padding: 10px 12px; border-radius: 10px; background: var(--visor); box-shadow: inset 0 0 0 1px var(--placa-rim); font-size: 13px; }
 .arq-total { margin-bottom: 8px; color: var(--texto); }
 .arq-total b { color: var(--ouro-1); }
@@ -334,11 +334,11 @@ input[type=range].faixa { accent-color: var(--ambar); }
 .arq-linha { display: grid; grid-template-columns: 70px 1fr; gap: 10px; color: var(--suave); }
 .arq-tam { color: var(--texto); font-variant-numeric: tabular-nums; text-align: right; }
 
-/* ---------- tela sem projeto ---------- */
+/* ---------- no-project screen ---------- */
 .sem-projeto h1 { background: var(--g-marca); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .sem-projeto .logo { width: 72px; height: 72px; margin: 0 auto 10px; }
 
-/* seletor de idioma no cabeçalho (fora da área de arrastar da janela) */
+/* language selector in the header (outside the window drag area) */
 .idioma-wrap { -webkit-app-region: no-drag; display: flex; align-items: center; flex: none; }
 .projeto-app + .idioma-wrap { margin-left: 4px; }
 .idioma { -webkit-app-region: no-drag; appearance: none; background: rgba(255, 255, 255, .04) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23A3ACBE' fill='none' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 8px center; color: var(--suave, #A3ACBE); border: 1px solid rgba(255, 255, 255, .1); border-radius: 6px; font: 500 12px/1 var(--fonte, system-ui); padding: 5px 24px 5px 9px; cursor: pointer; }

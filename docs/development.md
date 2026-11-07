@@ -2,7 +2,7 @@
 
 Use Node.js 22 and `npm ci`. Start with `npm start` or `npm run web`.
 
-- `npm run check:publicacao`: checks the content staged in Git.
+- `npm run check:publication`: checks the content staged in Git.
 - `npm test`: behavior scenarios for the core.
 - `npm run test:teamwork`: Teamwork contracts and flows.
 - `python tests/entrevista-ui.py`: visual lab with simulated actions.

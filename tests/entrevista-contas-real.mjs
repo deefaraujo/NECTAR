@@ -1,9 +1,9 @@
-// Opt-in: faz chamadas reais usando uma imagem sintética, sem capturar a tela.
+// Opt-in: makes real calls using a synthetic image, without capturing the screen.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { statusEntrevista, executarVisaoCli } from '../lib/entrevista-motores.mjs';
 import { localizarClaude, localizarCodex } from '../lib/runner.mjs';
-assert.equal(process.env.NECTAR_TESTE_VISAO_REAL,'1','Defina NECTAR_TESTE_VISAO_REAL=1 para autorizar chamadas reais');
+assert.equal(process.env.NECTAR_TESTE_VISAO_REAL,'1','Set NECTAR_TESTE_VISAO_REAL=1 to authorize real calls');
 console.log(JSON.stringify(await statusEntrevista()));
 const quadro='data:image/jpeg;base64,'+fs.readFileSync(new URL('./fixtures/entrevista-visao-sintetica.jpg',import.meta.url)).toString('base64');
 let falhas=0;

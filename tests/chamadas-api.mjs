@@ -1,4 +1,4 @@
-// Depuração pela API: listar quem roda e quem espera, parar um agente (inclusive na fila), parar tudo e religar o piloto.
+// Debugging through the API: list who is running and who is waiting, stop one agent (queued ones too), stop everything and resume autopilot.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -16,16 +16,16 @@ const pid = (await J('POST', '/api/projetos', { nome: 'Chamadas', caminho: path.
 await J('POST', `/api/p/${pid}/mensagem`, { canal: 'dm:backend', texto: '[teste:longo] me conta o andamento', engine: 'claude', modo: 'conversar' });
 let ch;
 for (let i = 0; i < 40; i++) { ch = await J('GET', `/api/p/${pid}/chamadas`); if (ch.rodando.length || ch.naFila.length) break; await new Promise((r) => setTimeout(r, 50)); }
-assert(ch.rodando.some((x) => x.agente === 'backend'), 'a API mostra quem está rodando');
-assert('vagas' in ch && 'pilotoSuspenso' in ch && Array.isArray(ch.naFila), 'e mostra vagas, fila e se o piloto está suspenso');
+assert(ch.rodando.some((x) => x.agente === 'backend'), 'the API shows who is running');
+assert('vagas' in ch && 'pilotoSuspenso' in ch && Array.isArray(ch.naFila), 'and shows free slots, queue and whether autopilot is suspended');
 const parou = await J('POST', `/api/p/${pid}/chamadas/parar`, { agente: 'backend' });
-assert(parou.cancelados >= 1, 'parar um agente pela API');
+assert(parou.cancelados >= 1, 'stop one agent through the API');
 for (let i = 0; i < 40; i++) { ch = await J('GET', `/api/p/${pid}/chamadas`); if (!ch.rodando.length) break; await new Promise((r) => setTimeout(r, 100)); }
-assert.equal(ch.rodando.length, 0, 'depois de parar, ninguém fica rodando');
+assert.equal(ch.rodando.length, 0, 'after stopping, nobody is left running');
 const tudo = await J('POST', `/api/p/${pid}/chamadas/parar`, {});
-assert.equal(tudo.pilotoSuspenso, true, 'parar tudo suspende o piloto');
+assert.equal(tudo.pilotoSuspenso, true, 'stopping everything suspends autopilot');
 const volta = await J('POST', `/api/p/${pid}/chamadas/retomar`, {});
-assert.equal(volta.pilotoSuspenso, false, 'e dá para religar o piloto pela API');
+assert.equal(volta.pilotoSuspenso, false, 'and autopilot can be resumed through the API');
 srv.encerrar(); await store.descarregar();
-console.log('PASS: chamadas pela API (listar quem roda e quem espera, parar um agente ou tudo, inclusive na fila, e religar o piloto).');
+console.log('PASS: calls through the API (list who runs and who waits, stop one agent or all, queued ones too, and resume autopilot).');
 process.exit(0);

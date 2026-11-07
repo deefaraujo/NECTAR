@@ -1,5 +1,5 @@
-// Faz o papel do Claude Code no teste do caminho real do executor: lê o prompt da entrada padrão e responde no mesmo
-// protocolo stream-json (uso da conta, eventos de texto e resultado). Nenhum modelo é chamado.
+// Stands in for Claude Code in the real executor path test: reads the prompt from stdin and replies in the same
+// stream-json protocol (account usage, text events and result). No model is called.
 let entrada = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (d) => { entrada += d; });

@@ -12,4 +12,4 @@ await assert.rejects(()=>decidirEntrevista({...entrada,quadro:'file:///segredo'}
 await assert.rejects(()=>decidirEntrevista(entrada,{fetchImpl:async()=>({ok:true,json:async()=>({message:{content:'{"tipo":"shell"}'}})})}));
 await assert.rejects(()=>decidirEntrevista(entrada,{fetchImpl:async()=>({ok:false,status:503})}),/503/);
 if(anterior===undefined)delete process.env.NECTAR_VISAO_MODELO;else process.env.NECTAR_VISAO_MODELO=anterior;
-console.log('Entrevista: contrato visual, limites e falhas validados (motor simulado).');
+console.log('Interview: visual contract, limits and failures validated (simulated engine).');

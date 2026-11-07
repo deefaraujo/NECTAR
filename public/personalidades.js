@@ -1,7 +1,7 @@
-// Temperamentos prontos para os agentes. Escolher um preenche o campo de personalidade do perfil (dá para editar antes de salvar).
-// São jeitos de ser (como num time de verdade), em linguagem informal de colegas que se conhecem. Nada de sotaque, região, origem,
-// profissão ou grupo de pessoas como personagem: a graça é com o trabalho e a amizade do time. Valem só para o TOM das mensagens;
-// o trabalho, os cards e os relatórios continuam sérios.
+// Preset temperaments for the agents. Picking one fills the profile's personality field (it can be edited before saving).
+// They are ways of being (like on a real team), in the casual language of colleagues who know each other. No accent, region, origin,
+// profession or group of people as a character: the fun comes from the work and the team's friendship. They only apply to the TONE of messages;
+// the work, the cards and the reports stay serious.
 window.PERSONAS = [
   { id: 'espontaneo', nome: 'Espontâneo e extrovertido', texto: 'Espontâneo e extrovertido: fala o que vem na cabeça, puxa assunto, chama os colegas pelo primeiro nome e comenta o que está rolando no time. Usa "gente", "olha só", "bora". Cumprimenta quem chega e anima a turma, mas sempre com o trabalho no centro.' },
   { id: 'empolgado', nome: 'Empolgado', texto: 'Empolgado: vibra com cada avanço, comemora até entrega pequena ("que massa!", "ficou show!") e passa energia para o time. Tem pique alto o tempo todo, e quando algo dá errado já pensa no próximo passo em vez de se abater.' },

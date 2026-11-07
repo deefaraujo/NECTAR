@@ -1,7 +1,7 @@
-/* Perfil no estilo Discord: fontes e efeitos do nome, decoração do avatar, placa do nome, cartão de perfil com capa,
-   tema em duas cores e efeitos (VFX em vfx.js), editor com prévia ao vivo e recorte de foto e capa. Arte própria em CSS. */
+/* Discord-style profile: name fonts and effects, avatar decoration, nameplate, profile card with banner,
+   two-color theme and effects (VFX in vfx.js), editor with live preview and photo and banner crop. Original art in CSS. */
 
-/* ---- fontes do nome (Google Fonts, OFL; licenças em /fonts) ---- */
+/* ---- name fonts (Google Fonts, OFL; licenses in /fonts) ---- */
 @font-face { font-family: 'WIA Tempo'; src: url(/fonts/bebas-neue-400-latin.woff2) format('woff2'); font-display: swap; }
 @font-face { font-family: 'WIA Sakura'; src: url(/fonts/pacifico-400-latin.woff2) format('woff2'); font-display: swap; }
 @font-face { font-family: 'WIA Jujuba'; src: url(/fonts/fredoka-500-latin.woff2) format('woff2'); font-weight: 300 700; font-display: swap; }
@@ -19,7 +19,7 @@
 .nm-st[data-fonte="8bit"] { font-family: 'WIA 8bit', monospace; font-size: .74em; font-weight: 400; line-height: 1.5; }
 .nm-st[data-fonte="vampiro"] { font-family: 'WIA Vampiro', cursive; font-weight: 400; letter-spacing: .03em; font-size: 1.08em; }
 
-/* efeitos: só no cartão de perfil, no editor e nas DMs (como no Discord); no resto, só a fonte */
+/* effects: only on the profile card, in the editor and in DMs (as in Discord); elsewhere, only the font */
 .nm-st.efx[data-efeito="solido"] { color: var(--n1); }
 .nm-st.efx[data-efeito="degrade"] { background: linear-gradient(90deg, var(--n1), var(--n2), var(--n1)); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: nm-brilho 4s linear infinite; }
 .nm-st.efx[data-efeito="neon"] { color: color-mix(in srgb, var(--n1) 30%, #fff); text-shadow: 0 0 2px #fff, 0 0 6px var(--n1), 0 0 14px var(--n1), 0 0 26px var(--n2); animation: nm-neon 3.2s ease-in-out infinite; }
@@ -30,7 +30,7 @@
 @keyframes nm-toon { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-1px) rotate(-1.2deg); } }
 @keyframes nm-pop { 0%, 80%, 100% { transform: scale(1); } 86% { transform: scale(1.12); } 92% { transform: scale(.97); } }
 
-/* ---- avatar: imagem recortada (zoom e posição) e decoração por fora do círculo ---- */
+/* ---- avatar: cropped image (zoom and position) and decoration outside the circle ---- */
 .av .av-img { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
 .av .av-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; transform-origin: center; }
 .av .deco { position: absolute; inset: calc(var(--t) * -.16); border-radius: 50%; pointer-events: none; z-index: 2; }
@@ -62,7 +62,7 @@
 @keyframes deco-pixel { to { filter: hue-rotate(360deg); } }
 @keyframes deco-flutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10%); } }
 
-/* ---- placa do nome (fundo atrás do nome na lista de membros) ---- */
+/* ---- nameplate (background behind the name in the member list) ---- */
 .membro.placa { position: relative; overflow: hidden; isolation: isolate; }
 .membro.placa::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .55; background-size: 200% 100%; animation: placa-anda 9s linear infinite; }
 .membro.placa:hover::before { opacity: .8; }
@@ -76,7 +76,7 @@
 .placa-lava::before { background-image: radial-gradient(circle at 20% 80%, #ff5a1f 0, transparent 30%), radial-gradient(circle at 70% 20%, #ffb300 0, transparent 25%), linear-gradient(90deg, #2a0700, #5c1400, #2a0700); }
 @keyframes placa-anda { to { background-position: -200% 0; } }
 
-/* ---- cartão de perfil (popout e prévia do editor) ---- */
+/* ---- profile card (popout and editor preview) ---- */
 .pcard { --p1: #2b2f3a; --p2: #1a1d24; position: relative; width: 320px; border-radius: 14px; overflow: hidden; color: var(--txt, #e8eaf0); background: linear-gradient(180deg, var(--p1), var(--p2)); box-shadow: 0 18px 50px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .06); isolation: isolate; }
 .pcard.tema { padding: 3px; background: linear-gradient(180deg, var(--p1), var(--p2)); }
 .pcard.tema .pcard-in { border-radius: 11px; background: linear-gradient(180deg, color-mix(in srgb, var(--p1) 35%, #111318), color-mix(in srgb, var(--p2) 35%, #0c0d11)); }
@@ -97,7 +97,7 @@
 .pcard-pop { position: fixed; z-index: 60; animation: pcard-entra .16s ease-out; }
 @keyframes pcard-entra { from { opacity: 0; transform: translateY(6px) scale(.98); } }
 
-/* ---- editor de perfil ---- */
+/* ---- profile editor ---- */
 .modal.ped-modal { width: min(980px, 96vw); }
 .ped-abas { display: flex; gap: 4px; margin: 4px 0 14px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
 .ped-abas button { background: none; border: 0; color: var(--mudo, #9aa3b5); padding: 8px 12px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
@@ -105,7 +105,7 @@
 .ped { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
 .ped-prev { position: sticky; top: 0; }
 .ped-sec { margin-bottom: 18px; }
-/* galeria de avatares da ferramenta: um clique troca a foto; o marcado é o que o agente está usando por padrão */
+/* the tool's avatar gallery: one click swaps the photo; the marked one is what the agent uses by default */
 .ped-galeria { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .ped-av { width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; overflow: hidden; background: var(--bg-4); cursor: pointer; box-shadow: 0 0 0 1px var(--linha-2); transition: transform .18s cubic-bezier(.22, 1, .36, 1), box-shadow .18s; }
 .ped-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -126,7 +126,7 @@
 .ped-rodape { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; position: sticky; bottom: -1px; padding-top: 10px; background: linear-gradient(transparent, var(--bg-2, #15171d) 30%); }
 @media (max-width: 760px) { .ped { grid-template-columns: 1fr; } .ped-prev { position: static; } }
 
-/* ---- recorte de foto e capa ---- */
+/* ---- photo and banner crop ---- */
 .recorte { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: rgba(5, 6, 9, .78); backdrop-filter: blur(4px); }
 .recorte-box { width: min(560px, 94vw); padding: 20px; border-radius: 14px; background: var(--bg-2, #15171d); box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
 .recorte-box h3 { margin: 0 0 14px; }
@@ -143,7 +143,7 @@
   .nm-st.efx, .av .deco, .av .deco::before, .av .deco::after, .membro.placa::before, .ped-t.placa-t::before { animation: none !important; }
 }
 
-/* GIF da comunidade na mensagem e aba Conversa do perfil */
+/* community GIF in the message and in the profile's Conversation tab */
 .gif-com { display: block; max-width: 260px; max-height: 200px; margin: 6px 0; border-radius: 8px; }
 .cv-tri { display: inline-flex; padding: 3px; border-radius: 8px; background: rgba(255, 255, 255, .05); }
 .cv-tri label { cursor: pointer; }
@@ -151,12 +151,12 @@
 .cv-tri span { display: block; padding: 6px 12px; border-radius: 6px; font-size: 13px; color: var(--mudo, #9aa3b5); }
 .cv-tri input:checked + span { background: var(--azul-1, #5865f2); color: #fff; }
 
-/* editor: as abas rolam dentro da janela (o .modal corta o que passa) e têm respiro nas bordas */
+/* editor: tabs scroll inside the window (.modal clips the overflow) and have breathing room at the edges */
 .ped-modal .ped-abas { padding: 0 22px; margin: 0; flex: none; }
 .ped-modal #ped-perfil, .ped-modal #ped-conversa, .ped-modal #ped-trabalho { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 22px 0; }
 .ped-modal .ped-rodape { margin: 8px -22px 0; padding: 12px 22px 16px; background: var(--bg-2, #15171d); box-shadow: 0 -1px 0 rgba(255, 255, 255, .06); }
 
-/* cartão como no Discord: o avatar fica no fluxo, sobre a borda da capa, e o nome vem logo abaixo dele (nunca por cima) */
+/* card as in Discord: the avatar stays in the flow, over the banner edge, and the name comes right below it (never on top) */
 .pcard-av { position: relative; left: auto; top: auto; display: inline-block; margin: -48px 0 0 14px; }
 .pcard-corpo { padding: 6px 16px 16px; }
 .pcard-av .av .deco { inset: calc(var(--t) * -.13); }
@@ -164,12 +164,12 @@
 .pcard-falar input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: inherit; font: inherit; font-size: 13px; }
 .pcard-falar input::placeholder { color: var(--mudo, #9aa3b5); }
 
-/* avatar com decoração: a moldura fica fora do círculo, então ganha respiro para não encostar no nome */
+/* avatar with decoration: the frame sits outside the circle, so it gets breathing room to avoid touching the name */
 .av:has(> .deco) { margin: calc(var(--t) * .18); }
 .ped-t .av:has(> .deco), .pcard-av .av:has(> .deco) { margin: 0; }
 .pcard-av:has(.deco) { margin-left: 22px; margin-bottom: 6px; }
 
-/* chat: coluna do avatar mais larga (a moldura da decoração não encosta no nome), nome maior e mais afastado */
+/* chat: wider avatar column (the decoration frame does not touch the name), larger name set further apart */
 .msg { grid-template-columns: 84px minmax(0, 1fr); }
 .msg .lado { padding: 4px 0 0 20px; }
 .msg .lado .av:has(> .deco) { margin: 6px 0 0 6px; }
@@ -182,7 +182,7 @@
 .cabeca > .av:has(> .deco) { margin: 0 6px 0 4px; }
 .cabeca h2 { margin-left: 4px; }
 
-/* personalidades prontas */
+/* preset personalities */
 .persona-lista { display: flex; flex-wrap: wrap; gap: 6px; }
 .persona-chip { padding: 6px 11px; border-radius: 999px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .09); color: inherit; font: inherit; font-size: 12.5px; cursor: pointer; }
 .persona-chip:hover { background: rgba(245, 166, 35, .16); border-color: rgba(245, 166, 35, .5); }

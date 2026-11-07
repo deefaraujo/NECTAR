@@ -16,5 +16,5 @@ assert.throws(()=>integrarIsolado({root,pasta,taskId:'B',branch:b.branch,target:
 const conflict=integrarIsolado({root,pasta,taskId:'B',branch:b.branch,target:merged.branch,expectedTarget:merged.commit,allowedPaths:['service.txt'],requiredTests:tests(b)});
 assert(!conflict.ok);assert.equal(conflict.failure,'integration_conflict');assert(conflict.conflicts.includes('service.txt'));assert(fs.existsSync(conflict.cwd));
 assert.equal(fs.readFileSync(path.join(root,'user-dirty.txt'),'utf8'),'preserve');assert.equal(git(root,['rev-parse','HEAD']),baseline);assert.equal(git(root,['branch','--show-current']),'main');
-console.log('PASS: Git real, writers isolados, retomada, escopo/testes/versão, conflito preservado e checkout sujo intacto.');
+console.log('PASS: real Git, isolated writers, resume, scope/tests/version, conflict preserved and dirty checkout intact.');
 fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});

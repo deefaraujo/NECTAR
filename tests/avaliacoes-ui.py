@@ -1,4 +1,4 @@
-"""Organizador operacional: dados isolados, navegador sem janela e nenhum modelo."""
+"""Operations organizer: isolated data, headless browser and no model."""
 import json, os, pathlib, subprocess, tempfile
 from playwright.sync_api import sync_playwright, expect
 root=pathlib.Path(__file__).resolve().parents[1]
@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-operacao-') as temp:
         with sync_playwright() as pw:
             browser=pw.chromium.launch(headless=True,channel='msedge')
             page=browser.new_page(viewport={'width':1366,'height':900})
-            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # os seletores destes testes estão em português
+            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # these tests' selectors are in Portuguese
             erros=[];page.on('pageerror',lambda e:erros.append(str(e)))
             page.goto(base)
             expect(page.locator('a[href="/avaliacoes.html"]')).to_be_visible()
@@ -34,7 +34,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-operacao-') as temp:
             page.locator('#lista-tarefas button').click()
             expect(page.locator('#proximoPasso')).to_have_value('Retomar após o processamento')
             expect(page.locator('[data-check="login"]')).to_be_checked()
-            # A troca de registro salva o ponto atual antes de abrir o próximo.
+            # Switching records saves the current checkpoint before opening the next one.
             page.locator('#status').select_option('pendencia')
             page.locator('#pendencia').fill('Acesso 403: verificar instruções atuais')
             page.locator('#nova').click()
@@ -56,6 +56,6 @@ with tempfile.TemporaryDirectory(prefix='nectar-operacao-') as temp:
             assert not erros,erros
             assert all('/api/avaliacoes/operacao' in u for u in chamadas),chamadas
             browser.close()
-        print('PASS: organizador manual cria, salva, retoma, filtra, exporta e preserva conflito; sem pedidos a modelos.')
+        print('PASS: manual organizer creates, saves, resumes, filters, exports and preserves conflict; no model requests.')
     finally:
         proc.terminate();proc.wait(timeout=20)

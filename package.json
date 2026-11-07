@@ -1,8 +1,22 @@
 {
-  "name": "work-ia",
+  "name": "nectar",
   "productName": "NECTAR",
   "version": "1.0.0",
-  "description": "A team of AI agents per project, with chat, board and memory",
+  "description": "A team of AI agents per project: chat, task board, memory, calendar, and autopilot, running on the Claude Code and Codex CLIs.",
+  "keywords": [
+    "ai-agents",
+    "multi-agent",
+    "claude-code",
+    "codex",
+    "electron",
+    "kanban",
+    "autopilot",
+    "desktop-app"
+  ],
+  "homepage": "https://github.com/deefaraujo/NECTAR#readme",
+  "bugs": {
+    "url": "https://github.com/deefaraujo/NECTAR/issues"
+  },
   "private": true,
   "main": "electron/main.mjs",
   "scripts": {
@@ -16,12 +30,14 @@
     "test:teamwork": "node tests/teamwork.mjs && node tests/claude-policy.mjs && node tests/worktree-teamwork.mjs && node tests/teamwork-metrics.mjs && node tests/benchmark-harness.mjs",
     "test:sandbox": "node tests/sandbox-real.mjs",
     "build": "electron-builder --win",
-    "check:publicacao": "node scripts/verificar-publicacao.mjs"
+    "check:publicacao": "node scripts/verificar-publicacao.mjs",
+    "check:publication": "node scripts/verificar-publicacao.mjs",
+    "test:i18n": "node tests/i18n.mjs"
   },
   "build": {
     "appId": "ai.work.app",
     "productName": "NECTAR",
-    "copyright": "NECTAR",
+    "copyright": "Copyright © 2026 Déborah Fernandes",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -56,7 +72,7 @@
           ]
         }
       ],
-      "artifactName": "NECTAR.zip"
+      "artifactName": "NECTAR-${version}-win-x64.${ext}"
     }
   },
   "devDependencies": {
@@ -74,5 +90,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/deefaraujo/NECTAR.git"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

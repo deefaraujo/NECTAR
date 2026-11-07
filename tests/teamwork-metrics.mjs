@@ -9,4 +9,4 @@ const repeated=[];for(const variant of ['solo','nectar_baseline','teamwork'])for
 assert.equal(compararBenchmark(repeated)[0].sufficient,false);
 const real=[];for(const variant of ['solo','nectar_baseline','teamwork'])for(let n=0;n<5;n++)real.push({...run,taskId:`task-${n}`,mode:'real',variant,ttvdMs:variant==='solo'?300:100,totalCost:1});
 assert.equal(compararBenchmark(real)[0].speedup,3);real[0].validated=false;assert.equal(compararBenchmark(real)[0].speedup,null);
-console.log('PASS: métricas preservam falhas, custo incompleto não vira zero e benchmark stub/amostra insuficiente não promove estratégia.');
+console.log('PASS: metrics keep failures, incomplete cost does not become zero, and a stub benchmark/insufficient sample does not promote a strategy.');

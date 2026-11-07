@@ -1,13 +1,13 @@
 'use strict';
-/* Game Studio AI: uma equipe de agentes que conversa no chat (formato Discord), mantém o planner
-   (formato Jira) e guarda o que aprende em memória. Cada projeto é uma pasta, com tudo próprio.
-   Sem framework: E guarda o que é do app, PJ o que é de cada projeto e U o que é da tela. */
+/* Game Studio AI: a team of agents that talks in chat (Discord style), keeps the planner
+   (Jira style) and stores what it learns in memory. Each project is a folder with everything of its own.
+   No framework: E holds app-level state, PJ per-project state and U screen state. */
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-// O elenco é do projeto aberto (cada projeto tem o seu template de agentes); sem projeto, vale o padrão.
+// The cast belongs to the open project (each project has its own agent template); with no project, the default applies.
 const E = {
   _roster: [], templates: [], marca: { nome: 'WORK.', sufixo: 'IA' }, colunas: [], config: {}, projetos: [], ativo: null, perguntas: [], uso: null, pausas: {},
   get roster() { return (typeof PJ !== 'undefined' && typeof U !== 'undefined' && PJ[U.proj]?.roster) || this._roster; },
@@ -24,37 +24,37 @@ const U = {
 
 const J = () => PJ[U.proj] || VAZIO;
 const P = (rota, id = U.proj) => `/api/p/${id}${rota}`;
-// Equipes dentro do projeto: U.proj é o id da EQUIPE aberta ("projeto" ou "projeto__equipe"); o projeto é a parte antes de "__".
+// Teams inside the project: U.proj is the id of the open TEAM ("project" or "project__team"); the project is the part before "__".
 const baseDe = (cid) => String(cid || '').split('__')[0];
 const equipesDoProjeto = (p) => (p?.equipes?.length ? p.equipes : [{ id: 'principal', cid: p?.id, nome: p?.templateNome || 'Equipe', template: p?.template }]);
 const todasEquipes = () => E.projetos.flatMap((p) => equipesDoProjeto(p).map((e) => ({ ...e, projeto: p })));
-// A equipe de avaliação de agentes de código tem entrada própria no trilho: abre direto a aba Avaliações (temas, repositórios, tarefas).
+// The code-agent evaluation team has its own rail entry: it opens straight into the Evaluations tab (themes, repositories, tasks).
 const equipeAvaliacao = () => todasEquipes().find((e) => e.template === 'avaliacao-agentes') || null;
 const equipeDe = (cid) => todasEquipes().find((e) => e.cid === cid) || null;
 const projetoAtual = () => E.projetos.find((p) => p.id === baseDe(U.proj)) || null;
 const equipeAtual = () => equipeDe(U.proj);
-const ultimaEquipe = (pid) => { try { const c = localStorage.getItem('eq:' + pid); if (c && equipeDe(c)) return c; } catch { /* sem armazenamento */ } return pid; };
-const lembrarEquipe = (cid) => { try { localStorage.setItem('eq:' + baseDe(cid), cid); } catch { /* sem armazenamento */ } };
-const rosterAtual = () => (U.proj && PJ[U.proj]?.roster) || E.roster;   // o elenco da equipe aberta (cada equipe tem o seu)
+const ultimaEquipe = (pid) => { try { const c = localStorage.getItem('eq:' + pid); if (c && equipeDe(c)) return c; } catch { /* no storage */ } return pid; };
+const lembrarEquipe = (cid) => { try { localStorage.setItem('eq:' + baseDe(cid), cid); } catch { /* no storage */ } };
+const rosterAtual = () => (U.proj && PJ[U.proj]?.roster) || E.roster;   // the cast of the open team (each team has its own)
 const liderAtual = () => J().lider || 'po';
-// "ext:<agente>@<equipe>" é alguém de outra equipe do projeto: o perfil (foto, estilo, nome) é o mesmo da equipe dele
+// "ext:<agent>@<team>" is someone from another team in the project: the profile (photo, style, name) is the one from their team
 const externoDe = (id) => { const m = /^ext:([^@]+)@(.+)$/.exec(String(id || '')); if (!m) return null; const x = (J().externos || []).find((e) => e.agente === m[1] && e.cid === m[2]); return x ? { id, nome: x.nome, cargo: `${x.cargo} (${x.equipe})`, papel: x.papel, cor: x.cor, foto: x.foto, capa: x.capa, estilo: x.estilo || {}, equipe: x.equipe, externo: true } : null; };
 const agente = (id) => rosterAtual().find((a) => a.id === id) || externoDe(id);
 const rosterDaEquipe = () => rosterAtual();
-// Agentes GERAIS (assessor, memorizador, MCP, Créditos): os mesmos em toda equipe e projeto, numa categoria própria da lista.
-// Quem a equipe não tem (o assessor fora da Assessoria) aparece pelo perfil da equipe dele e abre a conversa lá.
+// GENERAL agents (advisor, memorizer, MCP, Credits): the same across every team and project, in their own list category.
+// Anyone the team lacks (the advisor outside the Advisory team) shows with their own team's profile and opens the conversation there.
 const ORDEM_GERAIS = ['assessor', 'memorizador', 'mcp', 'creditos'];
 const gerais = () => ORDEM_GERAIS.map((k) => rosterAtual().find((a) => a.geral === k) || (J().externos || []).find((x) => x.geral === k)).filter(Boolean);
 const cartao = (id) => J().cartoes.find((c) => c.id === id);
 const nomeColuna = (id) => (E.colunas.find((c) => c.id === id) || {}).nome || id;
 const usuarioDe = () => J().usuario || { id: 'voce', nome: 'Você', foto: null, cargo: '', papel: 'Quem lidera o trabalho', cor: '#E2A226' };
-const templateId = () => (J().template && typeof J().template === 'object' ? J().template.id : J().template);   // /estado manda o template como objeto
+const templateId = () => (J().template && typeof J().template === 'object' ? J().template.id : J().template);   // /estado sends the template as an object
 const nomeAgente = (id) => (id === 'voce' ? usuarioDe().nome : id === 'sistema' ? 'Sistema' : (agente(id) || { nome: id }).nome);
 const nomeCanal = (canal) => (canal === 'equipe' || canal === 'bastidores' ? I18N.t(canal) : canal.startsWith('plan-') ? ((J().planning || []).find((p) => p.canal === canal) || {}).titulo || canal : canal.startsWith('grp-') ? ((J().grupos || []).find((g) => g.canal === canal) || {}).titulo || canal : (agente(canal.slice(3)) || {}).nome || canal);
 
-/* ------------------------------------------------------------ utilidades */
+/* ------------------------------------------------------------ utilities */
 async function api(metodo, url, corpo) {
-  if (corpo === undefined && metodo !== 'GET') corpo = {};   // o servidor só aceita POST/PUT/DELETE com JSON; sem isto, "use application/json"
+  if (corpo === undefined && metodo !== 'GET') corpo = {};   // the server only accepts POST/PUT/DELETE with JSON; without this, "use application/json"
   const r = await fetch(url, {
     method: metodo,
     headers: corpo !== undefined ? { 'Content-Type': 'application/json' } : {},
@@ -90,21 +90,21 @@ const copiarTexto = (t) => navigator.clipboard?.writeText(t).then(() => aviso(I1
 const matiz = (id) => { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
 const iniciais = (n) => String(n).split(/[\s\-_.]+/).filter(Boolean).slice(0, 2).map((s) => s[0]).join('').toUpperCase() || '?';
 
-// Quem a mensagem marca como a Game Director (o mesmo que o servidor entende).
-// As marcações que chamam a Game Director: os apelidos de sempre e o primeiro nome que ela escolheu.
+// Whether the message tags the Game Director (same rule the server uses).
+// Tags that call the Game Director: the usual aliases plus the first name the user chose.
 const reUsuario = () => {
   const n = semAcento(primeiroNome(usuarioDe().nome)).replace(/[^a-z0-9]/g, '');
   return new RegExp(`@\\s*(?:game\\s*director|gamedirector|gd|diretor|diretora|director|voc[eê]|vc${n ? `|${n}` : ''})\\b`, 'gi');
 };
 const mencionaVoce = (t) => reUsuario().test(String(t || ''));
 
-/* Markdown mínimo e seguro: escapa tudo antes de formatar. */
+/* Minimal, safe Markdown: escapes everything before formatting. */
 function md(txt) {
   let t = esc(txt);
   const blocos = [];
   t = t.replace(/```(?:\w+)?\n?([\s\S]*?)```/g, (_, c) => { blocos.push(c.replace(/\n$/, '')); return `§BLOCO${blocos.length - 1}§`; });
   t = t.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-  // [texto](url): link da web vira link; caminho do computador vira só o texto (o arquivo vai como anexo da mensagem)
+  // [text](url): a web link becomes a link; a local file path becomes plain text (the file goes as a message attachment)
   t = t.replace(/\[([^\]\n]{1,200})\]\((?:&lt;)?([^)\s]+?|[^)\n]+?)(?:&gt;)?\)/g, (_, rot, url) => (/^https?:\/\//i.test(url) ? `<a href="${url}" target="_blank" rel="noopener">${rot}</a>` : rot));
   t = t.replace(/\[gif:\s*([^\]\n]{1,80})\]/gi, (_, q) => `<img class="gif-com" loading="lazy" src="/api/gif?q=${encodeURIComponent(q.trim())}" alt="GIF: ${q.trim()}">`);
   t = t.replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>');
@@ -158,7 +158,7 @@ function md(txt) {
     .map((p) => (/^<(ul|ol|h\d|table|blockquote|hr)/.test(p) ? p : `<p>${p.replace(/\n/g, '<br>')}</p>`)).join('');
   return html.replace(/§BLOCO(\d+)§/g, (_, i) => `</p><pre><code>${blocos[i]}</code></pre><p>`).replace(/<p><\/p>/g, '');
 }
-// Esconde o bloco de ações, inclusive enquanto ele ainda está chegando (a cerca vem aos pedaços).
+// Hides the actions block, including while it is still streaming in (the fence arrives in pieces).
 function limparBloco(t) {
   t = t.replace(/```studio-actions[\s\S]*?```/g, '');
   const i = t.indexOf('```studio-actions');
@@ -168,7 +168,7 @@ function limparBloco(t) {
   return t.trim();
 }
 
-/* ------------------------------------------------------------ ícones (linha, 24x24) */
+/* ------------------------------------------------------------ icons (line, 24x24) */
 const IC = {
   hash: '<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',
   chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
@@ -213,7 +213,7 @@ const IC = {
   pasta: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   memoria: '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
   relogio: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  /* um glifo por agente */
+  /* one glyph per agent */
   bussola: '<circle cx="12" cy="12" r="9.5"/><path d="m15.8 8.2-2 5.6-5.6 2 2-5.6z"/>',
   pena: '<path d="M20 4c-8 0-13 4-13 11l-3 5 5-3c7 0 11-5 11-13z"/><path d="M8 16 16 8"/>',
   dialogos: '<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>',
@@ -233,16 +233,16 @@ const IC = {
   escudo: '<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
 };
 const GLIFO = new Proxy({}, { get: (_, id) => (typeof id === 'string' ? agente(id)?.glifo : undefined) });
-// Avatares da própria ferramenta (ilustrações da marca em public/marca/avatares). Agente sem foto recebe um deles,
-// sempre o mesmo para o mesmo id (variado entre os agentes); no editor de perfil dá para escolher qualquer um ou subir do PC.
+// The tool's own avatars (brand illustrations in public/marca/avatares). An agent without a photo gets one of them,
+// always the same for the same id (varied across agents); the profile editor lets you pick any of them or upload from the PC.
 const AVATARES = 11;
 const avatarUrl = (n) => `/marca/avatares/${String(n).padStart(2, '0')}.png`;
 const avatarPadrao = (id) => { let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return avatarUrl(1 + (h % AVATARES)); };
 const ic = (n, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${IC[n] || ''}</svg>`;
-// o símbolo da marca (favo de mel): imagem do guia da identidade, em public/marca
+// the brand symbol (honeycomb): image from the identity guide, in public/marca
 const logo = (t = 24) => `<img class="logo" src="/marca/nectar-mark.png" alt="" width="${t}" height="${t}" style="width:${t}px;height:${t}px" draggable="false">`;
 const COR_COL = { backlog: '#8C98AF', pronto: '#6C9BFF', andamento: '#F3AA3C', impedimento: '#EF5B5B', revisao: '#A58BF5', qa: '#2DC4A8', concluido: '#34D399' };
-// Modelos e níveis de esforço que o Claude Code desta conta aceita (testados na máquina).
+// Models and effort levels this account's Claude Code accepts (tested on this machine).
 const MODELOS_CLAUDE = [['', 'Padrão do Claude Code'], ['claude-haiku-4-5', 'Haiku 4.5'], ['claude-haiku-5-5', 'Haiku 5.5'], ['claude-sonnet-4-6', 'Sonnet 4.6'], ['claude-sonnet-5', 'Sonnet 5'], ['claude-sonnet-5-5', 'Sonnet 5.5'], ['claude-opus-5', 'Opus 5'], ['claude-opus-5-5', 'Opus 5.5']];
 const ESFORCOS = [['', 'Padrão do modelo'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High'], ['xhigh', 'Extra alto (xhigh)'], ['max', 'Max']];
 const ESFORCOS_CODEX = [['', 'Padrão do modelo'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High'], ['xhigh', 'Extra alto (xhigh)'], ['max', 'Max'], ['ultra', 'Ultra (só em alguns modelos)']];
@@ -252,8 +252,8 @@ const MENCOES = new Proxy({}, { get: (_, id) => (typeof id === 'string' ? (agent
 const semAcento = (x) => String(x).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const primeiroNome = (n) => String(n).trim().split(/\s+/)[0];
 
-/* ------------------------------------------------------------ avatares */
-/* ---- campo de mensagem: botões Modelo e Modo (listas) e painel de emoji ---- */
+/* ------------------------------------------------------------ avatars */
+/* ---- message field: Model and Mode buttons (lists) and emoji panel ---- */
 const SELETORES = {
   motor: { rot: 'Modelo', atual: () => E.config.engine, opcoes: [['claude', 'Claude', 'Claude Code, da Anthropic'], ['codex', 'Codex', 'Codex, da OpenAI (ChatGPT)']] },
   modo: { rot: 'Modo', atual: () => E.config.modo, opcoes: [['conversar', 'Planejar', 'O time analisa e conversa; só executa o que você já autorizou'], ['trabalhar', 'Executar', 'O time edita arquivos do projeto e executa o trabalho']] },
@@ -286,7 +286,7 @@ const EMOJIS = {
   'Diversos': '☕ 🍕 🍔 🍟 🍿 🍩 🍪 🎂 🍻 🍀 🌈 ☀️ 🌙 ⚡ ❄️ 🌊 🌸 🌻 🐱 🐶 🦊 🐼 🐧 🦄 🐢 🐙',
 };
 const recentesEmoji = () => { try { return JSON.parse(localStorage.getItem('emojis-recentes') || '[]'); } catch { return []; } };
-const guardarEmoji = (e) => { try { localStorage.setItem('emojis-recentes', JSON.stringify([e, ...recentesEmoji().filter((x) => x !== e)].slice(0, 16))); } catch { /* sem armazenamento */ } };
+const guardarEmoji = (e) => { try { localStorage.setItem('emojis-recentes', JSON.stringify([e, ...recentesEmoji().filter((x) => x !== e)].slice(0, 16))); } catch { /* no storage */ } };
 function abrirEmoji(ancora, aba = null) {
   const antes = $('#emoji-pop'); const mesmaAncora = !!antes && !aba; fecharPops(); if (mesmaAncora) return;
   const rec = recentesEmoji(); const abas = [...(rec.length ? [['Recentes', rec]] : []), ...Object.entries(EMOJIS).map(([n, l]) => [n, l.split(' ')])];
@@ -302,7 +302,7 @@ function inserirEmoji(e) {
   autoAltura(ta); U.rascunhos[`${U.proj}/${U.canal}`] = ta.value; guardarEmoji(e);
 }
 
-/* ---- perfil estilo Discord: estilo de cada pessoa (foto recortada, decoração, fonte e efeito do nome, placa, capa, tema, VFX) ---- */
+/* ---- Discord-style profile: each person's style (cropped photo, decoration, name font and effect, nameplate, banner, theme, VFX) ---- */
 const OPC = {
   decoracao: [['nenhuma', 'Nenhuma'], ['aurora', 'Aurora'], ['neon', 'Neon'], ['chamas', 'Chamas'], ['orbita', 'Órbita'], ['sakura', 'Sakura'], ['pixel', 'Pixel'], ['gelo', 'Gelo'], ['raio', 'Raio'], ['coroa', 'Coroa']],
   efeito: [['nenhum', 'Nenhum'], ['estrelas', 'Estrelas'], ['neve', 'Neve'], ['brasas', 'Brasas'], ['petalas', 'Pétalas'], ['bolhas', 'Bolhas'], ['confete', 'Confete'], ['codigo', 'Código'], ['vagalumes', 'Vaga-lumes']],
@@ -315,7 +315,7 @@ const pessoaDe = (id) => (id === 'voce' ? usuarioDe() : agente(id));
 const estiloDe = (id) => pessoaDe(id)?.estilo || {};
 const recorteCss = (r) => (r ? `transform:translate(${r.x}%,${r.y}%) scale(${r.zoom})` : '');
 const placaCls = (id) => { const p = estiloDe(id).placa; return p && p !== 'nenhuma' ? `placa placa-${p}` : ''; };
-/** Nome com a fonte escolhida; o efeito (cor, neon, degradê...) só onde `efx` (cartão de perfil, editor e DMs). */
+/** Name in the chosen font; the effect (color, neon, gradient...) only where `efx` is set (profile card, editor and DMs). */
 function nomeHtml(id, efx = false, estilo = null, nome = null) {
   const n = (estilo || estiloDe(id)).nome || {};
   const txt = esc(nome ?? nomeAgente(id));
@@ -332,10 +332,10 @@ function av(id, t = 'm', { dot = true, estilo = null, foto } = {}) {
   const p = J().presenca[id];
   const st = dot ? (p ? (p.estado === 'trabalhando' ? 'trab' : 'fila') : '') : null;
   const f = foto === undefined ? a.foto : foto;
-  // sem foto própria, o agente usa um dos avatares da marca (fixo por agente)
+  // with no photo of its own, the agent uses one of the brand avatars (fixed per agent)
   return `<span class="av ${t} foto ${f ? '' : 'padrao'}" style="--c:${a.cor}" data-perfil="${id}">${f ? img(f) : img(avatarPadrao(id), false)}${deco}${st !== null ? `<i class="dot ${st}"></i>` : ''}</span>`;
 }
-/** Cartão de perfil (popout e prévia do editor): capa, avatar com decoração, nome estilizado, tema em duas cores e VFX. */
+/** Profile card (popout and editor preview): banner, avatar with decoration, styled name, two-color theme and VFX. */
 function cartaoHtml(id, { estilo = null, nome = null, acoes = '' } = {}) {
   const pz = pessoaDe(id); if (!pz) return '';
   const e = estilo || estiloDe(id);
@@ -369,10 +369,10 @@ const iconePrio = { alta: 'prioAlta', normal: 'prioMedia', baixa: 'prioBaixa' };
 const nomePrio = { alta: 'Alta', normal: 'Normal', baixa: 'Baixa' };
 const aguardandoVoce = (agenteId) => J().perguntas.some((q) => q.estado === 'aberta' && q.de === agenteId);
 
-/* ------------------------------------------------------------ trilho: projetos e vistas */
+/* ------------------------------------------------------------ rail: projects and views */
 function renderRail() {
   const projs = E.projetos.map((p) => {
-    // o projeto inteiro (todas as equipes) é um botão só no trilho
+    // the whole project (all teams) is a single button on the rail
     const eqs = equipesDoProjeto(p).map((e) => PJ[e.cid]).filter(Boolean);
     const trab = eqs.some((j) => Object.values(j.presenca || {}).some((x) => x.estado === 'trabalhando'));
     const ab = E.perguntas.filter((q) => baseDe(q.projeto) === p.id).length;
@@ -396,8 +396,8 @@ function renderRail() {
     <button class="rail-btn" data-acao="ajustes" data-tip="Ajustes">${ic('engrenagem')}</button>`;
 }
 
-/* ------------------------------------------------------------ lista de canais */
-/** Seletor de equipes do projeto: cada equipe (template) tem conversas, contatos e planner próprios. Aguenta N equipes (a lista rola). */
+/* ------------------------------------------------------------ channel list */
+/** Project team selector: each team (template) has its own conversations, contacts and planner. Handles N teams (the list scrolls). */
 function equipesHtml(p) {
   if (!p) return '';
   const eqs = equipesDoProjeto(p);
@@ -451,7 +451,7 @@ async function abrirCanal(canal) {
   const j = J();
   j.naoLidas[canal] = 0;
   if (canal === 'bastidores') j.bastidores = await (await fetch(P('/bastidores'))).json().catch(() => []);
-  else if (canal === 'posts') { /* o feed vem do estado do projeto */ }
+  else if (canal === 'posts') { /* the feed comes from the project state */ }
   else if (!j.canais[canal]) {
     const h = await (await fetch(P(`/canal/${canal}`))).json().catch(() => []);
     j.canais[canal] = Array.isArray(h) ? h : [];
@@ -461,7 +461,7 @@ async function abrirCanal(canal) {
   if (m) m.scrollTop = m.scrollHeight;
 }
 
-/* ------------------------------------------------------------ canal Posts */
+/* ------------------------------------------------------------ Posts channel */
 function modalNovoPost() {
   const imgs = [];
   abrirModal(`<h2>Nova publicação</h2>
@@ -511,7 +511,7 @@ function postsHtml() {
     </article>`;
   }).join('');
 }
-// Redesenha o feed sem perder a rolagem nem o que está sendo digitado.
+// Redraws the feed without losing the scroll position or what is being typed.
 function renderPostsSuave() {
   const el = $('#mensagens'); if (!el || U.canal !== 'posts') return;
   const rascunhos = {}; $$('[data-post-resp]').forEach((i) => { if (i.value) rascunhos[i.dataset.postResp] = i.value; });
@@ -568,8 +568,8 @@ function renderChat() {
     renderDigitando();
     return;
   }
-  // Redesenhar a conversa não pode jogar a leitura para o começo: se era o mesmo canal, volta para onde você estava
-  // (ou fica colado no fim, se estava no fim). Trocar de canal continua abrindo no fim.
+  // Redrawing the conversation must not throw the reader back to the top: if it is the same channel, return to where you were
+  // (or stay pinned to the bottom, if you were at the bottom). Switching channels still opens at the bottom.
   const m0 = $('#mensagens'); const mesmoCanal = !!m0 && U.canalDesenhado === `${U.proj}/${U.canal}`;
   const colado = !mesmoCanal || m0.scrollHeight - m0.scrollTop - m0.clientHeight < 160; const topoAntes = mesmoCanal ? m0.scrollTop : 0;
   $('#centro').innerHTML = `
@@ -640,7 +640,7 @@ function mensagensHtml(lista) {
 function perguntaHtml(m) {
   const q = J().perguntas.find((x) => x.id === m.pergunta);
   if (!q) return '';
-  const comLider = q.estado === 'aberta' && q.paraPO;   // você passou para a liderança decidir
+  const comLider = q.estado === 'aberta' && q.paraPO;   // you handed it to the lead to decide
   const aberta = q.estado === 'aberta' && !comLider;
   const c = q.card ? cartao(q.card) : null;
   const podeDelegar = !q.planning && !q.decisao && q.de !== liderAtual();
@@ -680,7 +680,7 @@ function embedsHtml(resumo) {
     if (r.tipo === 'memoria') return `<button class="embed memoria" data-nota="${esc(r.caminho)}"><div class="linha1">${ic('memoria')}${esc(verboM[r.acao] || 'Memória')}</div><div class="tit">${esc(r.titulo)}</div><div class="caminho-m">${esc(r.caminho)}</div></button>`;
     const c = cartao(r.id);
     const cor = r.acao === 'moveu' ? (COR_COL[r.para] || '#6C9BFF') : (corAcao[r.acao] || '#6C9BFF');
-    // usa a foto gravada na hora da ação; só cai no estado atual em mensagens antigas, sem foto
+    // uses the photo recorded at the time of the action; falls back to the current state only for old messages without a photo
     const coluna = r.coluna ?? (c && c.coluna);
     const donoId = r.dono !== undefined ? r.dono : (c && c.dono);
     return `<button class="embed" style="--c:${cor}" data-issue="${esc(r.id)}">
@@ -690,7 +690,7 @@ function embedsHtml(resumo) {
   }).join('')}</div>`;
 }
 
-/* ---- anexos: o arquivo sobe para a pasta do projeto e os agentes o leem de lá ---- */
+/* ---- attachments: the file is uploaded to the project folder and the agents read it from there ---- */
 const urlAnexo = (rel, pid = U.proj) => P(`/anexo/${String(rel).split('/').map(encodeURIComponent).join('/')}`, pid);
 const tamanhoTxt = (b) => (b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
 
@@ -701,8 +701,8 @@ function anexosHtml(lista) {
     : `<a class="anexo-arq" href="${urlAnexo(a.rel, a.pid || U.proj)}" download="${esc(a.nome.replace(/^\d{6}-/, ''))}" target="_blank" rel="noopener">${ic('copiar')}<span>${esc(a.nome)}</span><small>${tamanhoTxt(a.tamanho)}</small></a>`)).join('')}</div>`;
 }
 
-// O campo de arquivo fica fora do chat: o chat é redesenhado a cada evento e, se o campo fosse junto enquanto a janela de
-// escolher arquivo está aberta, o arquivo escolhido se perdia (o evento caía num elemento que já não estava na página).
+// The file input lives outside the chat: the chat is redrawn on every event and, if the input were inside it while the
+// file picker was open, the chosen file was lost (the event landed on an element no longer on the page).
 const campoAnexo = () => $('#anexo-input') || document.body.appendChild(Object.assign(document.createElement('input'), { type: 'file', id: 'anexo-input', multiple: true, hidden: true }));
 const chaveAnexos = () => `${U.proj}/${U.canal}`;
 const anexosAtuais = () => (U.anexos ||= {})[chaveAnexos()] ||= [];
@@ -734,12 +734,12 @@ async function anexarArquivos(arquivos) {
 }
 
 function msgHtml(m, ant) {
-  if (m.oculta) return ''; // fala repetida ou "Sem novidade": o app não mostra
-  // ligação: o que foi dito por voz fica na transcrição da chamada, não no chat; só o bloco ```nota``` (o que ela pediu por escrito) entra
+  if (m.oculta) return ''; // repeated message or "Sem novidade": the app does not show it
+  // call: what was said by voice stays in the call transcript, not in the chat; only the ```nota``` block (what the user asked for in writing) goes in
   if (m.voz) { const nota = /```nota\s*\n([\s\S]*?)```/.exec(m.texto || '')?.[1]?.trim(); if (!nota) return ''; m = { ...m, texto: nota }; }
   if (m.de === 'sistema') return `<div class="aviso-sis" id="msg-${m.id}">${esc(m.texto)}</div>`;
   const minha = m.de === 'voce';
-  // participante de outra equipe: o perfil dele (foto, estilo) vem da equipe dele; se ela ainda não carregou, vale o que veio na mensagem
+  // participant from another team: their profile (photo, style) comes from their team; if it has not loaded yet, use what came with the message
   const a = minha ? null : agente(m.de);
   const ext = !minha && !a && m.ext && String(m.de).startsWith('ext:') ? m.ext : null;
   const novo = !ant || ant.de !== m.de || new Date(m.em) - new Date(ant.em) > 5 * 60000;
@@ -785,7 +785,7 @@ const naTela = (pid, canal) => pid === U.proj && U.vista === 'chat' && U.canal =
 function addMsg(pid, msg) {
   const j = PJ[pid];
   if (!j) return;
-  if (msg.canal.startsWith('pst-')) { const l = j.canais[msg.canal]; if (l && !l.some((x) => x.id === msg.id)) l.push(msg); return; } // a conversa do post aparece no feed
+  if (msg.canal.startsWith('pst-')) { const l = j.canais[msg.canal]; if (l && !l.some((x) => x.id === msg.id)) l.push(msg); return; } // the post's conversation shows up in the feed
   const lista = j.canais[msg.canal];
   if (lista) {
     if (lista.some((x) => x.id === msg.id)) return;
@@ -807,7 +807,7 @@ function addMsg(pid, msg) {
 function updMsg(pid, msg) {
   const j = PJ[pid];
   if (!j) return;
-  if (msg.status !== 'trabalhando') ultimoDelta.delete(msg.id);   // desenho de streaming atrasado nunca sobrescreve a mensagem final
+  if (msg.status !== 'trabalhando') ultimoDelta.delete(msg.id);   // a late streaming render never overwrites the final message
   if (msg.canal.startsWith('pst-')) { const l = j.canais[msg.canal]; const i = l ? l.findIndex((x) => x.id === msg.id) : -1; if (i >= 0) l[i] = msg; if (U.proj === pid && U.vista === 'chat' && U.canal === 'posts') renderPostsSuave(); return; }
   const lista = j.canais[msg.canal];
   const i = lista ? lista.findIndex((x) => x.id === msg.id) : -1;
@@ -834,11 +834,11 @@ function deltaMsg(e) {
   });
 }
 
-/* ---- compositor e menções ---- */
+/* ---- composer and mentions ---- */
 function autoAltura(ta) { if (!ta) return; ta.style.height = 'auto'; ta.style.height = `${Math.min(200, ta.scrollHeight)}px`; }
-/* ---- responder uma mensagem e encaminhar para outro chat ---- */
-// A resposta vai como citação no começo do texto ("> @Autor: trecho"): você vê a citação no chat e o agente citado é chamado,
-// sem formato novo no servidor. O @ de dentro do trecho é desarmado para não chamar mais ninguém.
+/* ---- reply to a message and forward to another chat ---- */
+// The reply goes as a quote at the start of the text ("> @Author: excerpt"): you see the quote in the chat and the quoted agent is called,
+// with no new format on the server. Any @ inside the excerpt is disarmed so it does not call anyone else.
 const trechoDe = (m, max = 160) => { const t = limparBloco(m.texto || '').replace(/\s+/g, ' ').replace(/@/g, '').trim(); return (t.length > max ? `${t.slice(0, max)}…` : t) || `${m.anexos?.length || 0} anexo(s)`; };
 const autorMarca = (de) => (de === 'voce' ? usuarioDe().nome : String(de).startsWith('ext:') ? nomeAgente(de) : `@${nomeAgente(de)}`);
 const msgDe = (id) => (J().canais[U.canal] || []).find((x) => x.id === id);
@@ -851,7 +851,7 @@ function responderMsg(id) {
   (U.resposta ||= {})[`${U.proj}/${U.canal}`] = { id, de: m.de, trecho: trechoDe(m) };
   renderChat(); $('#texto')?.focus();
 }
-/** Todos os chats do projeto, de todas as equipes: canais, grupos e DMs (a equipe aberta primeiro). */
+/** All chats in the project, across all teams: channels, groups and DMs (the open team first). */
 function chatsDoProjeto() {
   const eqs = equipesDoProjeto(projetoAtual()).slice().sort((a, b) => (b.cid === U.proj) - (a.cid === U.proj));
   return eqs.map((e) => { const j = PJ[e.cid]; if (!j) return null;
@@ -874,7 +874,7 @@ async function encaminharPara(cid, canal) {
   const origem = x.canal === 'equipe' ? '#equipe' : nomeCanal(x.canal);
   const corpo = limparBloco(x.m.texto || '').replace(/@/g, '').split('\n').map((l) => `> ${l}`).join('\n');
   const texto = `Encaminhada de ${x.m.de === 'voce' ? usuarioDe().nome : nomeAgente(x.m.de)} (${origem}${cid !== x.de ? `, ${equipeDe(x.de)?.nome || 'outra equipe'}` : ''}):\n${corpo}`;
-  // os anexos só acompanham dentro da mesma equipe (cada equipe guarda os seus na própria pasta)
+  // attachments only carry over within the same team (each team keeps its own in its own folder)
   const anexos = cid === x.de ? (x.m.anexos || []).map((a) => ({ rel: a.rel })) : [];
   const r = await api('POST', P('/mensagem', cid), { canal, texto, engine: E.config.engine, modo: E.config.modo, anexos });
   if (!r._ok) return aviso(r.erro || I18N.t('Não consegui encaminhar.'));
@@ -891,7 +891,7 @@ async function enviar() {
   const prontos = pend.filter((a) => a.estado === 'ok');
   if (!texto && !prontos.length) return;
   const chaveR = `${U.proj}/${U.canal}`; const resp = U.resposta?.[chaveR];
-  // texto livre depois de "Responder…": vai como resposta da pergunta (fecha ela), não como mensagem solta
+  // free text after "Responder…": goes as the answer to the question (closing it), not as a standalone message
   const qLivre = U.respPergunta?.[chaveR];
   if (qLivre && texto && !prontos.length && J().perguntas.some((x) => x.id === qLivre && x.estado === 'aberta' && !x.paraPO)) {
     delete U.respPergunta[chaveR];
@@ -917,7 +917,7 @@ function sugestoes() {
   if (!m) { box.hidden = true; return; }
   const q = m[2].toLowerCase();
   const bate = (a) => !q || [a.nome, a.cargo, a.token || MENCOES[a.id]].some((x) => x && semAcento(x).startsWith(semAcento(q)));
-  // os nomes são os que você deu a cada um (perfil); gente das outras equipes entra em seções separadas, por equipe
+  // names are the ones you gave each one (profile); people from other teams go in separate sections, per team
   const locais = [...(!q || 'todos'.startsWith(semAcento(q)) ? [{ id: '__todos', nome: 'todos', cargo: 'avisa o time inteiro' }] : []), ...(!q || 'image'.startsWith(semAcento(q)) || 'imagem'.startsWith(semAcento(q)) ? [{ id: '__image', nome: 'Image', cargo: 'gera uma imagem com o Codex' }] : []), ...rosterAtual().filter(bate)];
   const externos = (J().externos || []).filter((x) => !rosterAtual().some((a) => semAcento(primeiroNome(a.nome)) === semAcento(x.token))).filter(bate).map((x) => ({ id: `ext:${x.agente}@${x.cid}`, nome: x.nome, cargo: x.cargo, token: x.token, equipe: x.equipe, cor: x.cor, lider: x.lider }));
   const secoes = [[J().equipeNome ? I18N.t('Esta equipe ({equipe})', { equipe: J().equipeNome }) : I18N.t('Esta equipe'), locais], ...Object.entries(externos.reduce((acc, x) => { (acc[x.equipe] ||= []).push(x); return acc; }, {}))].filter(([, l]) => l.length);
@@ -943,15 +943,15 @@ async function responderPergunta(pid, qid, texto) {
   return r._ok;
 }
 
-/* ------------------------------------------------------------ painel da direita */
+/* ------------------------------------------------------------ right panel */
 function usoHtml() {
   const u = E.uso?.motores?.[U.usoMotor] || (U.usoMotor === 'claude' ? E.uso : null);
-  const pz = Object.entries(E.pausas || {}).filter(([, p]) => p.ate * 1000 > Date.now()).map(([eng, p]) => `<div class="uso-pausa">${ic('relogio')}<span>${I18N.t('{motor} parado, volta {quando}', { motor: eng === 'codex' ? 'Codex' : 'Claude', quando: `${diaCurto(p.ate * 1000) === 'hoje' ? '' : `${I18N.t(diaCurto(p.ate * 1000))} `}${horaCurta(p.ate * 1000)}` })}</span></div>`).join('');   // com a data quando a volta não é hoje (limite semanal)
+  const pz = Object.entries(E.pausas || {}).filter(([, p]) => p.ate * 1000 > Date.now()).map(([eng, p]) => `<div class="uso-pausa">${ic('relogio')}<span>${I18N.t('{motor} parado, volta {quando}', { motor: eng === 'codex' ? 'Codex' : 'Claude', quando: `${diaCurto(p.ate * 1000) === 'hoje' ? '' : `${I18N.t(diaCurto(p.ate * 1000))} `}${horaCurta(p.ate * 1000)}` })}</span></div>`).join('');   // with the date when the reset is not today (weekly limit)
   const cs = J().cartoes;
   const tot = cs.reduce((s, c) => s + (c.pontos || 0), 0);
   const feito = cs.filter((c) => c.coluna === 'concluido').reduce((s, c) => s + (c.pontos || 0), 0);
   const prog = tot ? `<div class="uso-l" title="${I18N.t('Pontos concluídos: {feitos} de {total}', { feitos: feito, total: tot })}"><span>Feito</span><i class="uso-b"><b class="ok" style="width:${Math.round(100 * feito / tot)}%"></b></i><em>${Math.round(100 * feito / tot)}%</em></div>` : '';
-  // o painel sempre mostra o piloto, mesmo sem leitura de uso ainda
+  // the panel always shows the autopilot, even before any usage reading
   const faixa = (p) => (p >= 90 ? 'crit' : p >= 75 ? 'alto' : p >= 50 ? 'med' : '');
   const lin = (rot, dica, w) => (w ? `<div class="uso-l" title="${dica}: ${w.pct}%"><span>${rot}</span><i class="uso-b"><b class="${faixa(w.pct)}" style="width:${Math.min(100, w.pct)}%"></b></i><em>${w.pct}%</em></div>` : '');
   const pil = E.config.piloto || {};
@@ -1034,8 +1034,8 @@ function filtrados() {
   return J().cartoes.filter((c) => (!U.filtro.size || U.filtro.has(c.dono)) && (!U.soBloq || c.bloqueio || c.aguardando)
     && (!q || `${c.id} ${c.titulo} ${c.descricao}`.toLowerCase().includes(q)));
 }
-// Trilha do card: entrega, verificações, revisão, documentação, testes e aceite. Cheio = feito, vermelho = falhou,
-// o primeiro vazio é o que o time está tentando agora. Dá para ver o card andar sem abrir nada.
+// Card track: delivery, checks, review, documentation, tests and acceptance. Filled = done, red = failed,
+// the first empty one is what the team is attempting now. You can watch the card move without opening anything.
 function trilhaHtml(c) {
   const p = c.prontidao;
   if (!p || ['backlog', 'pronto', 'concluido'].includes(c.coluna)) return '';
@@ -1102,8 +1102,8 @@ function listaHtml() {
       <td>${c.pontos ? `<span class="pts">${c.pontos}</span>` : ''}</td><td>${loz(c.coluna)}</td><td style="color:var(--mudo)">${idade(c.naColunaDesde)}</td></tr>`).join('')}
     </tbody></table>${cs.length ? '' : '<div class="vazio-p" style="padding:24px">Nenhuma tarefa com esses filtros.</div>'}</div>`;
 }
-// Atualiza o quadro sem piscar a tela inteira: o card que mudou de lugar desliza até o novo (FLIP), e o que
-// foi atualizado ou chegou ganha um brilho curto. Cada movimento que o time faz fica visível.
+// Updates the board without flashing the whole screen: a card that changed place slides to the new one (FLIP), and one
+// that was updated or just arrived gets a short glow. Every move the team makes stays visible.
 function renderConteudoPlanner() {
   const el = $('#planner-conteudo');
   if (!el) return;
@@ -1126,14 +1126,14 @@ function renderConteudoPlanner() {
   }
 }
 
-/* ------------------------------------------------------------ colmeia: vive em colmeia.js (canvas infinito); app.js só repassa eventos em colmeiaEvento() */
+/* ------------------------------------------------------------ hive: lives in colmeia.js (infinite canvas); app.js only forwards events in colmeiaEvento() */
 
-/* ------------------------------------------------------------ agenda: semana da Game Director, do projeto inteiro */
-// Eventos vêm da API do projeto (uma agenda por projeto). Você cria clicando num horário ou em "Novo evento"; os agentes criam
-// pelas ações agenda.* quando você conta um compromisso. Visão de semana, 7h às 21h, com os de dia inteiro em cima.
+/* ------------------------------------------------------------ calendar: the Game Director's week, for the whole project */
+// Events come from the project API (one calendar per project). You create one by clicking a time slot or "Novo evento"; agents create
+// them through the agenda.* actions when you mention an appointment. Week view, 7am to 9pm, with all-day events on top.
 const AG = { semana: null, eventos: [], carregando: false };
 const DIA_MS = 86400_000;
-const inicioSemana = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };   // segunda
+const inicioSemana = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };   // Monday
 const agKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 const agLocal = (d) => { const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
 const CORES_AG = { reuniao: '#7C9CFF', prazo: '#FF7A6B', lembrete: '#F3AA3C', pessoal: '#B36BFF', marco: '#4FD1A5' };
@@ -1152,7 +1152,7 @@ function renderAgenda(buscar = true) {
   if (buscar) carregarAgenda();
   const dias = Array.from({ length: 7 }, (_, i) => new Date(AG.semana.getTime() + i * DIA_MS));
   const hoje = agKey(new Date());
-  const H0 = 7, H1 = 21, ALT = 52;   // px por hora
+  const H0 = 7, H1 = 21, ALT = 52;   // px per hour
   const fmtDia = (d) => d.toLocaleDateString(I18N.locale, { weekday: 'short' }).replace('.', '');
   const rotulo = I18N.t('{inicio} a {fim}', { inicio: dias[0].toLocaleDateString(I18N.locale, { day: '2-digit', month: 'short' }).replace('.', ''), fim: dias[6].toLocaleDateString(I18N.locale, { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '') });
   const doDia = (d) => AG.eventos.filter((e) => { const a = new Date(e.inicio), b = new Date(e.fim); return a < new Date(d.getTime() + DIA_MS) && b > d; });
@@ -1245,7 +1245,7 @@ async function moverCard(id, col, forcar = false) {
   if (!r._ok) aviso(r.erro || I18N.t('Não consegui mover.'));
 }
 
-/* ------------------------------------------------------------ memória */
+/* ------------------------------------------------------------ memory */
 async function renderMemoria() {
   $('#centro').innerHTML = `<div class="planner"><div class="mem-barra"><div class="info">Carregando a memória…</div></div></div>`;
   const d = await (await fetch(P('/memoria'))).json().catch(() => ({ notas: [], estado: {} }));
@@ -1303,7 +1303,7 @@ function irParaNota(caminho) {
   if (location.hash.endsWith('/memoria')) rotear();
 }
 
-/* ------------------------------------------------------------ modais */
+/* ------------------------------------------------------------ modals */
 function abrirModal(html, classe = '') {
   const m = $('#modal');
   m.innerHTML = `<div class="modal ${classe}" role="dialog">${html}</div>`;
@@ -1332,8 +1332,8 @@ function perguntarTexto(titulo, placeholder, botao) {
   });
 }
 
-/* ---- caixa "Precisa de você" ---- */
-/* ---- demandas do Jira e agenda: o que a P.O. enxerga, e o que dá para fazer com isso ---- */
+/* ---- "Precisa de você" box ---- */
+/* ---- Jira demands and calendar: what the P.O. sees, and what can be done with it ---- */
 function modalDemandas() {
   U.demandas = true;
   const ig = J().integ || {};
@@ -1355,7 +1355,7 @@ function modalDemandas() {
     </div>`, 'inbox demandas');
 }
 
-/* ---- central: o que precisa de você, o que aconteceu e os relatórios ---- */
+/* ---- hub: what needs you, what happened and the reports ---- */
 const naoLidasTotal = () => Object.values(PJ).reduce((s, j) => s + (j.naoLidasN || 0), 0);
 const ICONE_NOTIF = { card: 'checkq', pergunta: 'sino', creditos: 'relogio', relatorio: 'memoria', aviso: 'alerta' };
 
@@ -1407,7 +1407,7 @@ async function marcarLidas(ids) {
   atualizarTitulo();
 }
 
-// Abre o que a notificação aponta: o card, a conversa ou o relatório.
+// Opens what the notification points to: the card, the conversation or the report.
 function abrirNotif(pid, n) {
   if (pid !== U.proj) location.hash = `${pid}/chat/equipe`;
   fecharModal();
@@ -1417,10 +1417,10 @@ function abrirNotif(pid, n) {
   irPara('chat', n.canal || 'equipe');
 }
 
-// Com o piloto ligado, o Electron impede o Windows de suspender o app; fora do Electron não há o que fazer.
-function aplicarPiloto() { try { window.studioApp?.manterAcordado?.(!!E.config.piloto?.ativo); } catch { /* sem a ponte do Electron */ } }
+// With the autopilot on, Electron keeps Windows from suspending the app; outside Electron there is nothing to do.
+function aplicarPiloto() { try { window.studioApp?.manterAcordado?.(!!E.config.piloto?.ativo); } catch { /* no Electron bridge */ } }
 
-// Avisa o servidor que a pessoa está por aqui (no máximo a cada 20 s): ele monta o resumo de quando ela esteve fora.
+// Tells the server the user is around (at most every 20 s): it builds the summary of the time they were away.
 let ultimoPing = 0;
 function pingAtividade() {
   if (Date.now() - ultimoPing < 20_000) return;
@@ -1435,7 +1435,7 @@ function atualizarTitulo() {
   document.title = `${n ? `(${n}) ` : ''}${E.marca.nome}${E.marca.sufixo ? `${E.marca.nome.endsWith('.') ? '' : ' '}${E.marca.sufixo}` : ''}`;
 }
 
-/* ---- toasts: cada coisa importante que acontece aparece, com a ação à mão ---- */
+/* ---- toasts: every important thing that happens shows up, with the action at hand ---- */
 function toast(n, pid) {
   const el = document.createElement('button');
   el.className = `toast ${n.nivel}`;
@@ -1455,7 +1455,7 @@ function notifChegou(e) {
   j.naoLidasN = e.naoLidas;
   renderRail();
   atualizarTitulo();
-  // movimento comum de card não vira aviso na tela (o card já se mexe no planner); o que pede atenção, sim
+  // routine card moves do not become on-screen notices (the card already moves in the planner); things that need attention do
   const comAviso = n.nivel !== 'info' || n.tipo === 'relatorio';
   const vendo = e.projeto === U.proj && ((U.vista === 'chat' && n.canal === U.canal) && n.tipo !== 'creditos');
   if (comAviso && !vendo) toast(n, e.projeto);
@@ -1465,7 +1465,7 @@ function notifChegou(e) {
 
 const avDe = (id) => av(id, 'm', { dot: false });
 
-/* ---- editor de perfil: aparência estilo Discord (com prévia ao vivo) e, para agentes, o trabalho (skills, regras, contexto) ---- */
+/* ---- profile editor: Discord-style appearance (with live preview) and, for agents, the work (skills, rules, context) ---- */
 async function modalPerfil(id, { manter = false, aba = null } = {}) {
   const ehEu = id === 'voce';
   const a = pessoaDe(id);
@@ -1531,7 +1531,7 @@ function pedPerfilHtml(id) {
   </div><div class="ped-prev" id="ped-prev"></div></div>`;
 }
 function pedPrev() { const el = $('#ped-prev'); if (!el) return; el.innerHTML = cartaoHtml(U.ped.id, { estilo: U.ped.estilo, nome: U.ped.nome }); VFX.ligar(el); pedLigarVoz(); }
-/** Controles de voz do perfil: a escolha fica em U.ped.estilo.voz e só vai para o servidor em "Salvar perfil". */
+/** Profile voice controls: the choice lives in U.ped.estilo.voz and only goes to the server on "Salvar perfil". */
 function pedLigarVoz() {
   const sel = $('#ped-voz-nome'); if (!sel) return;
   const e = U.ped.estilo; const pad = U.vozes?.padrao || { ritmo: 0.4, expressividade: 0.45 };
@@ -1591,13 +1591,13 @@ async function pedConversaHtml(id) {
   </div>`;
 }
 
-/* ---- recorte da foto e da capa: zoom e posição sobre a imagem carregada (o GIF fica animado) ---- */
+/* ---- photo and banner crop: zoom and position over the loaded image (GIFs stay animated) ---- */
 const LIMITE_IMG = { foto: 8 * 1024 * 1024, capa: 10 * 1024 * 1024 };
 function lerDataUrl(arquivo) { return new Promise((ok, falha) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = () => falha(new Error(I18N.t('Não consegui ler o arquivo.'))); fr.readAsDataURL(arquivo); }); }
 function carregarImg(src) { return new Promise((ok, falha) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => falha(new Error(I18N.t('Não consegui abrir essa imagem.'))); i.src = src; }); }
 async function prepararImagem(arquivo, tipo) {
   if (!/^image\/(png|jpeg|webp|gif)$/.test(arquivo.type)) throw new Error(I18N.t('Use PNG, JPG, WEBP ou GIF.'));
-  if (arquivo.type === 'image/gif') {   // GIF vai como veio, para continuar animado
+  if (arquivo.type === 'image/gif') {   // GIF goes as is, so it stays animated
     if (arquivo.size > LIMITE_IMG[tipo]) throw new Error(I18N.t('O GIF passou de {mb} MB.', { mb: LIMITE_IMG[tipo] / 1024 / 1024 }));
     return lerDataUrl(arquivo);
   }
@@ -1650,7 +1650,7 @@ async function aplicarRecorte() {
   setTimeout(() => { if (U.ped?.id === id && !$('#modal').hidden) modalPerfil(id, { manter: true }); }, 200);
 }
 
-/* ---- caixa de iniciativas do assessor e "o que aconteceu enquanto estive fora" ---- */
+/* ---- advisor initiatives box and "what happened while I was away" ---- */
 const ESTADO_INI = { detected: ['detectada', 'off'], evaluating: ['avaliando', 'fila'], proposed: ['aguarda você', 'voce'], approved: ['aprovada', 'on'], planning: ['planejando', 'on'], queued: ['na fila', 'fila'], running: ['em andamento', 'on'], waiting_dependency: ['esperando dependência', 'fila'], waiting_approval: ['aguarda você', 'voce'], reviewing: ['em revisão', 'on'], completed: ['concluída', 'ok'], blocked: ['bloqueada', 'erro'], failed: ['falhou', 'erro'], cancelled: ['cancelada', 'off'], expired: ['expirou', 'off'] };
 async function modalIniciativas() {
   const r = await fetch(P('/iniciativas')).then((x) => x.json()).catch(() => null); if (!r) return aviso(I18N.t('Não consegui ler as iniciativas.'));
@@ -1666,7 +1666,7 @@ async function modalIniciativas() {
     <div class="inbox-lista">${lista.length ? lista.map(item).join('') : '<div class="vazio-inbox">Nenhuma iniciativa ainda. Com o modo automático ligado, cada sinal novo (reunião, Jira, outra equipe, quadro) vira uma iniciativa aqui.</div>'}</div>`, 'inbox');
 }
 async function modalDesde() {
-  const chave = `ultimaAtividade:${U.proj}`; let desde = null; try { desde = localStorage.getItem(chave); } catch { /* sem armazenamento */ }
+  const chave = `ultimaAtividade:${U.proj}`; let desde = null; try { desde = localStorage.getItem(chave); } catch { /* no storage */ }
   const r = await fetch(P(`/desde${desde ? `?desde=${encodeURIComponent(desde)}` : ''}`)).then((x) => x.json()).catch(() => null); if (!r) return aviso(I18N.t('Não consegui montar o resumo.'));
   const sec = (tit, itens, f) => (itens.length ? `<div class="sec"><h4>${tit} <span class="mudo">${itens.length}</span></h4>${itens.map(f).join('')}</div>` : '');
   abrirModal(`<div class="inbox-topo"><h2>O que aconteceu</h2><span class="espaco"></span><span class="mudo">${I18N.t('desde {dia} {hora}', { dia: diaTxt(r.desde), hora: hhmm(r.desde) })}</span><button class="btn-ic" data-acao="fechar" title="Fechar">${ic('fechar')}</button></div>
@@ -1682,11 +1682,11 @@ async function modalDesde() {
       ${!(r.aguardandoVoce.length || r.concluidos.length || r.bloqueados.length || r.paraVoce.length || r.cards.length || r.entregas.length) ? '<div class="vazio-inbox">Nada aconteceu nesse período.</div>' : ''}
     </div>`, 'inbox');
 }
-// marca quando você esteve aqui pela última vez (para "o que aconteceu" saber de onde contar)
-setInterval(() => { try { if (U.proj && document.visibilityState === 'visible') localStorage.setItem(`ultimaAtividadeViva:${U.proj}`, new Date().toISOString()); } catch { /* sem armazenamento */ } }, 30_000);
-document.addEventListener('visibilitychange', () => { try { if (U.proj && document.visibilityState === 'hidden') localStorage.setItem(`ultimaAtividade:${U.proj}`, new Date().toISOString()); } catch { /* sem armazenamento */ } });
+// records when you were last here (so "what happened" knows where to count from)
+setInterval(() => { try { if (U.proj && document.visibilityState === 'visible') localStorage.setItem(`ultimaAtividadeViva:${U.proj}`, new Date().toISOString()); } catch { /* no storage */ } }, 30_000);
+document.addEventListener('visibilitychange', () => { try { if (U.proj && document.visibilityState === 'hidden') localStorage.setItem(`ultimaAtividade:${U.proj}`, new Date().toISOString()); } catch { /* no storage */ } });
 
-/** Painel "Arquivos desta equipe" nos Ajustes: tamanho por categoria, a política de cada uma e a faxina sob demanda. */
+/** "Arquivos desta equipe" panel in Settings: size per category, each one's policy and on-demand cleanup. */
 async function carregarArquivos() {
   const el = $('#aj-arquivos'); if (!el) return;
   const r = await fetch(P('/arquivos')).then((x) => x.json()).catch(() => null);
@@ -1696,7 +1696,7 @@ async function carregarArquivos() {
     <div class="linha-in" style="margin-top:8px;align-items:center"><button class="btn-sec" data-acao="faxina">Faxina agora</button><span class="mudo">${r.previa.n ? I18N.t(r.previa.n === 1 ? '{n} item sairia ({tamanho})' : '{n} itens sairiam ({tamanho})', { n: r.previa.n, tamanho: esc(r.previa.liberadoTexto) }) : I18N.t('nada para tirar no momento')}; ${I18N.t('o app faz isso sozinho a cada 12 h')}</span></div>`;
 }
 
-/** Um avatar da galeria da ferramenta vira a foto do perfil (passa pelo mesmo caminho do upload, sem recorte). */
+/** An avatar from the tool's gallery becomes the profile photo (same path as an upload, no crop). */
 async function escolherAvatar(id, n) {
   if (!id) return;
   try {
@@ -1708,7 +1708,7 @@ async function escolherAvatar(id, n) {
   } catch (e) { aviso(e.message); }
 }
 
-/* ---- regras em lista e documentos .md de contexto (janela do agente e Ajustes do projeto) ---- */
+/* ---- list-based rules and .md context documents (agent window and project Settings) ---- */
 const rotaEscopo = (escopo) => (escopo === 'projeto' ? '' : `/agente/${escopo}`);
 function blocoRegras(escopo, r, rotulo) {
   const itens = r.itens || [];
@@ -1736,7 +1736,7 @@ async function adicionarRegra(escopo) {
   await redesenharRegras(escopo); document.getElementById(`rg-novo-${escopo}`)?.focus();
 }
 
-// Recorta a foto no centro, em quadrado de 256 px, antes de enviar: o arquivo fica pequeno e o rosto não estica.
+// Crops the photo at the center into a 256 px square before sending: the file stays small and the face does not stretch.
 function prepararFoto(arquivo) {
   return new Promise((ok, falha) => {
     const img = new Image();
@@ -1754,8 +1754,8 @@ function prepararFoto(arquivo) {
   });
 }
 
-/* ---- adicionar projeto ---- */
-/** Adicionar equipe ao projeto aberto: escolhe o tipo (template) e, se quiser, um nome. */
+/* ---- add project ---- */
+/** Add a team to the open project: pick the type (template) and, optionally, a name. */
 function modalNovaEquipe() {
   const p = projetoAtual();
   if (!p) return;
@@ -1807,7 +1807,7 @@ function modalNovoProjeto({ template = '', nome = '' } = {}) {
     if (!escolhidas.length) { aviso(I18N.t('Escolha ao menos uma equipe.')); return; }
     const r = await api('POST', '/api/projetos', { nome: $('#np-nome').value.trim(), caminho: caminho.value.trim(), template: escolhidas[0], conhecer: $('#np-conhecer').checked, engine: E.config.engine, modo: E.config.modo });
     if (!r._ok) { aviso(r.erro || I18N.t('Não consegui adicionar.')); return; }
-    for (const tpl of escolhidas.slice(1)) await api('POST', `/api/p/${r.projeto.id}/equipes`, { template: tpl });   // a primeira é a principal
+    for (const tpl of escolhidas.slice(1)) await api('POST', `/api/p/${r.projeto.id}/equipes`, { template: tpl });   // the first one is the main one
     fecharModal();
     await recarregarApp();
     for (const e of equipesDoProjeto(E.projetos.find((x) => x.id === r.projeto.id))) await carregarProjeto(e.cid);
@@ -1848,7 +1848,7 @@ function ressalvasHtml(c) {
   const rot = { aberta: 'aberta', resolvida: 'resolvida', aceita: 'aceita pela P.O.' };
   return `<h4>Ressalvas</h4>${l.map((r) => `<div class="ressalva ${r.status}"><b>${esc(rot[r.status] || r.status)}</b>, ${esc(r.tipo)}, ${esc(r.severidade)}${r.origem ? `, ${I18N.t('de {nome}', { nome: esc(nomeAgente(r.origem)) })}` : ''}<p>${esc(r.texto)}</p>${r.resolucao?.texto ? `<p class="mudo">${I18N.t(r.status === 'aceita' ? 'Motivo da aceitação: {texto}' : 'Resolução: {texto}', { texto: esc(r.resolucao.texto) })}${r.resolucao.evidencia ? ` ${I18N.t('Evidência: {evidencia}', { evidencia: esc(r.resolucao.evidencia) })}` : ''}</p>` : ''}</div>`).join('')}`;
 }
-// A Game Director é a última QA: depois de concluído, ela testa e aprova ou reprova.
+// The Game Director is the final QA: once done, they test and approve or reject.
 function validacaoHtml(c) {
   if (c.coluna !== 'concluido' || !c.validacao) return '';
   const v = c.validacao;
@@ -1902,7 +1902,7 @@ function renderIssue(forcar = false) {
     const botao=$('[data-acao="bloquear"],[data-acao="desbloquear"]',m);
     if (botao) { botao.dataset.acao=c.bloqueio?'desbloquear':'bloquear'; botao.textContent=c.bloqueio?I18N.t('Liberar bloqueio'):I18N.t('Bloquear'); }
   }
-  // não reabre o card por cima de outra janela (ex.: "Arquivar?"), nem enquanto se digita nele
+  // does not reopen the card over another window (e.g. "Arquivar?"), nor while it is being typed in
   if (!forcar && (m.hidden || !m.querySelector('.issue'))) return;
   if (!forcar && m.contains(document.activeElement) && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
   const dono = c.dono ? agente(c.dono) : null;
@@ -1959,7 +1959,7 @@ function renderIssue(forcar = false) {
   const t = $('#i-titulo');
   if (t) { t.style.height = 'auto'; t.style.height = `${t.scrollHeight}px`; }
 }
-// Fichas do registro que o card aponta: quem pega o card recebe cada uma inteira no prompt, sem procurar.
+// Registry entries the card points to: whoever takes the card gets each one in full in the prompt, without searching.
 function contextoCardHtml(c) {
   const fichas = (typeof REG !== 'undefined' && REG.dados?.entradas) || [];
   const atual = c.contexto || [];
@@ -1969,7 +1969,7 @@ function contextoCardHtml(c) {
     <div class="reg-ctx">${atual.map((k) => `<span class="chip-cam" title="${esc(k)}">${ic('ficha')}${esc(nomeFicha(k))}<button class="btn-ic" data-ctx-rem="${esc(k)}" title="Tirar do card">${ic('fechar')}</button></span>`).join('') || '<div class="vazio-p" style="padding:2px 0 6px">Nenhuma. O agente recebe o que a tarefa citar pelo nome.</div>'}</div>
     ${fichas.length ? `<select class="in" data-ctx-add><option value="">Apontar ficha</option>${fichas.filter((f) => !atual.includes(f.chave)).map((f) => `<option value="${esc(f.chave)}">${esc(f.nome)} (${esc((REG.dados.tipos[f.tipo] || {}).titulo || f.tipo)})</option>`).join('')}</select>` : ''}`;
 }
-// Ficha de fatos do card: o que o app mediu (job, validação, git) e o que os agentes registraram. É a fonte de verdade, não o chat.
+// Card fact sheet: what the app measured (job, validation, git) and what the agents recorded. It is the source of truth, not the chat.
 function fatosHtml(cardId) {
   const f = J().fatos || {}; const doCard = Object.entries(f.cards?.[cardId] || {}); const doProj = Object.entries(f.projeto || {});
   if (!doCard.length && !doProj.length) return '';
@@ -1981,8 +1981,8 @@ async function patchCard(campos) {
   if (!r._ok) aviso(r.erro || I18N.t('Não salvou.'));
 }
 
-/* ---- ajustes ---- */
-/* ---- página Conexões: um clique para entrar na conta (Jira, Notion, Teams, Trello). Valem para o app inteiro. ---- */
+/* ---- settings ---- */
+/* ---- Connections page: one click to sign in to the account (Jira, Notion, Teams, Trello). They apply to the whole app. ---- */
 const CX_ORDEM = ['jira', 'notion', 'github', 'teams', 'trello'];
 const CX_NOME = { jira: 'Jira', notion: 'Notion', github: 'GitHub', teams: 'Teams', trello: 'Trello' };
 const CX_LETRA = { jira: 'J', notion: 'N', github: 'G', teams: 'T', trello: 'T' };
@@ -2010,7 +2010,7 @@ function conexaoCard(app, c = {}) {
   const erro = c.erro && !ok && !c.entrando ? `<div class="cx-erro">${esc(c.erro.texto)}</div>` : '';
   return `<div class="conta ${ok ? 'on' : ''} ${venceu ? 'alerta' : ''}" data-conexao="${app}" data-estado="${esc(c.estado || '')}"><span class="conta-ic cx-${app}">${CX_LETRA[app]}</span><div class="conta-info"><b>${nome}</b><small>${linha}</small>${erro}</div><div class="cx-botoes">${botao}</div></div>`;
 }
-/** Identificadores do aplicativo (não são de conta nenhuma): quem distribui o NECTAR, ou a TI, configura uma vez; quem usa só clica. */
+/** Application identifiers (not tied to any account): whoever distributes NECTAR, or IT, configures them once; users just click. */
 function configAppHtml(cxs) {
   const g = cxs.gifs || {};
   return `<details class="cx-app"><summary>Configuração da TI (uma vez só, por quem distribui o app)</summary>
@@ -2033,7 +2033,7 @@ function acompanharConexoes() {
   }, 2500);
 }
 
-/* ---- página Modelos: conta do Claude e do Codex (conectar pelo site oficial, desconectar) ---- */
+/* ---- Models page: Claude and Codex accounts (connect through the official site, disconnect) ---- */
 function contaCard(eng, contasM) {
   const c = contasM[eng] || {}, nome = eng === 'claude' ? 'Claude' : 'Codex', site = eng === 'claude' ? 'claude.ai' : 'chatgpt.com';
   const inst = contasM.instalar?.[eng] || {};
@@ -2265,10 +2265,10 @@ async function modalAjustes() {
       alvo.innerHTML = r.ok ? `<div class="teste ok">${I18N.t('Funcionou. Respondeu "{texto}" em {s} s.', { texto: esc(r.texto), s: (r.ms / 1000).toFixed(1) })}</div>` : `<div class="teste falha">${esc(r.erro || 'Falhou.')}</div>`;
     };
   });
-  if (U.ajuste === 'projeto') carregarArquivos();   // tamanho por categoria e faxina, medido depois de a tela abrir
+  if (U.ajuste === 'projeto') carregarArquivos();   // size per category and cleanup, measured after the screen opens
 }
 
-/* ---- trocador rápido (Ctrl+K) ---- */
+/* ---- quick switcher (Ctrl+K) ---- */
 function abrirTroca() {
   U.troca = { q: '', sel: 0 };
   abrirModal(`<input id="troca-q" placeholder="Ir para um projeto, canal, agente ou tarefa" autocomplete="off"><div class="res" id="troca-res"></div><div class="troca-rodape"><kbd>↑</kbd> <kbd>↓</kbd> navegar &nbsp; <kbd>Enter</kbd> abrir &nbsp; <kbd>Esc</kbd> fechar</div>`, 'troca');
@@ -2300,7 +2300,7 @@ function irTroca(i) {
   if (x.card) abrirIssue(x.card); else location.hash = x.ir;
 }
 
-/* ------------------------------------------------------------ render geral e estado */
+/* ------------------------------------------------------------ general render and state */
 function renderSemProjeto() {
   $('#app').className = 'app vista-planner';
   renderRail();
@@ -2335,13 +2335,13 @@ async function carregarProjeto(id) {
   PJ[id].teamwork=e.teamwork||null;
 }
 
-// Com vários agentes trabalhando, chegam dezenas de eventos por segundo. Cada tipo de redesenho acontece no máximo uma vez por
-// quadro de animação, com o estado mais recente (o dado é atualizado na hora; só o desenho espera).
+// With several agents working, dozens of events arrive per second. Each kind of redraw happens at most once per
+// animation frame, with the latest state (the data is updated immediately; only the drawing waits).
 const desenhos = new Map();
 function depois(chave, fn) {
   if (desenhos.has(chave)) return;
   const roda = () => { desenhos.delete(chave); try { fn(); } catch (err) { console.error(err); } };
-  // janela em segundo plano não recebe quadro de animação: um temporizador garante que o desenho acontece mesmo assim
+  // a background window gets no animation frames: a timer makes sure the drawing happens anyway
   const t = setTimeout(() => { if (desenhos.has(chave)) { cancelAnimationFrame(desenhos.get(chave).raf); roda(); } }, 250);
   desenhos.set(chave, { raf: requestAnimationFrame(() => { clearTimeout(t); roda(); }) });
 }
@@ -2377,7 +2377,7 @@ function notificar(titulo, corpo) {
     if (!('Notification' in window)) return;
     if (Notification.permission === 'default') Notification.requestPermission();
     if (Notification.permission === 'granted' && (document.hidden || !document.hasFocus())) new Notification(titulo, { body: corpo });
-  } catch { /* o sistema não deixou: o sino do app já avisa */ }
+  } catch { /* the system refused: the app's bell already notifies */ }
 }
 function perguntaNova(e) {
   const q = { ...e.pergunta, projeto: e.projeto, projetoNome: e.projetoNome };
@@ -2402,7 +2402,7 @@ function perguntaAtualizada(e) {
   if (U.inbox) modalInbox();
 }
 
-/* ------------------------------------------------------------ rotas e eventos */
+/* ------------------------------------------------------------ routes and events */
 async function rotear() {
   const segs = (location.hash || '#').slice(1).split('/').filter(Boolean);
   if (segs.length && equipeDe(segs[0])) U.proj = segs.shift();
@@ -2453,10 +2453,10 @@ document.addEventListener('click', async (ev) => {
   const t = ev.target.closest('[data-uso-motor],[data-projeto],[data-eqsel],[data-vista],[data-canal],[data-issue],[data-acao],[data-motor],[data-modo],[data-mencao],[data-filtro],[data-visao],[data-aba],[data-aj],[data-copiar],[data-troca],[data-responder],[data-ir-canal],[data-nota],[data-cen],[data-notif],[data-part-rem],[data-anexo-rem],[data-ag-slot],[data-co],[data-avatar]');
   if (!t) return;
   const d = t.dataset;
-  if (d.avatar) return escolherAvatar(U.ped?.id, Number(d.avatar));   // avatar da galeria da ferramenta
+  if (d.avatar) return escolherAvatar(U.ped?.id, Number(d.avatar));   // avatar from the tool's gallery
   if (d.anexoRem !== undefined) { const l = anexosAtuais(); const [x] = l.splice(Number(d.anexoRem), 1); if (x?.previa) URL.revokeObjectURL(x.previa); return renderAnexosPend(); }
-  if (d.agSlot) return modalEvento(null, d.agSlot);   // clicou num horário vazio da agenda
-  if (d.co) { if (d.co === 'rainha') return modalPerfil('voce'); const [cid, ag] = d.co.split('|'); location.hash = `${cid}/chat/dm:${ag}`; return; }   // célula da colmeia: abre a DM de quem está nela
+  if (d.agSlot) return modalEvento(null, d.agSlot);   // clicked an empty calendar slot
+  if (d.co) { if (d.co === 'rainha') return modalPerfil('voce'); const [cid, ag] = d.co.split('|'); location.hash = `${cid}/chat/dm:${ag}`; return; }   // hive cell: opens the DM of whoever is in it
   if (d.cen) { U.centroAba = d.cen; return modalCentral(d.cen); }
   if (d.notif) { const n = (J().notifs || []).find((x) => x.id === d.notif); if (n) { marcarLidas([n.id]); abrirNotif(U.proj, n); } return; }
   if (d.partRem) { const c = cartao(U.issue); return patchCard({ participantes: c.participantes.filter((p) => p.agente !== d.partRem) }); }
@@ -2772,8 +2772,8 @@ document.addEventListener('click', async (ev) => {
       chBotoes(); chTileFala('voce', false); return;
     }
     case 'chamada-tela': return compartilharTela();
-    case 'chamada-layout':   // compacto (faixa fina, o chat inteiro embaixo) e volta
-    case 'chamada-chat': {   // mostra ou esconde o chat embaixo da chamada
+    case 'chamada-layout':   // compact (thin strip, full chat below) and back
+    case 'chamada-chat': {   // shows or hides the chat below the call
       if (d.acao === 'chamada-chat') CH.layout = CH.layout === 'cheio' ? 'dividido' : 'cheio';
       else CH.layout = CH.layout === 'compacto' ? 'dividido' : 'compacto';
       chLayout();
@@ -2849,7 +2849,7 @@ document.addEventListener('change', async (ev) => {
   if (t.matches('[data-campo]')) return patchCard({ [t.dataset.campo]: t.dataset.campo === 'dono' ? (t.value || null) : t.value });
 });
 
-/* ---- menu da conversa (botão direito na lista lateral) ---- */
+/* ---- conversation menu (right click on the side list) ---- */
 function fecharCtx() { $('#ctx-menu')?.remove(); }
 document.addEventListener('contextmenu', (ev) => {
   const it = ev.target.closest('#lista .canal[data-canal]');
@@ -2879,16 +2879,16 @@ function modalMembros(canal) {
     <div class="acoes"><button class="btn-sec" data-acao="fechar">Cancelar</button><button class="btn-primario" data-acao="membros-ok" data-cv="${esc(canal)}">Adicionar</button></div>`, 'perfil');
 }
 
-/* ------------------------------------------------------------ chamada de voz com a liderança */
-// O navegador grava (16 kHz, mono), detecta quando você fala e quando para, manda cada fala como WAV ao servidor; a resposta do agente
-// volta como áudio pelo SSE (evento "voz"). Falar por cima do agente pausa o áudio e interrompe a chamada dele. Microfone só com a
-// janela aberta: encerrar desliga tudo.
+/* ------------------------------------------------------------ voice call with the lead */
+// The browser records (16 kHz, mono), detects when you start and stop speaking, and sends each utterance as WAV to the server; the agent's reply
+// comes back as audio over SSE ("voz" event). Talking over the agent pauses the audio and interrupts its turn. Microphone only while the
+// window is open: hanging up turns everything off.
 const CH = { aberta: false, ctx: null, stream: null, proc: null, audio: null, fila: [], fimPendente: false, mudo: false, falando: false, buf: [], amostras: 0, silencio: 0, ruido: 0.01, voz: 0, enviando: 0, estado: '', lider: null, nome: '', canal: '', tela: null, lado: false, layout: 'dividido', transcricao: [], escolhaFonte: null, vigia: null, assinatura: null, ultimoQuadro: 0 };
 const ESTADO_CH = { preparando: 'Preparando a voz (na primeira vez pode levar uns minutos)', ouvindo: 'Ouvindo', transcrevendo: 'Entendendo', pensando: 'Pensando', gerando: 'Preparando a resposta', falando: 'Falando', erro: 'Problema', encerrada: 'Encerrada' };
-// A chamada vive dentro da DM da liderança, como um canal de voz: o palco fica em cima das mensagens, com um quadro por participante
-// (foto e decoração do perfil, nome estilizado, tema de cor, anel verde em quem fala), a tela compartilhada em destaque quando existe
-// e os controles embaixo. Em outro canal, a barra lateral mostra "Voz conectada" com os mesmos controles, e a chamada continua.
-const chCurto = (estado) => (ESTADO_CH[estado] || estado || '').split(' (')[0];   // no quadro e no painel, sem o parêntese explicativo
+// The call lives inside the lead's DM, like a voice channel: the stage sits above the messages, with one tile per participant
+// (profile photo and decoration, styled name, color theme, green ring on whoever is speaking), the shared screen featured when there is one
+// and the controls below. In another channel, the sidebar shows "Voz conectada" with the same controls, and the call continues.
+const chCurto = (estado) => (ESTADO_CH[estado] || estado || '').split(' (')[0];   // in the tile and the panel, without the explanatory parenthesis
 function chTile(id) {
   const pz = pessoaDe(id); const e = estiloDe(id); const cor = pz?.cor || '#5865f2';
   const p1 = e.tema?.c1 || `color-mix(in srgb, ${cor} 45%, #1b1e26)`, p2 = e.tema?.c2 || '#14161c';
@@ -2921,12 +2921,12 @@ function chamadaHtml() {
     <div class="ch-picker" id="ch-picker" hidden></div>
   </div>`;
 }
-/** Barra lateral, em qualquer canal: "Voz conectada", com quem, e os controles (igual ao painel de voz do Discord). */
+/** Sidebar, in any channel: "Voz conectada", with whom, and the controls (like Discord's voice panel). */
 function chamadaPainelHtml() {
   return `<div class="voz-painel"><button class="vp-canal" data-canal="${esc(CH.canal)}" title="Ir para a chamada">${av(CH.lider, 'm', { dot: false })}<span class="vp-info"><b>${ic('fone')}Voz conectada</b><small class="vp-estado">${nomeHtml(CH.lider)} <span>${esc(chCurto(CH.estado))}</span></small></span></button>
     <span class="vp-btns"><button class="btn-ic ${CH.mudo ? 'off' : ''}" data-acao="chamada-mudo" title="${CH.mudo ? 'Ligar microfone' : 'Silenciar'}">${ic(CH.mudo ? 'micOff' : 'mic')}</button><button class="btn-ic ${CH.tela ? 'on' : ''}" data-acao="chamada-tela" title="Compartilhar tela">${ic('tela')}</button><button class="btn-ic sair" data-acao="chamada-encerrar" title="Sair da chamada">${ic('fone')}</button></span></div>`;
 }
-/** Depois de qualquer renderização do chat: religa o vídeo da tela, o seletor de microfone e o estado dos quadros. */
+/** After any chat render: reattaches the screen video, the microphone selector and the tile state. */
 function montarChamada() {
   const el = $('#chamada'); if (!el || !CH.aberta) return;
   const v = $('#ch-tela video'); if (v && CH.tela) v.srcObject = CH.tela;
@@ -2935,7 +2935,7 @@ function montarChamada() {
   chTileFala('voce', CH.falando);
 }
 function chTileFala(id, ligado) { $(`#chamada [data-tile="${id}"]`)?.classList.toggle('falando', !!ligado); }
-/** Nível de som (0 a 1) de quem está falando: vira a borda viva em volta da foto, no palco e no painel lateral. */
+/** Sound level (0 to 1) of whoever is speaking: drives the live border around the photo, on the stage and in the side panel. */
 function chNivel(id, v) {
   const n = Math.max(0, Math.min(1, v)).toFixed(2);
   for (const el of $$(`#chamada [data-tile="${id}"] .ch-av .av${id === 'voce' ? '' : ', .voz-painel .vp-canal .av'}`)) el.style.setProperty('--nivel', n);
@@ -2947,14 +2947,14 @@ function chLayout() {
   const bc = $('#chamada [data-acao="chamada-chat"]'); if (bc) { bc.classList.toggle('on', CH.layout !== 'cheio'); bc.title = CH.layout === 'cheio' ? I18N.t('Mostrar o chat') : I18N.t('Esconder o chat'); }
   const m = $('#mensagens'); if (m) m.scrollTop = m.scrollHeight;
 }
-/** Medidor do áudio do agente: o som que toca passa por um analisador e vira o nível da borda dele. */
-/* Saída de voz sem cortes: cada trecho que chega é decodificado na hora e AGENDADO no relógio do áudio emendado no anterior
-   (Web Audio, amostra a amostra), em vez de um <audio> por frase, que deixava um vazio audível entre uma fala e outra.
-   Contexto próprio para a saída: o do microfone roda a 16 kHz e estragaria a voz do agente. */
+/** Agent audio meter: the sound being played goes through an analyser and becomes its border level. */
+/* Gapless voice output: each incoming chunk is decoded immediately and SCHEDULED on the audio clock, butted against the previous one
+   (Web Audio, sample-accurate), instead of one <audio> per sentence, which left an audible gap between utterances.
+   A dedicated context for output: the microphone one runs at 16 kHz and would ruin the agent's voice. */
 function saidaCtx() {
   if (!CH.ctxSaida) {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const sk = lerDisp().saida; if (sk && ctx.setSinkId) ctx.setSinkId(sk).catch(() => {});   // alto-falante escolhido
+    const sk = lerDisp().saida; if (sk && ctx.setSinkId) ctx.setSinkId(sk).catch(() => {});   // selected speaker
     CH.ganhoSaida = ctx.createGain(); CH.ganhoSaida.gain.value = lerDisp().volume;
     CH.anSaida = ctx.createAnalyser(); CH.anSaida.fftSize = 256;
     CH.ganhoSaida.connect(CH.anSaida); CH.anSaida.connect(ctx.destination);
@@ -2963,7 +2963,7 @@ function saidaCtx() {
   if (CH.ctxSaida.state === 'suspended') CH.ctxSaida.resume().catch(() => {});
   return CH.ctxSaida;
 }
-function medidorSaida() {   // a borda do agente acompanha o som que está saindo
+function medidorSaida() {   // the agent's border follows the sound being played
   if (CH.medindo) return; CH.medindo = true;
   const dados = new Uint8Array(CH.anSaida.fftSize); let suave = 0;
   const tick = () => {
@@ -2974,7 +2974,7 @@ function medidorSaida() {   // a borda do agente acompanha o som que está saind
   };
   requestAnimationFrame(tick);
 }
-/** Baixa e decodifica já (em paralelo com o que toca) e agenda na ordem de chegada, colado no fim do trecho anterior. */
+/** Downloads and decodes right away (in parallel with what is playing) and schedules in arrival order, right after the previous chunk. */
 function agendarAudio(url, { ack = false } = {}) {
   const ctx = saidaCtx();
   const geracao = CH.geracaoSaida;
@@ -2986,7 +2986,7 @@ function agendarAudio(url, { ack = false } = {}) {
     const agora = ctx.currentTime;
     const inicio = Math.max(agora + 0.03, CH.proxInicio || 0);
     src.start(inicio);
-    CH.proxInicio = inicio + buf.duration - 0.02;   // encosta no anterior: 20 ms de sobreposição somem com o fade natural das bordas
+    CH.proxInicio = inicio + buf.duration - 0.02;   // butt against the previous one: a 20 ms overlap disappears under the natural fade at the edges
     CH.fontes.push(src); CH.tocando = true;
     if (!ack) chEstado('falando');
     medidorSaida();
@@ -2998,12 +2998,12 @@ function agendarAudio(url, { ack = false } = {}) {
     };
   });
 }
-function chBotoes() {   // os mesmos botões existem no palco e no painel lateral
+function chBotoes() {   // the same buttons exist on the stage and in the side panel
   for (const b of $$('[data-acao="chamada-mudo"]')) { b.innerHTML = ic(CH.mudo ? 'micOff' : 'mic'); b.classList.toggle('off', CH.mudo); b.title = CH.mudo ? I18N.t('Ligar microfone') : I18N.t('Silenciar'); }
   for (const b of $$('[data-acao="chamada-tela"]')) { b.classList.toggle('on', !!CH.tela); b.title = CH.tela ? I18N.t('Parar de compartilhar') : I18N.t('Compartilhar tela'); }
   $('#chamada [data-tile="voce"]')?.classList.toggle('mudo', CH.mudo);
 }
-/** Escolha de tela ou janela dentro da própria chamada (no app; no navegador o Chrome tem o seletor dele). */
+/** Screen or window picker inside the call itself (in the app; in the browser Chrome has its own picker). */
 function escolherFonteTela(fontes) {
   return new Promise((resolve) => {
     const box = $('#ch-picker'); if (!box) return resolve(null);
@@ -3030,7 +3030,7 @@ async function compartilharTela() {
     if (v) { v.srcObject = stream; caixa.hidden = false; }
     $('#chamada .ch-palco')?.classList.add('com-tela');
     chBotoes();
-    stream.getVideoTracks()[0].onended = () => pararTela();   // parou pelo Windows ou fechou a janela mostrada
+    stream.getVideoTracks()[0].onended = () => pararTela();   // stopped via Windows or the shared window was closed
     CH.assinatura = null; CH.ultimoQuadro = 0;
     clearInterval(CH.vigia); CH.vigia = setInterval(vigiarTela, 2500);
   } catch (e) {
@@ -3039,15 +3039,15 @@ async function compartilharTela() {
 }
 function pararTela() {
   clearInterval(CH.vigia); CH.vigia = null;
-  if (CH.tela) api('POST', P('/voz/tela'), {});   // avisa que não há mais tela
+  if (CH.tela) api('POST', P('/voz/tela'), {});   // signals there is no screen anymore
   try { CH.tela?.getTracks().forEach((t) => t.stop()); } catch { /* ok */ }
   CH.tela = null;
   const caixa = $('#ch-tela'); if (caixa) { caixa.hidden = true; const v = caixa.querySelector('video'); if (v) v.srcObject = null; }
   $('#chamada .ch-palco')?.classList.remove('com-tela');
   chBotoes();
 }
-/** Olha a tela a cada 2,5 s numa miniatura de 48x30: só quando a imagem muda de verdade (e no máximo a cada 4 s) um quadro sobe para o
- *  servidor, que o guarda para a próxima fala ou para o agente que pediu para acompanhar. Tela parada não gasta nada. */
+/** Looks at the screen every 2.5 s through a 48x30 thumbnail: only when the image really changes (and at most every 4 s) is a frame uploaded to the
+ *  server, which keeps it for the next utterance or for the agent that asked to follow along. A still screen costs nothing. */
 async function vigiarTela() {
   const v = $('#ch-tela video'); if (!CH.aberta || !CH.tela || !v || !v.videoWidth) return;
   const c = document.createElement('canvas'); c.width = 48; c.height = 30;
@@ -3061,7 +3061,7 @@ async function vigiarTela() {
   const rel = await quadroDaTela(); if (!rel) return;
   api('POST', P('/voz/tela'), { rel });
 }
-/** Um quadro da tela compartilhada (JPEG, até 1280 px) sobe como anexo do projeto; o servidor decide quando o agente o vê. */
+/** A frame of the shared screen (JPEG, up to 1280 px) is uploaded as a project attachment; the server decides when the agent sees it. */
 async function quadroDaTela() {
   const v = $('#ch-tela video'); if (!CH.tela || !v || !v.videoWidth) return null;
   const escala = Math.min(1, 1280 / v.videoWidth);
@@ -3101,7 +3101,7 @@ function wavDe(floats, taxa = 16000) {
 }
 const FILTROS_MIC = { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true };
 const micVirtual = (nome) => /virtual|steam streaming|oculus|cable|voicemeeter|loopback|stereo mix|mixagem/i.test(nome || '');
-/** Abre o microfone escolhido; se o padrão falhar (microfone virtual sem o programa dele aberto, dispositivo ocupado), tenta os outros. */
+/** Opens the selected microphone; if the default fails (virtual mic without its program running, busy device), tries the others. */
 async function abrirMicrofone(deviceId) {
   const quero = deviceId || lerDisp().mic;
   const tentar = async (id) => navigator.mediaDevices.getUserMedia({ audio: id ? { ...FILTROS_MIC, deviceId: { exact: id } } : FILTROS_MIC });
@@ -3109,7 +3109,7 @@ async function abrirMicrofone(deviceId) {
   if (quero) { try { return await tentar(quero); } catch (e) { erros.push(e.message); } }
   let padrao = null;
   try { padrao = await tentar(''); } catch (e) { erros.push(e.message); }
-  // o padrão do Windows abriu, mas é um microfone virtual (Oculus, Steam, cabo): ele "funciona" e entrega silêncio. Prefere um físico.
+  // the Windows default opened, but it is a virtual mic (Oculus, Steam, cable): it "works" and delivers silence. Prefer a physical one.
   const devs = (await navigator.mediaDevices.enumerateDevices().catch(() => [])).filter((d) => d.kind === 'audioinput' && d.deviceId && !['default', 'communications'].includes(d.deviceId));
   devs.sort((x, y) => Number(micVirtual(x.label)) - Number(micVirtual(y.label)));
   if (padrao) {
@@ -3118,11 +3118,11 @@ async function abrirMicrofone(deviceId) {
     if (!fisico) return padrao;
     try { const s = await tentar(fisico.deviceId); padrao.getTracks().forEach((t) => t.stop()); aviso(I18N.t('O microfone padrão do Windows é virtual ({virtual}); usando {fisico}.', { virtual: rotulo.replace(/^Default - /, ''), fisico: fisico.label }), 7000); return s; } catch { return padrao; }
   }
-  // o padrão não abriu: tenta cada microfone, físicos primeiro
+  // the default did not open: try each microphone, physical ones first
   for (const d of devs) { try { const s = await tentar(d.deviceId); salvarDisp({ mic: d.deviceId }); return s; } catch (e) { erros.push(`${d.label || d.deviceId.slice(0, 6)}: ${e.message}`); } }
   throw new Error(I18N.t('nenhum microfone abriu. {erros}', { erros: [...new Set(erros)].slice(0, 3).join(' | ') }));
 }
-/* ---- Ajustes > Modelos: a voz do agente (timbre, ritmo, expressividade), prévia e amostra própria ---- */
+/* ---- Settings > Models: the agent's voice (timbre, pace, expressiveness), preview and custom sample ---- */
 const vozEscolhida = () => ({ nome: $('#voz-nome')?.value, ritmo: Number($('#voz-ritmo')?.value) / 100, expressividade: Number($('#voz-exp')?.value) / 100 });
 function montarVozAjustes(vz) {
   const sel = $('#voz-nome'); if (!sel) return;
@@ -3148,20 +3148,20 @@ async function ouvirPrevia() {
   a.play().catch(() => { if (st) st.textContent = I18N.t('O navegador bloqueou o áudio; clique de novo.'); });
 }
 
-/* ---- Ajustes > Dispositivos: microfone, alto-falante, volume e sensibilidade da chamada. Fica neste computador (localStorage). ---- */
+/* ---- Settings > Devices: microphone, speaker, volume and call sensitivity. Stored on this computer (localStorage). ---- */
 const DISP_PADRAO = { mic: '', saida: '', ganho: 1, sensibilidade: 1, volume: 1 };
 function lerDisp() {
   try {
     const d = JSON.parse(localStorage.getItem('voz:dispositivos') || '{}');
-    const antigo = localStorage.getItem('voz:mic');   // escolha feita antes de existir esta aba
+    const antigo = localStorage.getItem('voz:mic');   // choice made before this tab existed
     return { ...DISP_PADRAO, ...d, ...(antigo && !d.mic ? { mic: antigo } : {}) };
   } catch { return { ...DISP_PADRAO }; }
 }
 function salvarDisp(parte) {
-  try { localStorage.setItem('voz:dispositivos', JSON.stringify({ ...lerDisp(), ...parte })); if (parte.mic !== undefined) localStorage.removeItem('voz:mic'); } catch { /* sem armazenamento */ }
+  try { localStorage.setItem('voz:dispositivos', JSON.stringify({ ...lerDisp(), ...parte })); if (parte.mic !== undefined) localStorage.removeItem('voz:mic'); } catch { /* no storage */ }
   aplicarDisp();
 }
-/** Vale na hora, inclusive com a chamada aberta. */
+/** Takes effect immediately, even with the call open. */
 function aplicarDisp() {
   const d = lerDisp();
   if (CH.ganho) CH.ganho.gain.value = d.ganho;
@@ -3184,14 +3184,14 @@ function dispositivosHtml() {
     <div class="campo"><label class="rot">Alto-falante ou fone</label><select class="in" id="disp-saida"><option value="">Padrão do Windows</option></select></div>
     <div class="campo"><label class="rot">Volume da voz do agente <em id="disp-vol-v">${pct(d.volume)}</em></label><div class="linha-in"><input type="range" class="faixa" id="disp-vol" min="0" max="100" step="5" value="${Math.round(d.volume * 100)}"><button class="btn-sec" data-acao="disp-testar-som">Testar som</button></div></div>`;
 }
-let dispTeste = null;   // { stream, ctx } do medidor ao vivo
+let dispTeste = null;   // { stream, ctx } of the live meter
 function pararTesteMic() { if (!dispTeste) return; try { dispTeste.stream.getTracks().forEach((t) => t.stop()); } catch { /* ok */ } try { dispTeste.ctx.close(); } catch { /* ok */ } dispTeste = null; }
 async function montarDispositivos() {
   const selMic = $('#disp-mic'), selSaida = $('#disp-saida'); if (!selMic) return;
   if (!navigator.mediaDevices?.enumerateDevices) { $('#disp-status').textContent = I18N.t('Este navegador não lista dispositivos de áudio.'); return; }
   let devs = await navigator.mediaDevices.enumerateDevices().catch(() => []);
-  // sem permissão concedida ainda, o navegador esconde os nomes: pede uma vez, só para listar, e solta o microfone na hora
-  if (devs.some((x) => x.kind === 'audioinput') && devs.filter((x) => x.kind === 'audioinput').every((x) => !x.label)) { try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach((t) => t.stop()); devs = await navigator.mediaDevices.enumerateDevices(); } catch { /* fica sem nomes */ } }
+  // with no permission granted yet, the browser hides the names: ask once, just to list them, and release the microphone right away
+  if (devs.some((x) => x.kind === 'audioinput') && devs.filter((x) => x.kind === 'audioinput').every((x) => !x.label)) { try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach((t) => t.stop()); devs = await navigator.mediaDevices.enumerateDevices(); } catch { /* stays without names */ } }
   const d = lerDisp();
   const op = (x, atual, virt) => `<option value="${esc(x.deviceId)}" ${x.deviceId === atual ? 'selected' : ''}>${esc(x.label || I18N.t('Dispositivo'))}${virt && micVirtual(x.label) ? ' (virtual)' : ''}</option>`;
   selMic.insertAdjacentHTML('beforeend', devs.filter((x) => x.kind === 'audioinput' && x.deviceId && !['default', 'communications'].includes(x.deviceId)).map((x) => op(x, d.mic, true)).join(''));
@@ -3202,7 +3202,7 @@ async function montarDispositivos() {
   selMic.onchange = async () => { salvarDisp({ mic: selMic.value }); await testarMic(); if (CH.aberta) { try { const novo = await abrirMicrofone(selMic.value); CH.stream?.getTracks().forEach((t) => t.stop()); CH.stream = novo; CH.fonte?.disconnect(); CH.fonte = CH.ctx.createMediaStreamSource(novo); CH.fonte.connect(CH.ganho || CH.proc); CH.ruido = 0.01; } catch (e) { aviso(I18N.t('Esse microfone não abriu: {erro}', { erro: e.message }), 6000); } } };
   await testarMic();
 }
-/** Medidor ao vivo: o mesmo caminho da chamada (ganho e piso de ruído), para o que você vê aqui ser o que a chamada ouve. */
+/** Live meter: the same path as the call (gain and noise floor), so what you see here is what the call hears. */
 async function testarMic() {
   pararTesteMic();
   const status = $('#disp-status'); if (!status) return;
@@ -3217,7 +3217,7 @@ async function testarMic() {
   const dados = new Float32Array(an.fftSize); let ruido = 0.01, suave = 0, falouAlguma = false;
   const tick = () => {
     if (dispTeste?.ctx !== ctx) return;
-    if (!$('#disp-nivel')) { pararTesteMic(); return; }   // saiu da aba ou fechou os Ajustes
+    if (!$('#disp-nivel')) { pararTesteMic(); return; }   // left the tab or closed Settings
     const d = lerDisp(); ganho.gain.value = d.ganho;
     an.getFloatTimeDomainData(dados); let s = 0; for (let i = 0; i < dados.length; i++) s += dados[i] * dados[i];
     const rms = Math.sqrt(s / dados.length);
@@ -3233,7 +3233,7 @@ async function testarMic() {
   };
   requestAnimationFrame(tick);
 }
-/** Dois tons curtos pela saída escolhida, no volume escolhido. */
+/** Two short tones through the selected output, at the selected volume. */
 async function testarSom() {
   const d = lerDisp();
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3265,11 +3265,11 @@ async function abrirChamada() {
   if (!navigator.mediaDevices?.getUserMedia) return aviso(I18N.t('Este navegador não dá acesso ao microfone.'));
   const lider = liderAtual(); const a = agente(lider);
   Object.assign(CH, { aberta: true, lider, nome: a?.nome || I18N.t('Liderança'), canal: `dm:${lider}`, mudo: false, estado: 'preparando', buf: [], amostras: 0, silencio: 0, voz: 0, falando: false, tela: null, lado: false, transcricao: [] });
-  // a chamada acontece na DM da liderança: entra nela (o palco é desenhado junto com o chat) e o painel lateral aparece
+  // the call happens in the lead's DM: enter it (the stage is drawn together with the chat) and the side panel appears
   if (U.vista !== 'chat' || U.canal !== CH.canal) await irPara('chat', CH.canal); else { renderChat(); renderLista(); }
   try { CH.stream = await abrirMicrofone(); } catch (e) {
     fecharChamada();
-    // NotReadableError com microfones listados: o Windows ou um antivírus (Kaspersky, por exemplo) está barrando este app, não é falta de aparelho
+    // NotReadableError with microphones listed: Windows or an antivirus (Kaspersky, for example) is blocking this app, it is not a missing device
     if (e.name === 'NotReadableError') return aviso(I18N.t('O microfone existe, mas este app foi impedido de usá-lo. Confira em Configurações do Windows > Privacidade > Microfone se apps da área de trabalho têm acesso; se houver um antivírus corporativo (Kaspersky), peça à TI para permitir o NECTAR em "Acesso a dispositivos de gravação de som".'), 14000);
     return aviso(I18N.t('Sem microfone: {erro}', { erro: e.message }), 9000);
   }
@@ -3278,7 +3278,7 @@ async function abrirChamada() {
   if (!r._ok) { const msg = r.erro || I18N.t('Não consegui iniciar a chamada.'); fecharChamada(); return aviso(msg, 10000); }
   CH.ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
   CH.fonte = CH.ctx.createMediaStreamSource(CH.stream);
-  CH.ganho = CH.ctx.createGain(); CH.ganho.gain.value = lerDisp().ganho;   // volume do microfone (Ajustes > Dispositivos)
+  CH.ganho = CH.ctx.createGain(); CH.ganho.gain.value = lerDisp().ganho;   // microphone volume (Settings > Devices)
   CH.proc = CH.ctx.createScriptProcessor(2048, 1, 1);
   CH.fonte.connect(CH.ganho); CH.ganho.connect(CH.proc); CH.proc.connect(CH.ctx.destination);
   const taxa = CH.ctx.sampleRate;
@@ -3288,36 +3288,36 @@ async function abrirChamada() {
     const d = ev.inputBuffer.getChannelData(0);
     let soma = 0; for (let i = 0; i < d.length; i++) soma += d[i] * d[i];
     const rms = Math.sqrt(soma / d.length);
-    // a borda em volta da sua foto acompanha o microfone o tempo todo (mesmo sussurro): é o sinal de que ele está captando
+    // the border around your photo follows the microphone all the time (even a whisper): it is the sign that it is picking up
     CH.nivelVoce = Math.max(Math.min(1, Math.sqrt(rms / 0.12)), (CH.nivelVoce || 0) * 0.7); chNivel('voce', CH.nivelVoce < 0.06 ? 0 : CH.nivelVoce);
     const dur = d.length / taxa;
-    if (!CH.falando) CH.ruido = CH.ruido * 0.95 + rms * 0.05;   // piso de ruído se adapta enquanto você não fala
-    const limiar = Math.max(0.012, CH.ruido * 3.5) / lerDisp().sensibilidade;   // sensibilidade (Ajustes > Dispositivos)
-    // Enquanto o agente fala (e por meio segundo depois), o microfone ouve a caixa de som: o eco da voz dele voltava como fala sua,
-    // interrompia a resposta e ainda virava mensagem. Então, com som tocando, só fala sustentada e bem acima do eco conta.
+    if (!CH.falando) CH.ruido = CH.ruido * 0.95 + rms * 0.05;   // the noise floor adapts while you are not speaking
+    const limiar = Math.max(0.012, CH.ruido * 3.5) / lerDisp().sensibilidade;   // sensitivity (Settings > Devices)
+    // While the agent speaks (and for half a second after), the microphone hears the speaker: the echo of its voice came back as your speech,
+    // interrupted the reply and even became a message. So, with sound playing, only sustained speech well above the echo counts.
     const tocando = CH.tocando || Date.now() - (CH.fimAudioEm || 0) < 500;
     if (CH.tocando) CH.fimAudioEm = Date.now();
     if (rms > limiar * (tocando ? 3 : 1)) {
       CH.voz += dur; CH.silencio = 0;
-      if (!CH.falando && CH.voz >= (tocando ? 1.2 : 0.25)) {   // começou a falar de verdade (com o agente falando, exige bem mais)
+      if (!CH.falando && CH.voz >= (tocando ? 1.2 : 0.25)) {   // really started speaking (with the agent speaking, it takes much more)
         CH.falando = true; chTileFala('voce', true);
-        if (CH.tocando || CH.fila.length || ['pensando', 'gerando'].includes(CH.estado)) { pararAudio(); api('POST', P('/voz/interromper'), {}); }   // falou por cima: para o agente e derruba a fila
+        if (CH.tocando || CH.fila.length || ['pensando', 'gerando'].includes(CH.estado)) { pararAudio(); api('POST', P('/voz/interromper'), {}); }   // talked over it: stop the agent and drop the queue
       }
     } else { CH.silencio += dur; if (!CH.falando) CH.voz = Math.max(0, CH.voz - dur); }
     if (CH.falando || (CH.voz > 0 && !tocando)) { CH.buf.push(new Float32Array(d)); CH.amostras += d.length; }
-    if (CH.falando && CH.silencio >= 0.9) enviarFala();          // pausa de pensamento curta não encerra o turno; 0,9 s encerra
-    else if (!CH.falando && CH.buf.length > 20) { CH.buf.splice(0, CH.buf.length - 8); CH.amostras = CH.buf.reduce((s, x) => s + x.length, 0); }   // guarda só um pouco antes da fala
-    if (CH.falando && CH.amostras > taxa * 60) enviarFala();     // fala muito longa: manda o que tem
+    if (CH.falando && CH.silencio >= 0.9) enviarFala();          // a short thinking pause does not end the turn; 0.9 s does
+    else if (!CH.falando && CH.buf.length > 20) { CH.buf.splice(0, CH.buf.length - 8); CH.amostras = CH.buf.reduce((s, x) => s + x.length, 0); }   // keep only a little before the speech
+    if (CH.falando && CH.amostras > taxa * 60) enviarFala();     // very long utterance: send what we have
   };
 }
 async function enviarFala() {
   const partes = CH.buf; const n = CH.amostras;
   CH.buf = []; CH.amostras = 0; CH.falando = false; CH.voz = 0; CH.silencio = 0; chTileFala('voce', false);
-  if (n < 16000 * 0.4) return;   // menos de 0,4 s: ruído
+  if (n < 16000 * 0.4) return;   // under 0.4 s: noise
   const tudo = new Float32Array(n); let o = 0; for (const p of partes) { tudo.set(p, o); o += p.length; }
   CH.enviando++; chEstado('transcrevendo');
   try {
-    if (CH.tela && Date.now() - CH.ultimoQuadro > 4000) { const rel = await quadroDaTela(); if (rel) { CH.ultimoQuadro = Date.now(); await api('POST', P('/voz/tela'), { rel }); } }   // o agente vê a tela como ela está na hora em que você fala
+    if (CH.tela && Date.now() - CH.ultimoQuadro > 4000) { const rel = await quadroDaTela(); if (rel) { CH.ultimoQuadro = Date.now(); await api('POST', P('/voz/tela'), { rel }); } }   // the agent sees the screen as it is at the moment you speak
     const r = await fetch(P('/voz/falar'), { method: 'POST', headers: { 'Content-Type': 'audio/wav', 'x-studio-voz': '1' }, body: wavDe(tudo, CH.ctx.sampleRate) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) chEstado('ouvindo', j.erro || I18N.t('Não entendi.'));
@@ -3327,8 +3327,8 @@ async function enviarFala() {
 }
 function pararAudio() {
   clearTimeout(CH.ackTimer); CH.fila = []; CH.fimPendente = false;
-  CH.geracaoSaida = (CH.geracaoSaida || 0) + 1;   // o que ainda estava baixando ou agendado é descartado
-  for (const s of CH.fontes || []) { try { s.onended = null; s.stop(); } catch { /* já parou */ } }
+  CH.geracaoSaida = (CH.geracaoSaida || 0) + 1;   // whatever was still downloading or scheduled is discarded
+  for (const s of CH.fontes || []) { try { s.onended = null; s.stop(); } catch { /* already stopped */ } }
   CH.fontes = []; CH.proxInicio = 0; CH.tocando = false; CH.fimAudioEm = Date.now();
   chNivel(CH.lider, 0);
 }
@@ -3339,7 +3339,7 @@ function tocarProximo() {
 }
 function vozEvento(e) {
   if (!CH.aberta || e.projeto !== U.proj) return;
-  if (e.estado === 'falando') {   // uma frase pronta: entra na fila e toca em ordem, enquanto o resto ainda é gerado
+  if (e.estado === 'falando') {   // a finished sentence: goes into the queue and plays in order, while the rest is still being generated
     if (e.texto) chLinha(CH.lider, e.texto);
     if (e.audio) CH.fila.push(P(`/voz/audio/${e.audio}`));
     if (e.fim) CH.fimPendente = true;
@@ -3348,7 +3348,7 @@ function vozEvento(e) {
   if (e.estado === 'fim') { CH.fimPendente = true; if (!CH.tocando && !CH.fila.length) { CH.fimPendente = false; chEstado('ouvindo'); } return; }
   if (e.estado === 'pensando') {
     clearTimeout(CH.ackTimer);
-    if (e.ack) CH.ackTimer = setTimeout(() => { if (CH.aberta && CH.estado === 'pensando' && !CH.tocando && !CH.fila.length) agendarAudio(P(`/voz/audio/${e.ack}`), { ack: true }); }, 1800);   // só se a resposta demorar
+    if (e.ack) CH.ackTimer = setTimeout(() => { if (CH.aberta && CH.estado === 'pensando' && !CH.tocando && !CH.fila.length) agendarAudio(P(`/voz/audio/${e.ack}`), { ack: true }); }, 1800);   // only if the reply takes a while
   } else clearTimeout(CH.ackTimer);
   if (e.estado === 'encerrada') return fecharChamada(true);
   if (e.interrompido) pararAudio();
@@ -3367,7 +3367,7 @@ function fecharChamada(jaEncerrada = false) {
   if (!jaEncerrada) api('POST', P('/voz/encerrar'), {});
 }
 
-/* ------------------------------------------------------------ pontos de salvamento */
+/* ------------------------------------------------------------ save points */
 async function salvarProjeto() {
   if (!U.proj) return aviso(I18N.t('Abra um projeto para salvar.'));
   const r = await api('POST', P('/pontos'), {});
@@ -3457,7 +3457,7 @@ document.addEventListener('keydown', async (ev) => {
   if (t.id === 'i-titulo' && ev.key === 'Enter') { ev.preventDefault(); t.blur(); }
 });
 
-// arrastar arquivos para o chat e colar imagem da área de transferência
+// drag files into the chat and paste an image from the clipboard
 const temArquivos = (ev) => [...(ev.dataTransfer?.types || [])].includes('Files');
 document.addEventListener('dragover', (ev) => { if (temArquivos(ev) && $('#anexos-pend')) { ev.preventDefault(); $('.compositor')?.classList.add('soltar'); } });
 document.addEventListener('dragleave', (ev) => { if (!ev.relatedTarget) $('.compositor')?.classList.remove('soltar'); });
@@ -3494,7 +3494,7 @@ document.addEventListener('input', (ev) => {
   if (t.id === 'i-titulo') { t.style.height = 'auto'; t.style.height = `${t.scrollHeight}px`; }
 });
 
-/* arrastar e soltar no quadro */
+/* drag and drop on the board */
 let arrastando = null;
 document.addEventListener('dragstart', (ev) => {
   const c = ev.target.closest?.('.card');
@@ -3524,8 +3524,8 @@ document.addEventListener('drop', (ev) => {
 setInterval(() => { $$('[data-desde]').forEach((el) => { const d = Number(el.dataset.desde); if (d) el.textContent = mmss(Date.now() - d); }); }, 1000);
 
 let conectou = false;
-// O navegador pode conservar o stream SSE durante uma interrupção curta.
-// A volta da rede precisa reconciliar mesmo sem um novo onopen.
+// The browser may keep the SSE stream alive during a short interruption.
+// When the network comes back we must reconcile even without a new onopen.
 window.addEventListener('online', async () => {
   try {
     await recarregarApp();
@@ -3545,7 +3545,7 @@ function conectar() {
   };
   es.onmessage = (ev) => {
     const e = JSON.parse(ev.data);
-    if (U.vista === 'colmeia') { try { colmeiaEvento(e); } catch { /* a colmeia é só visual */ } }
+    if (U.vista === 'colmeia') { try { colmeiaEvento(e); } catch { /* the hive is visual only */ } }
     switch (e.tipo) {
       case 'teamwork': {
         const j=PJ[e.projeto];if(!j)return;
@@ -3570,7 +3570,7 @@ function conectar() {
       case 'notif.lidas': { const j = PJ[e.projeto]; if (j) { j.naoLidasN = e.naoLidas; renderRail(); atualizarTitulo(); } return; }
       case 'elenco': {
         const j = PJ[e.projeto]; if (j) { j.roster = e.roster; if (e.usuario) j.usuario = e.usuario; }
-        // as outras equipes mostram esta gente como colega externo: o perfil novo vale lá também, sem recarregar
+        // other teams show these people as external colleagues: the new profile applies there too, without reloading
         let aqui = e.projeto === U.proj;
         for (const [cid, o] of Object.entries(PJ)) for (const x of o.externos || []) { if (x.cid !== e.projeto) continue; const a = e.roster.find((r) => r.id === x.agente); if (a) { Object.assign(x, { nome: a.nome, foto: a.foto || null, capa: a.capa || null, estilo: a.estilo || {} }); if (cid === U.proj) aqui = true; } }
         if (aqui) renderTudo(); return;
@@ -3606,7 +3606,7 @@ function conectar() {
   conectar();
 }());
 
-// Apontar ficha do registro no card aberto: quem pega o card recebe a ficha inteira.
+// Point a registry entry at the open card: whoever takes the card gets the full entry.
 document.addEventListener('change', (ev) => {
   const s = ev.target.closest?.('[data-ctx-add]'); if (!s || !U.issue || !s.value) return;
   patchCard({ contexto: [...(cartao(U.issue)?.contexto || []), s.value] });

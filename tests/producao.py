@@ -1,9 +1,9 @@
-"""Vista Produção: fichas, referência aprovada, pedido pronto no chat, card com ficha. Sem modelo (STUDIO_FAKE)."""
+"""Production view: entries, approved reference, ready-made chat request, card with entry. No model (STUDIO_FAKE)."""
 import base64, json, os, pathlib, subprocess, sys, tempfile, urllib.request
 from playwright.sync_api import sync_playwright, expect
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-OUT = pathlib.Path(tempfile.mkdtemp(prefix='nectar-prod-shots-'))   # capturas para olhar quando algo falha
+OUT = pathlib.Path(tempfile.mkdtemp(prefix='nectar-prod-shots-'))   # screenshots to inspect when something fails
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==')
 with tempfile.TemporaryDirectory(prefix='nectar-prod-') as temp:
     tmp = pathlib.Path(temp); data = tmp / 'data'; data.mkdir()
@@ -32,14 +32,14 @@ with tempfile.TemporaryDirectory(prefix='nectar-prod-') as temp:
         gal = req(f'/api/p/{pid}/registro/galeria'); nomes = {i['nome'] for i in gal['itens']}
         assert 'q01.png' in nomes and any(i['ficha'] == 'personagem:ana' for i in gal['itens']), gal
         reg = req(f'/api/p/{pid}/registro'); assert reg['vista'] == 'Produção' and len(reg['entradas']) == 4 and 'pedidos' in reg['tipos']['cena'], reg['tipos']['cena']
-        # arquivo: só de dentro do projeto
+        # file: only from inside the project
         assert urllib.request.urlopen(f'{base}/api/p/{pid}/arquivo?caminho=biblia/ana.md').status == 200
-        try: urllib.request.urlopen(f'{base}/api/p/{pid}/arquivo?caminho=' + urllib.parse.quote(str(ROOT / 'package.json'))); raise SystemExit('arquivo fora do projeto foi servido')
+        try: urllib.request.urlopen(f'{base}/api/p/{pid}/arquivo?caminho=' + urllib.parse.quote(str(ROOT / 'package.json'))); raise SystemExit('a file outside the project was served')
         except urllib.error.HTTPError as e: assert e.code == 404
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True, channel='msedge')
             page = browser.new_page(viewport={'width': 1480, 'height': 920})
-            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # os seletores destes testes estão em português
+            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # the selectors in these tests are in Portuguese
             errors = []; page.on('pageerror', lambda e: errors.append(str(e)))
             page.goto(f'{base}/#{pid}/registro')
             expect(page.locator('.producao h1')).to_have_text('Produção')
@@ -52,12 +52,12 @@ with tempfile.TemporaryDirectory(prefix='nectar-prod-') as temp:
             expect(page.locator('.reg-ref img')).to_have_count(1)
             expect(page.locator('.reg-pedido')).to_have_count(3)
             page.screenshot(path=str(OUT / '2-ana.png'))
-            # acrescentar pela ficha
+            # append through the entry
             page.locator('#reg-acresc').fill('Agora usa óculos redondos.'); page.locator('#reg-acresc').press('Enter')
             expect(page.locator('.reg-resumo')).to_contain_text('óculos redondos'); expect(page.locator('.reg-meta')).to_contain_text('v3')
-            # documento completo
+            # full document
             page.locator('[data-reg="ler-doc"]').click(); expect(page.locator('.reg-doc-modal .texto')).to_contain_text('Ficha completa da Ana'); page.keyboard.press('Escape')
-            # criar tarefa com a ficha -> card com contexto
+            # create a task from the entry -> card with context
             page.locator('[data-reg="card"]').click(); expect(page.locator('.reg-ctx .chip-cam')).to_contain_text('Ana')
             page.locator('#n-tit').fill('Folha de personagem da Ana'); page.locator('#m-sim').click()
             page.wait_for_function("() => J().cartoes.some(c => (c.contexto||[]).includes('personagem:ana'))", timeout=8000)
@@ -69,38 +69,38 @@ with tempfile.TemporaryDirectory(prefix='nectar-prod-') as temp:
             page.locator('.issue-side [data-ctx-add]').select_option('cena:ep01-c01')
             page.wait_for_function("(id) => (J().cartoes.find(c => c.id === id).contexto||[]).length === 2", arg=cid, timeout=8000)
             page.screenshot(path=str(OUT / '3-card.png')); page.keyboard.press('Escape')
-            # gerados: aprovar quadro como referência da cena
+            # generated: approve a frame as the scene reference
             page.locator('[data-reg="modo"][data-modo="gerados"]').click()
             expect(page.locator('.reg-ger')).to_have_count(2)
             page.screenshot(path=str(OUT / '4-gerados.png'))
             page.locator('.reg-ger:not(.aprovada)').first.click(); page.locator('#rv-ficha').select_option('cena:ep01-c01'); page.locator('#rv-aprovar').click()
             page.wait_for_function("() => document.querySelectorAll('.reg-ger.aprovada').length === 2", timeout=8000)
-            # pedido pronto abre o chat com o texto montado
+            # a ready-made request opens chat with the text filled in
             page.locator('[data-reg="modo"][data-modo="fichas"]').click(); page.locator('.reg-item[data-chave="cena:ep01-c01"]').click()
             expect(page.locator('.reg-pedido')).to_have_count(4)
             page.locator('.reg-pedido').nth(1).click()
             expect(page.locator('#texto')).to_have_value('@arte gere os quadros de Cena 1 do ep 1 (3 a 6, 9:16) com as referências aprovadas de quem aparece.')
             page.screenshot(path=str(OUT / '5-chat.png'))
-            # evento de agente redesenha: anota pela ação simulada
+            # an agent event redraws: notes through the simulated action
             page.goto(f'{base}/#{pid}/registro/personagem:ana'); expect(page.locator('.reg-nome')).to_have_text('Ana')
             req(f'/api/p/{pid}/mensagem', {'canal': 'dm:continuidade', 'texto': '[teste:anotar:personagem:Bruno:Irmão da Ana, barba.] anota aí'})
             expect(page.locator('.reg-item[data-chave="personagem:bruno"]')).to_be_visible(timeout=15000)
-            # remover
+            # remove
             page.locator('.reg-item[data-chave="personagem:bruno"]').click(); page.locator('[data-reg="remover"]').click(); page.locator('#m-sim').click()
             expect(page.locator('.reg-item')).to_have_count(4)
-            # telas menores: nada some; o painel vai para baixo e a árvore vira faixa
+            # smaller screens: nothing disappears; the panel moves below and the tree becomes a strip
             for w, h in ((1000, 800), (760, 900), (600, 900)):
                 page.set_viewport_size({'width': w, 'height': h}); page.locator('.reg-item[data-chave="personagem:ana"]').click()
                 expect(page.locator('.reg-lado')).to_be_visible(); expect(page.locator('.reg-pedido').first).to_be_visible(); expect(page.locator('.reg-nome')).to_be_visible()
-                assert page.evaluate('() => document.documentElement.scrollWidth <= document.documentElement.clientWidth'), f'rolagem horizontal em {w}px'
+                assert page.evaluate('() => document.documentElement.scrollWidth <= document.documentElement.clientWidth'), f'horizontal scroll at {w}px'
                 page.screenshot(path=str(OUT / f'7-{w}.png'))
                 page.locator('[data-reg="modo"][data-modo="gerados"]').click(); expect(page.locator('.reg-ger').first).to_be_visible()
                 page.locator('.reg-ger').first.click(); expect(page.locator('#rv-ficha')).to_be_visible(); page.screenshot(path=str(OUT / f'8-{w}-ver.png')); page.keyboard.press('Escape')
                 page.locator('[data-reg="modo"][data-modo="fichas"]').click()
-            print('capturas em', OUT)
+            print('screenshots in', OUT)
             assert not errors, errors
             browser.close()
-        print('PASS: vista Produção (fichas, acrescentar, documento, card com contexto, gerados aprovados, pedido no chat, evento de agente, remover).')
+        print('PASS: Production view (entries, append, document, card with context, approved generated images, chat request, agent event, remove).')
     finally:
         proc.kill(); err = proc.stderr.read()
         if err.strip(): print('STDERR:', err[-3000:], file=sys.stderr)

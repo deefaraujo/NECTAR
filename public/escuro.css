@@ -1,7 +1,7 @@
 /* =====================================================================
-   ESCURO: tema que carrega por último e substitui o tom quente (creme e marrom) por um dark mode neutro:
-   pretos sem matiz, texto cinza frio, um acento só (índigo) e um gradiente discreto no fundo. Sem a trama de favo.
-   O âmbar fica para o que pede você (aguardando, pergunta), não para tudo.
+   ESCURO: theme that loads last and replaces the warm tone (cream and brown) with a neutral dark mode:
+   hueless blacks, cool gray text, a single accent (indigo) and a subtle background gradient. No honeycomb pattern.
+   Amber is reserved for what needs you (waiting, question), not for everything.
    ===================================================================== */
 :root {
   --bg-0: #08090B;
@@ -41,20 +41,20 @@ body {
 ::-webkit-scrollbar-thumb { background: #2A2E37; }
 ::-webkit-scrollbar-thumb:hover { background: #3A3F4A; background-clip: content-box; border: 3px solid transparent; }
 
-/* painéis: sem trama, um preto levemente acima do fundo */
+/* panels: no pattern, a black slightly above the background */
 .rail, .lista, .membros, .aj-nav, .issue-side, .mem-arvore { background-image: none; }
 .rail { background-color: rgba(8, 9, 11, .9); }
 .lista, .membros { background-color: rgba(13, 14, 17, .82); }
 .titulo-app { background: rgba(8, 9, 11, .9); }
 .titulo-app::after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .08) 30%, rgba(255, 255, 255, .08) 70%, transparent); }
 
-/* filetes dos cabeçalhos: cinza neutro em vez de âmbar */
+/* header strips: neutral gray instead of amber */
 .lista-topo::after, .cabeca::after, .planner-topo::after, .mem-barra::after, .issue-topo::after, .inbox-topo::after {
   background: linear-gradient(90deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .04) 60%, transparent);
 }
 .cat::before, .mem-grupo::before { background: var(--mudo); box-shadow: none; opacity: .6; }
 
-/* navegação: o ativo é um índigo calmo, sem brilho quente */
+/* navigation: the active item is a calm indigo, no warm glow */
 .rail-btn { background: var(--bg-3); }
 .rail-btn:hover { background: var(--bg-4); }
 .rail-btn.ativo, .rail-proj.ativo, .rail-btn.marca { background: var(--g-marca); color: var(--placa-texto); }
@@ -67,29 +67,29 @@ body {
 .av.padrao { background: var(--bg-3); }
 select.in option { background: var(--bg-2); }
 
-/* ações da mensagem ao passar o mouse: responder, encaminhar, copiar */
+/* message actions on hover: reply, forward, copy */
 .msg:hover .copiar { display: flex; gap: 2px; padding: 2px; }
-/* barra "Respondendo a" em cima do campo de texto */
+/* "Respondendo a" bar above the text field */
 .respondendo { display: flex; align-items: center; gap: 8px; padding: 7px 10px; margin: 0 0 6px; border-left: 2px solid var(--acento); background: rgba(124, 140, 255, .07); border-radius: 6px; color: var(--suave); font-size: 12.5px; }
 .respondendo > svg.ic { width: 15px; height: 15px; flex: none; color: var(--acento); }
 .respondendo span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .respondendo b { color: var(--texto); }
 .respondendo .btn-ic { width: 24px; height: 24px; flex: none; }
-/* ficha de fatos do card: medido pelo app em destaque, relato em neutro */
+/* card fact sheet: app-measured items highlighted, reports in neutral */
 .fato { display: grid; grid-template-columns: minmax(90px, 160px) 1fr auto; gap: 8px; align-items: baseline; padding: 6px 10px; margin-bottom: 4px; border-radius: 6px; background: var(--bg-2); border-left: 3px solid var(--linha-2); font-size: 12.5px; }
 .fato.medido { border-left-color: var(--acento); }
 .fato b { color: var(--texto); font-weight: 600; overflow-wrap: anywhere; }
 .fato .val { color: var(--suave); overflow-wrap: anywhere; }
 .fato small { color: var(--mudo); white-space: nowrap; }
 .fatos-proj { margin-top: 6px; } .fatos-proj summary { cursor: pointer; color: var(--mudo); font-size: 12px; margin-bottom: 4px; }
-/* plano de execução do card: passo, dono e estado */
+/* card execution plan: step, owner and state */
 .passo { display: grid; grid-template-columns: 22px 1fr auto auto; gap: 8px; align-items: center; padding: 6px 10px; margin-bottom: 4px; border-radius: 6px; background: var(--bg-2); border-left: 3px solid var(--linha-2); font-size: 12.5px; }
 .passo.feito { border-left-color: #5CCB8A; } .passo.feito .t { color: var(--mudo); text-decoration: line-through; }
 .passo.pulado { border-left-color: var(--mudo); opacity: .7; }
 .passo .n { color: var(--mudo); font-variant-numeric: tabular-nums; }
 .passo .t { color: var(--texto); } .passo .t small { display: block; color: var(--mudo); font-size: 11.5px; }
 .passo .st { color: var(--mudo); font-size: 11.5px; white-space: nowrap; }
-/* métricas: grade de números e barra por agente */
+/* metrics: number grid and per-agent bar */
 .met-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin: 12px 16px 0; }
 .met { padding: 10px 12px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--linha); display: flex; flex-direction: column; gap: 2px; }
 .met .k { color: var(--mudo); font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; }
@@ -98,7 +98,7 @@ select.in option { background: var(--bg-2); }
 .met-ag { display: grid; grid-template-columns: 24px 160px 1fr auto; gap: 8px; align-items: center; margin: 4px 16px; font-size: 12.5px; color: var(--suave); }
 .met-ag i { display: block; height: 6px; border-radius: 3px; background: var(--acento); min-width: 2px; }
 .met-ag b { color: var(--texto); font-weight: 600; white-space: nowrap; }
-/* modal de encaminhar */
+/* forward modal */
 .enc-modal { width: min(460px, calc(100vw - 32px)); }
 .enc-modal .enc-previa { margin: 12px 0; padding: 8px 10px; border-left: 2px solid var(--linha-2); color: var(--suave); font-size: 12.5px; background: var(--bg-2); border-radius: 6px; }
 .enc-modal #enc-busca { width: 100%; margin-bottom: 8px; }

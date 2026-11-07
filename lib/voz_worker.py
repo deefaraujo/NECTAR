@@ -1,8 +1,8 @@
-# Worker de voz do NECTAR: reconhecimento de fala (faster-whisper, GPU quando houver) e síntese (Piper), tudo local.
-# Protocolo: uma linha JSON por pedido no stdin, uma linha JSON por resposta no stdout. Fica carregado entre pedidos.
+# NECTAR voice worker: speech recognition (faster-whisper, GPU when available) and synthesis (Piper), all local.
+# Protocol: one JSON line per request on stdin, one JSON line per response on stdout. Stays loaded between requests.
 #   {"id":1,"op":"stt","wav":"caminho.wav","idioma":"pt"}  -> {"id":1,"texto":"...","segundos":2.1,"ms":430}
 #   {"id":2,"op":"tts","texto":"...","wav":"saida.wav"}      -> {"id":2,"ok":true,"segundos":3.4,"ms":380}
-# Nada sai daqui para a internet, exceto o download do modelo na primeira vez (feito pela própria biblioteca).
+# Nothing leaves here for the internet, except the model download the first time (done by the library itself).
 import json
 import os
 import sys
@@ -22,7 +22,7 @@ def responder(obj):
 def carregar_stt():
     from faster_whisper import WhisperModel
     pedido = os.environ.get("STUDIO_VOZ_MODELO")
-    # GPU: o turbo (large-v3-turbo) entende português bem melhor que o small e cabe em 6 GB; sem GPU, o small na CPU
+    # GPU: turbo (large-v3-turbo) understands Portuguese much better than small and fits in 6 GB; without GPU, small on the CPU
     tentativas = [(pedido or "large-v3-turbo", "cuda", "int8_float16"), (pedido or "small", "cpu", "int8")]
     erro = None
     for modelo, device, tipo in tentativas:
@@ -70,18 +70,18 @@ class VozChatterbox:
         from chatterbox.mtl_tts import ChatterboxMultilingualTTS
         self.torch = torch
         self.m = ChatterboxMultilingualTTS.from_pretrained(device="cuda" if torch.cuda.is_available() else "cpu")
-        self.ref_atual = None   # WAV curto de uma voz brasileira que dá o timbre e o sotaque; sem ele a voz padrão soa estrangeira
+        self.ref_atual = None   # short WAV of a Brazilian voice that gives the timbre and accent; without it the default voice sounds foreign
     def gerar(self, texto, wav, ref=None, cfg=0.5, exag=0.5):
         import numpy as np
-        if ref and os.path.exists(ref) and ref != self.ref_atual:   # o condicionamento da voz é caro: só refaz quando a voz muda
+        if ref and os.path.exists(ref) and ref != self.ref_atual:   # voice conditioning is expensive: only redo it when the voice changes
             self.m.prepare_conditionals(ref, exaggeration=float(exag))
             self.ref_atual = ref
         with self.torch.inference_mode():
-            # cfg_weight menor = fala mais pausada; exaggeration maior = mais expressiva (e um pouco mais rápida)
+            # lower cfg_weight = slower speech; higher exaggeration = more expressive (and a bit faster)
             a = self.m.generate(texto, language_id="pt", cfg_weight=float(cfg), exaggeration=float(exag))
-        # PCM de 16 bits (o torchaudio gravaria em ponto flutuante, que o navegador e o leitor de WAV não entendem)
+        # 16-bit PCM (torchaudio would write floating point, which the browser and the WAV reader do not understand)
         amostras = np.clip(a.squeeze().cpu().numpy(), -1.0, 1.0)
-        # apara o silêncio das pontas (deixa 60 ms): emendado ao trecho seguinte, o silêncio virava um corte audível na fala
+        # trims silence at the ends (keeps 60 ms): joined to the next chunk, the silence became an audible cut in the speech
         acima = np.flatnonzero(np.abs(amostras) > 0.01)
         if acima.size:
             folga = int(self.m.sr * 0.06)
@@ -92,8 +92,8 @@ class VozChatterbox:
 
 
 def carregar_tts():
-    # Uma voz só no produto, a de maior qualidade (Chatterbox Multilingual). Sem ela instalada, o app explica em vez de cair
-    # numa voz pior em silêncio.
+    # A single voice in the product, the highest-quality one (Chatterbox Multilingual). Without it installed, the app explains instead of falling back
+    # silently to a worse voice.
     try:
         return VozChatterbox(), "chatterbox-multilingual"
     except Exception as e:
@@ -102,8 +102,8 @@ def carregar_tts():
 
 
 def main():
-    # O app pode dividir em dois processos (STUDIO_VOZ_PAPEL=stt ou tts): o reconhecimento (CTranslate2) e a voz natural (torch)
-    # carregam versões diferentes do cuDNN e não convivem no mesmo processo.
+    # The app may split into two processes (STUDIO_VOZ_PAPEL=stt or tts): recognition (CTranslate2) and the natural voice (torch)
+    # load different cuDNN versions and cannot share the same process.
     papel = os.environ.get("STUDIO_VOZ_PAPEL") or "ambos"
     stt, stt_nome = carregar_stt() if papel in ("ambos", "stt") else (None, None)
     tts, tts_nome = carregar_tts() if papel in ("ambos", "tts") else (None, None)

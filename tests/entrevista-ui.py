@@ -1,4 +1,4 @@
-"""Smoke do laboratório no navegador, com dados isolados e sem controle da área de trabalho."""
+"""Browser smoke test of the lab, with isolated data and no desktop control."""
 import json, os, pathlib, subprocess, tempfile
 from playwright.sync_api import sync_playwright, expect
 
@@ -16,7 +16,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-entrevista-') as temp:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, channel='msedge')
             page = browser.new_page(viewport={'width': 1366, 'height': 900})
-            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # os seletores destes testes estão em português
+            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # these tests' selectors are in Portuguese
             errors = []
             page.on('pageerror', lambda e: errors.append(str(e)))
             page.goto(base)
@@ -51,7 +51,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-entrevista-') as temp:
             assert 'Quadro inválido' in response.json()['erro']
             page.set_viewport_size({'width': 390, 'height': 844})
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-            # Ciclo visual simulado, sem modelo nem entrada no teclado real.
+            # Simulated visual loop, with no model and no real keyboard input.
             page.add_init_script("""
               window.acoesDeTeste=[];
               window.studioApp={
@@ -138,7 +138,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-entrevista-') as temp:
             assert page.evaluate('acoesDeTeste.length') == 0
             assert not errors, errors
             browser.close()
-        print('Entrevista UI: configuração, PDF, erro da API e ciclo de programação simulado com memória, execução, submissão, aceite e métricas validados.')
+        print('Interview UI: configuration, PDF, API error and simulated programming loop with memory, run, submission, acceptance and metrics validated.')
     finally:
         proc.terminate()
         proc.wait(timeout=20)

@@ -1,4 +1,4 @@
-"""Verifica a interface com dados isolados e sem chamadas de modelo."""
+"""Checks the UI with isolated data and no model calls."""
 import base64, json, os, pathlib, subprocess, tempfile, urllib.request, time
 from playwright.sync_api import sync_playwright, expect
 
@@ -28,7 +28,7 @@ with tempfile.TemporaryDirectory(prefix='work-ia-ui-') as temp:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True, channel='msedge')
             page = browser.new_page(viewport={'width': 1480, 'height': 920})
-            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # os seletores destes testes estão em português
+            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # these tests' selectors are in Portuguese
             errors = []
             page.on('pageerror', lambda e: errors.append(str(e)))
             page.goto(base)
@@ -63,7 +63,7 @@ with tempfile.TemporaryDirectory(prefix='work-ia-ui-') as temp:
                     break
                 time.sleep(.05)
             assert current['workflow']['revisao'] == 1, current
-            # Entregas ficam no histórico; o produto gera um relatório baixável ao concluir.
+            # Deliveries stay in the history; the product generates a downloadable report on completion.
             assert not request(f'/api/p/{pid}/estado')['cartoes'][0].get('relatorios')
             for acao, dados in [('revisao', {'status': 'aprovado'}), ('documentacao', {'status': 'sem_alteracao'}), ('qa', {'status': 'aprovado'})]:
                 result = page.request.post(f'{base}/api/p/{pid}/cartao/{card["id"]}/workflow', data={'acao': acao, 'dados': {'revisao': 1, 'evidencia': 'SIMULADO: teste da interface', **dados}})
@@ -80,7 +80,7 @@ with tempfile.TemporaryDirectory(prefix='work-ia-ui-') as temp:
             page.evaluate('(id) => abrirIssue(id)', dependent['id'])
             expect(page.locator('[data-dependencias]')).to_have_value(card['id'])
             page.locator('#modal [data-acao="fechar"]').click()
-            # Estado canônico, lista longa, download e reconciliação de SSE.
+            # Canonical state, long list, download and SSE reconciliation.
             teamwork = request(f'/api/p/{pid}/teamwork')
             task_count = len(teamwork['tasks'])
             pasta_projeto = request(f'/api/p/{pid}/estado')['pastaProjeto']
@@ -138,7 +138,7 @@ with tempfile.TemporaryDirectory(prefix='work-ia-ui-') as temp:
             page.screenshot(path=str(out / 'uso-codex-perfil.png'))
             assert not errors, errors
             browser.close()
-        print('PASS: workflow e checkpoints, dependências bloqueadas, decisões escolhidas/revisionadas pela interface, abas Claude/Codex, relatório, nome/foto persistentes e regras revogáveis; sem erros JavaScript.')
+        print('PASS: workflow and checkpoints, blocked dependencies, decisions chosen/revised through the UI, Claude/Codex tabs, report, persistent name/photo and revocable rules; no JavaScript errors.')
     finally:
         proc.terminate()
         proc.wait(timeout=15)

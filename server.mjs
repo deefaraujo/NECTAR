@@ -1,9 +1,9 @@
-// Servidor local do NECTAR. Sem dependências: só Node 22.
+// NECTAR local server. No dependencies: Node 22 only.
 //   node studio/server.mjs   ->  http://localhost:4317
 //
-// Segurança: escuta só em 127.0.0.1 e recusa pedido de outra origem. Este servidor pode mandar um
-// agente editar arquivos de um projeto, então um site qualquer aberto no navegador não pode
-// conseguir falar com ele.
+// Security: listens on 127.0.0.1 only and rejects cross-origin requests. This server can tell an
+// agent to edit a project's files, so an arbitrary site open in the browser must not be able
+// to talk to it.
 import http from 'node:http';
 import { decidirEntrevista } from './lib/entrevista.mjs';
 import { lerCurriculoPdf } from './lib/curriculo.mjs';
@@ -49,7 +49,7 @@ function origemOk(req) {
   return !o || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(o);
 }
 
-// Busca de GIF com cache: o mesmo termo devolve sempre o mesmo GIF (a conversa não muda ao recarregar).
+// Cached GIF search: the same term always returns the same GIF (the conversation does not change on reload).
 const cacheGif = new Map();
 async function buscarGif(q) {
   const k = q.toLowerCase();
@@ -65,7 +65,7 @@ async function buscarGif(q) {
     const j = await r.json();
     const link = g.provedor === 'tenor' ? j.results?.[0]?.media_formats?.gif?.url : (j.data?.[0]?.images?.fixed_height?.url || j.data?.[0]?.images?.original?.url);
     if (link && /^https:\/\//.test(link)) { cacheGif.set(k, link); return link; }
-  } catch { /* sem rede ou chave inválida */ }
+  } catch { /* no network or invalid key */ }
   return null;
 }
 
@@ -86,7 +86,7 @@ function corpoJson(req, limite = 1_000_000) {
 }
 
 const LIMITE_ANEXO = 25 * 1024 * 1024;
-/** Anexos já enviados antes (PUT /anexo): aqui só se confere que cada um existe dentro da pasta de anexos do projeto. */
+/** Attachments already uploaded (PUT /anexo): here we only check that each one exists inside the project's attachments folder. */
 function anexosValidos(c, lista) {
   const base = path.resolve(c.pasta, 'anexos');
   return (Array.isArray(lista) ? lista : []).slice(0, 8).map((a) => {
@@ -109,13 +109,13 @@ const estadoApp = () => ({
   config: lerConfig(), perguntas: projetos.perguntasAbertas(), uso: creditos.atual(), pausas: creditos.pausas(),
 });
 
-// Só o quadro: é o que a tela busca a cada mudança de card (o estado inteiro traz conversas, memória, posts, etc.).
+// Board only: this is what the UI fetches on every card change (the full state includes conversations, memory, posts, etc.).
 const quadroDe = (c) => ({ cartoes: c.quadro.listar().map(card => ({ ...card, prontidao: prontidao(card), ressalvas: listaRessalvas(card), relatorios: (card.relatorios || []).map(({ texto, ...r }) => r) })), wip: c.quadro.estadoWip() });
 
 const estadoProjeto = (c) => ({
   projeto: c.projeto, pastaProjeto: c.pasta, usuario: c.elenco.usuario, roster: c.elenco.ROSTER, template: c.elenco.template, lider: c.elenco.papeis.lead || 'po', equipeNome: c.projeto.equipeNome || null, naoLidas: c.notificacoes.naoLidas(), ...quadroDe(c),
   motores: c.equipe.motores(), planning: c.equipe.plannings(), grupos: c.equipe.grupos(), arquivadas: c.equipe.arquivadas(), posts: c.equipe.posts(), presenca: c.equipe.presencaAtual(), perguntas: c.equipe.perguntas().filter((p) => !p.paraPO).slice(-60), memoria: c.memoria.estado(),
-  externos: projetos.colegasExternos(c.projeto.id),   // gente das outras equipes do projeto (menção e conversa entre equipes), com os nomes atuais
+  externos: projetos.colegasExternos(c.projeto.id),   // people from the project's other teams (mentions and cross-team chat), with current names
   fatos: c.equipe.fatos.listar(), jobs: c.equipe.jobs(),
   registro: { vista: c.equipe.registro.vista || 'Registro', total: c.equipe.registro.listar().length },
   teamwork: c.equipe.teamwork.snapshot(),
@@ -135,7 +135,7 @@ creditos.aoMudar((uso) => emitir({ tipo: 'uso', uso, pausas: creditos.pausas() }
 creditos.aoEvento(() => emitir({ tipo: 'pausa', pausas: creditos.pausas() }));
 setInterval(() => { for (const res of ouvintes) res.write(': batimento\n\n'); }, 25_000).unref();
 
-// ------------------------------------------------------------------ API de um projeto
+// ------------------------------------------------------------------ per-project API
 async function apiProjeto(req, res, c, rota, url) {
   const m = req.method;
   const eq = c.equipe;
@@ -162,10 +162,10 @@ async function apiProjeto(req, res, c, rota, url) {
     try{const a=eq.teamwork.artifacts.verificar(artRota[1]);const bytes=eq.teamwork.artifacts.ler(a.artifactId);res.writeHead(200,{'Content-Type':'application/octet-stream','Content-Disposition':`attachment; filename="${a.artifactId}.txt"`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return res.end(bytes);}
     catch(e){return json(res,404,{erro:e.message});}
   }
-  // Arquivos da pasta da equipe: quanto ocupa cada coisa, a política de cada uma e a faxina sob demanda
+  // Team folder files: size of each item, its retention policy, and on-demand cleanup
   if (m === 'GET' && rota === 'arquivos') return json(res, 200, c.faxina.inventario());
   if (m === 'POST' && rota === 'faxina') return json(res, 200, c.faxina.executar());
-  // Colmeia: arrastou um agente até outro agente ou até um card e escolheu ajudar, monitorar ou parar
+  // Hive: an agent was dragged onto another agent or a card, choosing help, monitor or stop
   if (m === 'POST' && rota === 'colmeia') { const b = await corpoJson(req); const r = c.equipe.acaoColmeia({ acao: b.acao, agente: b.agente, alvoAgente: b.alvoAgente || null, card: b.card || null }); return json(res, r.ok ? 202 : 400, r); }
   if (m === 'GET' && rota === 'quadro') return json(res, 200, quadroDe(c));
   const relatorioRota=rota.match(/^cartao\/([A-Z]+-\d+)\/relatorio$/);
@@ -208,8 +208,8 @@ async function apiProjeto(req, res, c, rota, url) {
 
   if (m === 'GET' && rota === 'memoria') return json(res, 200, { notas: c.memoria.listar(), estado: c.memoria.estado() });
 
-  // Registro do projeto (a bíblia, na equipe de novela): fichas anotadas uma vez e entregues prontas aos agentes.
-  // A tela lê, anota como "voce", aprova referências e remove. Cada mudança avisa o navegador.
+  // Project registry (the series bible, for the soap opera team): entries written once and handed ready to agents.
+  // The UI reads, writes as "voce", approves references and removes. Every change notifies the browser.
   if (rota === 'registro' && m === 'GET') {
     const reg = eq.registro; const usos = {};
     for (const card of c.quadro.listar()) for (const k of (card.contexto || [])) { const ch = reg.resolver(k); if (ch) (usos[ch] ||= []).push({ id: card.id, titulo: card.titulo, coluna: card.coluna, dono: card.dono }); }
@@ -224,8 +224,8 @@ async function apiProjeto(req, res, c, rota, url) {
   }
   { const mr = rota.match(/^registro\/(.+)$/);
     if (mr && m === 'DELETE') { const r = eq.registro.remover(decodeURIComponent(mr[1])); if (r.ok) emitir({ tipo: 'registro', projeto: c.projeto.id, chave: r.chave, removida: true }); return json(res, r.ok ? 200 : 404, r.ok ? r : { erro: 'Essa ficha não existe.' }); } }
-  // O que a equipe gerou (imagens pedidas no chat, GIFs de storyboard, quadros nas pastas de episódio), do mais novo ao mais
-  // antigo, com a ficha que já aprovou cada um como referência.
+  // What the team generated (images requested in chat, storyboard GIFs, frames in episode folders), newest to
+  // oldest, with the entry that approved each one as a reference, if any.
   if (rota === 'registro/galeria' && m === 'GET') {
     const IMG = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp']);
     const itens = []; const vistos = new Set();
@@ -236,7 +236,7 @@ async function apiProjeto(req, res, c, rota, url) {
         if (d.isDirectory()) { if (prof < 4 && !/^(node_modules|\.git|anexos)$/.test(d.name)) varrer(f, origem, prof + 1); continue; }
         if (!IMG.has(path.extname(d.name).toLowerCase()) || vistos.has(f.toLowerCase())) continue;
         vistos.add(f.toLowerCase());
-        try { const st = fs.statSync(f); itens.push({ caminho: f, nome: d.name, origem, gif: /\.gif$/i.test(d.name), tamanho: st.size, em: st.mtime.toISOString() }); } catch { /* sumiu no meio */ }
+        try { const st = fs.statSync(f); itens.push({ caminho: f, nome: d.name, origem, gif: /\.gif$/i.test(d.name), tamanho: st.size, em: st.mtime.toISOString() }); } catch { /* removed meanwhile */ }
       }
     };
     varrer(path.join(c.pasta, 'anexos'), 'chat'); varrer(path.join(c.pasta, 'gifs'), 'storyboard');
@@ -246,7 +246,7 @@ async function apiProjeto(req, res, c, rota, url) {
     itens.sort((a, b) => b.em.localeCompare(a.em));
     return json(res, 200, { itens: itens.slice(0, 120).map((i) => ({ ...i, ficha: refsDe.get(path.resolve(i.caminho).toLowerCase()) || null })) });
   }
-  // Um arquivo do projeto (referência aprovada, GIF, documento da bíblia), só de dentro da pasta do trabalho ou da pasta de registros.
+  // A project file (approved reference, GIF, bible document), only from inside the work folder or the registry folder.
   if (rota === 'arquivo' && m === 'GET') {
     const pedido = String(url.searchParams.get('caminho') || '');
     const arq = path.resolve(path.isAbsolute(pedido) ? pedido : path.join(c.projeto.raiz, pedido));
@@ -272,7 +272,7 @@ async function apiProjeto(req, res, c, rota, url) {
     catch (e) { return json(res, 400, { erro: e.message }); }
   }
 
-  // Anexos nos chats: o arquivo vai para <pasta do projeto>/anexos/<dia>/ e os agentes o leem de lá.
+  // Chat attachments: the file goes to <project folder>/anexos/<day>/ and agents read it from there.
   if (rota === 'anexo' && m === 'PUT') {
     const nome = String(url.searchParams.get('nome') || 'arquivo').replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_').replace(/\s+/g, ' ').trim().slice(-90) || 'arquivo';
     const agoraD = new Date();
@@ -285,9 +285,9 @@ async function apiProjeto(req, res, c, rota, url) {
     const saida = fs.createWriteStream(destino);
     req.on('data', (d) => { total += d.length; if (total > LIMITE_ANEXO && !estourou) { estourou = true; saida.destroy(); req.destroy(); } });
     await new Promise((ok) => { req.pipe(saida); saida.on('finish', ok); saida.on('close', ok); saida.on('error', ok); req.on('error', ok); });
-    if (estourou || total === 0) { try { fs.rmSync(destino, { force: true }); } catch { /* já foi */ } return json(res, 413, { erro: estourou ? 'O arquivo passou de 25 MB.' : 'Arquivo vazio.' }); }
+    if (estourou || total === 0) { try { fs.rmSync(destino, { force: true }); } catch { /* already gone */ } return json(res, 413, { erro: estourou ? 'O arquivo passou de 25 MB.' : 'Arquivo vazio.' }); }
     const ext = path.extname(nome).toLowerCase();
-    const extraido = ext === '.pdf' ? await extrairTexto(destino) : null; // texto ao lado do PDF, para qualquer agente ler
+    const extraido = ext === '.pdf' ? await extrairTexto(destino) : null; // text next to the PDF, so any agent can read it
     return json(res, 201, { ok: true, textoExtraido: extraido ? (extraido.ok ? `${extraido.chars} caracteres` : extraido.motivo) : null, anexo: { nome, tipo: TIPOS_ANEXO[ext] || 'application/octet-stream', tamanho: total, rel: `${relDir}/${hora}-${nome}`, imagem: ['.png', '.jpg', '.jpeg', '.gif', '.webp'].includes(ext) } });
   }
   const manexo = rota.match(/^anexo\/(.+)$/);
@@ -302,13 +302,13 @@ async function apiProjeto(req, res, c, rota, url) {
     return fs.createReadStream(arq).pipe(res);
   }
 
-  // Perfil dos agentes: nome de pessoa (o @ segue o nome) e foto.
+  // Agent profiles: person name (the @ handle follows the name) and photo.
   const mperf = rota.match(/^agente\/([\w-]+)\/perfil$/);
   if (mperf && m === 'PUT') {
     try { const b = await corpoJson(req); const r = c.perfis.definirNome(mperf[1], b.nome); return json(res, r.ok ? 200 : 400, r.ok ? { ok: true } : r); }
     catch (e) { return json(res, 400, { erro: e.message }); }
   }
-  // Foto e capa: guardadas como vieram (GIF animado) com o enquadramento à parte.
+  // Photo and cover: stored as uploaded (animated GIF) with framing kept separately.
   const mfoto = rota.match(/^(?:agente\/([\w-]+)\/(foto|capa)|(foto|capa)\/([\w-]+))$/);
   if (mfoto) {
     const id = mfoto[1] || mfoto[4]; const tipo = mfoto[2] || mfoto[3];
@@ -336,7 +336,7 @@ async function apiProjeto(req, res, c, rota, url) {
     catch (e) { return json(res, 400, { erro: e.message }); }
   }
 
-  // Canal Posts: publicações do time. Reagir é com a Game Director; responder é na conversa do post (canal pst-N).
+  // Posts channel: team posts. Reactions come from the Game Director; replies go in the post's thread (channel pst-N).
   if (rota === 'posts' && m === 'GET') return json(res, 200, c.equipe.posts());
   if (rota === 'posts' && m === 'POST') {
     const b = await corpoJson(req);
@@ -350,9 +350,9 @@ async function apiProjeto(req, res, c, rota, url) {
   const mpr = rota.match(/^posts\/(p\d+)\/reagir$/);
   if (mpr && m === 'POST') { const b = await corpoJson(req); return json(res, 200, c.equipe.reagirPost(mpr[1], String(b.emoji || ''), 'voce')); }
 
-  // Grupos de trabalho: colegas que trabalham juntos fora do #equipe.
+  // Work groups: teammates working together outside #equipe.
   if (rota === 'grupos' && m === 'GET') return json(res, 200, c.equipe.grupos());
-  // Menu da conversa na lista lateral (botão direito): arquivar, excluir, adicionar membros. Limpar usa POST /limpar.
+  // Conversation menu in the sidebar (right click): archive, delete, add members. Clearing uses POST /limpar.
   if (m === 'POST' && /^conversa\/(arquivar|excluir|membros)$/.test(rota)) {
     const b = await corpoJson(req);
     if (!canalValido(b.canal)) return json(res, 400, { erro: 'Conversa inválida.' });
@@ -362,28 +362,28 @@ async function apiProjeto(req, res, c, rota, url) {
   const mgr = rota.match(/^grupos\/(grp-\d+)\/encerrar$/);
   if (mgr && m === 'POST') return json(res, 200, c.equipe.encerrarGrupoUsuario(mgr[1]));
 
-  // Planning: grupos temporários em que o time discute uma demanda antes de existir qualquer card.
+  // Planning: temporary groups where the team discusses a request before any card exists.
   if (rota === 'planning' && m === 'GET') return json(res, 200, c.equipe.plannings());
   const mpl = rota.match(/^planning\/(plan-\d+)\/cancelar$/);
   if (mpl && m === 'POST') return json(res, 200, c.equipe.cancelarPlanning(mpl[1]));
 
-  // Motores do projeto: ligar ou desligar o Claude e o Codex e fixar o teto de esforço de cada um.
+  // Project engines: enable or disable Claude and Codex and set each one's effort cap.
   if (rota === 'motores' && m === 'GET') return json(res, 200, c.equipe.motores());
   if (rota === 'motores' && m === 'PUT') { const b = await corpoJson(req); const r = c.equipe.salvarMotores(b); return json(res, r.erro ? 400 : 200, r); }
 
-  // Vigia dos repositórios: quais repositórios acompanhar, de quanto em quanto tempo.
+  // Repository watcher: which repositories to track and how often.
   if (rota === 'vigia' && m === 'GET') return json(res, 200, c.equipe.vigia.config());
   if (rota === 'vigia' && m === 'PUT') { const b = await corpoJson(req); return json(res, 200, c.equipe.vigia.salvar(b)); }
   if (rota === 'vigia/agora' && m === 'POST') return json(res, 200, await c.equipe.vigia.agora());
 
-  // Pastas extras: além da pasta alvo, o time pode olhar estas.
+  // Extra folders: besides the target folder, the team may look at these.
   if (rota === 'extras' && m === 'PUT') {
     const b = await corpoJson(req);
     const r = projetos.definirExtras(c.projeto.projetoId || c.projeto.id, b.lista);
     return json(res, r.ok ? 200 : 400, r);
   }
 
-  // Integrações (Jira e agenda): só leitura. O token nunca volta para a tela.
+  // Integrations (Jira and calendar): read-only. The token is never sent back to the UI.
   if (rota === 'integracoes' && m === 'GET') return json(res, 200, c.integracoes.publico());
   if (rota === 'integracoes' && m === 'PUT') {
     const b = await corpoJson(req);
@@ -416,19 +416,19 @@ async function apiProjeto(req, res, c, rota, url) {
     return json(res, r.ok ? 201 : 400, r);
   }
 
-  // Pontos de salvamento: automáticos a cada 10 min (se algo mudou) e manuais pelo botão "Salvar projeto".
+  // Save points: automatic every 10 min (if something changed) and manual via the "Salvar projeto" button.
   if (rota === 'pontos' && m === 'GET') return json(res, 200, { lista: c.pontos.listar(), projeto: c.projeto.nome });
   if (rota === 'pontos' && m === 'POST') { const b = await corpoJson(req); const r = await c.pontos.salvar({ tipo: 'manual', rotulo: b.rotulo }); return json(res, r.ok ? 201 : 400, r); }
   const mpt = rota.match(/^pontos\/([\w-]+)(\/restaurar)?$/);
   if (mpt && mpt[2] && m === 'POST') { const r = await c.pontos.restaurar(mpt[1]); return json(res, r.ok ? 200 : 400, r); }
   if (mpt && !mpt[2] && m === 'DELETE') { const r = c.pontos.excluir(mpt[1]); return json(res, r.ok ? 200 : 400, r); }
 
-  // Central de notificações e relatório do dia.
+  // Notification center and daily report.
   if (rota === 'notificacoes' && m === 'GET') return json(res, 200, { lista: c.notificacoes.listar(150), naoLidas: c.notificacoes.naoLidas() });
   if (rota === 'notificacoes/lidas' && m === 'POST') { const b = await corpoJson(req); return json(res, 200, c.notificacoes.marcarLidas(b.ids === 'todas' ? 'todas' : (Array.isArray(b.ids) ? b.ids : []))); }
   if (rota === 'relatorio' && m === 'POST') { const b = await corpoJson(req); return json(res, 200, c.equipe.relatorio({ manual: true, comentar: !!b.comentar })); }
 
-  // Regras e contexto: a Game Director ensina cada agente (e o projeto inteiro) sem mexer nos arquivos.
+  // Rules and context: the Game Director teaches each agent (and the whole project) without touching the files.
   const mr = rota.match(/^(?:agente\/([\w-]+)\/)?regras$/);
   if (mr) {
     const escopo = mr[1] || 'projeto';
@@ -437,7 +437,7 @@ async function apiProjeto(req, res, c, rota, url) {
       if (m === 'PUT') { const b = await corpoJson(req); return json(res, 200, Array.isArray(b.itens) ? c.memoria.gravarListaRegras(escopo, b.itens) : c.memoria.gravarRegras(escopo, b.texto)); }
     } catch (e) { return json(res, 400, { erro: e.message }); }
   }
-  // .md feito por fora: de regras (o app extrai os tópicos e acumula na lista) ou de contexto (vira documento de referência)
+  // externally written .md: rules (the app extracts the topics and appends them to the list) or context (becomes a reference document)
   const mri = rota.match(/^(?:agente\/([\w-]+)\/)?regras\/importar$/);
   if (mri && m === 'POST') {
     try { const b = await corpoJson(req); return json(res, 200, c.memoria.importarRegras(mri[1] || 'projeto', b.texto)); }
@@ -470,11 +470,11 @@ async function apiProjeto(req, res, c, rota, url) {
   const mp = rota.match(/^agente\/([\w-]+)\/parar$/);
   if (m === 'POST' && mp) return json(res, 200, { cancelados: eq.cancelarAgente(mp[1]) });
   if (m === 'POST' && rota === 'cancelar') return json(res, 200, { cancelados: eq.cancelar() });
-  // Depuração: quem roda e quem espera vaga; parar (todos ou um agente, inclusive na fila) usa /cancelar e /agente/:id/parar
-  // Chamada de voz com a liderança da equipe (local: faster-whisper + Piper). A fala vira mensagem na DM; a resposta vira áudio.
-  // Agenda do projeto (uma para todas as equipes): você cria e edita pela tela ou por aqui; os agentes, pelas ações agenda.*
+  // Debugging: who is running and who is waiting for a slot; stopping (all or one agent, including queued) uses /cancelar and /agente/:id/parar
+  // Voice call with the team lead (local: faster-whisper + Piper). Speech becomes a DM message; the reply becomes audio.
+  // Project calendar (one for all teams): the user creates and edits it in the UI or here; agents use the agenda.* actions
   if (rota === 'ronda' && m === 'POST') { const r = c.equipe.rondaAssessor({ forcar: true }); return json(res, r.ok ? 202 : 400, r); }
-  // Iniciativas do assessor: listar, aprovar ou cancelar (quem decide é você); e o resumo do que aconteceu desde que você saiu
+  // Assistant initiatives: list, approve or cancel (the user decides); plus the summary of what happened since the user left
   if (rota === 'iniciativas' && m === 'GET') return json(res, 200, { iniciativas: c.equipe.iniciativas.listar(), resumo: c.equipe.iniciativas.resumo() });
   if (rota === 'contrato' && m === 'GET') { const atual = c.equipe.contratos.atual(); return json(res, 200, { atual, cobertura: atual ? c.equipe.contratos.cobertura(atual.id) : null, historico: c.equipe.contratos.listar().filter((x) => !x.aberto).slice(-10) }); }
   if (rota === 'contrato/corrigir' && m === 'POST') { const b = await corpoJson(req); const atual = c.equipe.contratos.atual(); if (!atual) return json(res, 404, { erro: 'Não há contrato do pedido aberto.' }); return json(res, 200, { contrato: c.equipe.contratos.corrigir(atual.id, String(b.texto || '')) }); }
@@ -490,7 +490,7 @@ async function apiProjeto(req, res, c, rota, url) {
   if (m === 'POST' && rota === 'voz/iniciar') { const b = await corpoJson(req); const r = await sessoesVoz.iniciar(c, { engine: b.engine, modo: b.modo }); return json(res, r.ok ? 200 : 503, r); }
   if (m === 'POST' && rota === 'voz/falar') {
     const partes = []; let total = 0; for await (const ch of req) { total += ch.length; if (total > 25 * 1024 * 1024) return json(res, 413, { erro: 'Áudio grande demais.' }); partes.push(ch); }
-    const relTela = req.headers['x-studio-tela'];   // quadro da tela compartilhada, já enviado como anexo
+    const relTela = req.headers['x-studio-tela'];   // shared-screen frame, already uploaded as an attachment
     const r = await sessoesVoz.falou(c, Buffer.concat(partes), { anexos: relTela ? anexosValidos(c, [{ rel: String(relTela) }]) : [] });
     return json(res, r.ok ? 200 : 400, r);
   }
@@ -530,7 +530,7 @@ async function apiProjeto(req, res, c, rota, url) {
     const b = await corpoJson(req);
     return json(res, projetos.renomear(c.projeto.projetoId || c.projeto.id, b.nome) ? 200 : 400, { ok: true });
   }
-  // Equipes do projeto: adicionar (um template), renomear e tirar (os arquivos ficam na pasta)
+  // Project teams: add (from a template), rename and remove (files stay in the folder)
   const pid = c.projeto.projetoId || c.projeto.id;
   if (m === 'POST' && rota === 'equipes') { const b = await corpoJson(req); const r = projetos.adicionarEquipe(pid, b); return json(res, r.ok ? 201 : 400, r); }
   const meq = rota.match(/^equipes\/([a-z0-9_]+)$/);
@@ -563,17 +563,17 @@ async function apiProjeto(req, res, c, rota, url) {
   return json(res, 404, { erro: 'não existe' });
 }
 
-// ------------------------------------------------------------------ API geral
+// ------------------------------------------------------------------ global API
 async function api(req, res, url) {
   const m = req.method;
   const p = url.pathname;
 
-  // JSON obrigatório em tudo que escreve: obriga o navegador a fazer a checagem de origem (CORS).
-  // Exceção: o upload de anexo manda o arquivo cru. O cabeçalho próprio faz o navegador pedir permissão (preflight) a qualquer
-  // site de fora, e este servidor não concede, então só a tela do app consegue enviar. Sem a exceção, nenhum anexo chegava.
+  // JSON is required on every write: it forces the browser to perform the origin check (CORS).
+  // Exception: attachment upload sends the raw file. The custom header makes the browser request permission (preflight) for any
+  // external site, which this server never grants, so only the app's UI can send it. Without the exception, no attachment got through.
   const uploadAnexo = m === 'PUT' && /^\/api\/p\/[\w-]+\/anexo$/.test(p) && req.headers['x-studio-anexo'] === '1';
-  const audioVoz = m === 'POST' && /^\/api\/p\/[\w-]+\/voz\/falar$/.test(p) && req.headers['x-studio-voz'] === '1';   // a fala vem como WAV cru, com cabeçalho próprio (mesma proteção do anexo)
-  const amostraVoz = m === 'PUT' && p === '/api/voz/amostra' && req.headers['x-studio-voz'] === '1';   // WAV de amostra da voz própria
+  const audioVoz = m === 'POST' && /^\/api\/p\/[\w-]+\/voz\/falar$/.test(p) && req.headers['x-studio-voz'] === '1';   // speech arrives as raw WAV, with a custom header (same protection as attachments)
+  const amostraVoz = m === 'PUT' && p === '/api/voz/amostra' && req.headers['x-studio-voz'] === '1';   // sample WAV of the user's own voice
   if (m !== 'GET' && !uploadAnexo && !audioVoz && !amostraVoz && !(req.headers['content-type'] || '').includes('application/json')) {
     return json(res, 415, { erro: 'use application/json' });
   }
@@ -602,8 +602,8 @@ async function api(req, res, url) {
     try { return json(res,200,{acao:await decidirEntrevista(await corpoJson(req,3200000),{signal:controller.signal})}); }
     catch(e){return json(res,400,{erro:e.message,recuperavel:erroVisualRecuperavel(e.message)});} finally{clearTimeout(timer);}
   }
-  // A interface avisa que a pessoa está por aqui. Se ela volta depois de uma ausência longa, o app monta o
-  // resumo do que o time fez nesse tempo (sem modelo).
+  // The UI reports that the user is present. If they return after a long absence, the app builds a
+  // summary of what the team did meanwhile (no model call).
   if (m === 'POST' && p === '/api/atividade') {
     const antes = ultimaAtividade;
     ultimaAtividade = Date.now();
@@ -613,7 +613,7 @@ async function api(req, res, url) {
     return json(res, 200, { ok: true });
   }
   if (m === 'GET' && p === '/api/templates') return json(res, 200, listarTemplates());
-  // Conexões diretas com as contas (Jira, Trello, Teams): conectar no navegador, voltar para cá, desconectar.
+  // Direct account connections (Jira, Trello, Teams): connect in the browser, return here, disconnect.
   if (m === 'GET' && p === '/api/conexoes') return json(res, 200, conexoes.status());
   const mcx2 = p.match(/^\/api\/conexoes\/(jira|notion|github|trello|teams)\/(conectar|desconectar|cancelar|configurar|retorno|verificar)$/);
   if (mcx2) {
@@ -632,7 +632,7 @@ async function api(req, res, url) {
       return json(res, r.ok ? 200 : 400, r);
     } catch (e) { return json(res, 400, { erro: e.message }); }
   }
-  // Leitura na conta conectada (Trello e Teams) para os agentes, por curl local: o token é posto aqui e nunca chega a eles.
+  // Reads from the connected account (Trello and Teams) for agents via local curl: the token is added here and never reaches them.
   const mprox = p.match(/^\/api\/conexao\/(trello|teams|github)(\/.+)$/);
   if (mprox) {
     if (m !== 'GET') return json(res, 405, { erro: 'Só leitura (GET). Escrever na conta é decisão da Game Director.' });
@@ -643,8 +643,8 @@ async function api(req, res, url) {
       return res.end(Buffer.from(await r.arrayBuffer()));
     } catch (e) { return json(res, 400, { erro: e.message }); }
   }
-  // MCPs conectados (página MCP): os do Claude Code desta máquina e os cadastrados aqui.
-  // voz: qual sintetizador usar (piper = rápida, chatterbox = natural) e o estado do serviço local
+  // Connected MCPs (MCP page): this machine's Claude Code ones and those registered here.
+  // voice: which synthesizer to use (piper = fast, chatterbox = natural) and the local service status
   if (p === '/api/voz' && m === 'GET') return json(res, 200, { ...voz.lerVozConfig(), tts: 'chatterbox', niveis: voz.niveisVoz(), voz: voz.vozAtual(), vozes: voz.listarVozes(), servico: await voz.estadoServico() });
   if (p === '/api/voz' && m === 'PUT') {
     const b = await corpoJson(req); const novo = {};
@@ -659,7 +659,7 @@ async function api(req, res, url) {
     }
     return json(res, 200, { ...voz.definirVozConfig(novo), niveis: voz.niveisVoz(), voz: voz.vozAtual(), vozes: voz.listarVozes() });
   }
-  // amostra da própria voz (WAV cru) e prévia da voz escolhida
+  // user's own voice sample (raw WAV) and preview of the chosen voice
   if (p === '/api/voz/amostra' && m === 'PUT') { const partes = []; let total = 0; for await (const ch of req) { total += ch.length; if (total > 16 * 1024 * 1024) return json(res, 413, { erro: 'A amostra passou de 15 MB.' }); partes.push(ch); } try { voz.salvarAmostra(Buffer.concat(partes)); return json(res, 200, { ok: true, vozes: voz.listarVozes() }); } catch (e) { return json(res, 400, { erro: e.message }); } }
   if (p === '/api/voz/previa' && m === 'POST') { const b = await corpoJson(req); try { return json(res, 200, await voz.previa({ nome: b.nome, ritmo: b.ritmo, expressividade: b.expressividade, texto: typeof b.texto === 'string' ? b.texto.slice(0, 300) : undefined })); } catch (e) { return json(res, 503, { erro: e.message }); } }
   if (p === '/api/voz/previa/audio' && m === 'GET') { const a = voz.arquivoPrevia(); if (!a) return json(res, 404, { erro: 'sem prévia' }); res.writeHead(200, { 'Content-Type': 'audio/wav', 'Cache-Control': 'no-store' }); return fs.createReadStream(a).pipe(res); }
@@ -668,7 +668,7 @@ async function api(req, res, url) {
   const mmcp = p.match(/^\/api\/mcp\/([\w-]+)$/);
   if (mmcp && m === 'PUT') { const b = await corpoJson(req); const r = mcpReg.definir(mmcp[1], b); return json(res, r.ok ? 200 : 400, r); }
   if (mmcp && m === 'DELETE') { const r = mcpReg.remover(mmcp[1]); return json(res, r.ok ? 200 : 400, r); }
-  // Contas do Claude e do Codex (página Modelos): status, conectar pelo site oficial e desconectar.
+  // Claude and Codex accounts (Models page): status, connect via the official site, and disconnect.
   if (m === 'GET' && p === '/api/contas') {
     const cfg = lerConfig(); const forcar = url.searchParams.get('forcar') === '1';
     const [claude, codex] = await Promise.all([contas.status('claude', cfg, forcar), contas.status('codex', cfg, forcar)]);
@@ -680,7 +680,7 @@ async function api(req, res, url) {
     const r = mct[2] === 'conectar' ? await contas.conectar(mct[1], cfg) : mct[2] === 'desconectar' ? await contas.desconectar(mct[1], cfg) : contas.cancelarLogin(mct[1]);
     return json(res, r.ok ? 200 : 400, r);
   }
-  // GIFs da comunidade (GIPHY ou Tenor): o agente escreve [gif: termo] e a tela pede /api/gif?q=termo, que redireciona ao GIF.
+  // Community GIFs (GIPHY or Tenor): the agent writes [gif: term] and the UI requests /api/gif?q=term, which redirects to the GIF.
   if (p === '/api/gifs' && m === 'GET') { const g = lerConfig().gifs || {}; return json(res, 200, { provedor: g.provedor || 'giphy', configurado: !!g.chave }); }
   if (p === '/api/gifs' && m === 'PUT') {
     const b = await corpoJson(req); const cfg = lerConfig();
@@ -819,7 +819,7 @@ async function api(req, res, url) {
   return json(res, 404, { erro: 'não existe' });
 }
 
-// ------------------------------------------------------------------ estático
+// ------------------------------------------------------------------ static
 function estatico(res, url) {
   const nome = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname).slice(1);
   const arquivo = path.resolve(PUBLICO, nome);
@@ -829,8 +829,8 @@ function estatico(res, url) {
     res.writeHead(200, {
       'Content-Type': MIME[path.extname(arquivo)] || 'application/octet-stream',
       'Cache-Control': 'no-store',
-      // O app mostra texto escrito por agentes. Mesmo que algo escapasse do escape de HTML, a página
-      // só carrega script e dados do próprio servidor, e não pode ser posta dentro de outra página.
+      // The app displays agent-written text. Even if something slipped past HTML escaping, the page
+      // only loads scripts and data from this server, and cannot be embedded in another page.
       'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
       'X-Content-Type-Options': 'nosniff',
     });
@@ -851,25 +851,25 @@ const servidor = http.createServer(async (req, res) => {
 });
 
 /**
- * Liga o servidor. porta 0 = o sistema escolhe uma livre (é o que o aplicativo faz).
- * projetoPadrao { nome, caminho, legados }: usado só na primeira abertura, quando ainda não há projeto.
+ * Starts the server. port 0 = the OS picks a free one (what the app does).
+ * projetoPadrao { nome, caminho, legados }: used only on first launch, when no project exists yet.
  */
 export function iniciarServidor({ porta = PORTA, abrirNavegador = false, projetoPadrao = null } = {}) {
-  // uso das duas contas lido a cada minuto, sem gastar chamada de modelo: o painel não envelhece com os agentes parados
-  const lerUsos = () => { atualizarUsoCodex().catch(() => {}); atualizarUsoClaude().catch(() => {}); try { projetos.tiquetaqueAgendas(); } catch { /* agenda sem projeto aberto */ } };
+  // usage of both accounts read every minute without a model call: the panel stays fresh while agents are idle
+  const lerUsos = () => { atualizarUsoCodex().catch(() => {}); atualizarUsoClaude().catch(() => {}); try { projetos.tiquetaqueAgendas(); } catch { /* calendar with no open project */ } };
   lerUsos();
   const usoTimer = setInterval(lerUsos, 60_000);
   usoTimer.unref();
   if (projetoPadrao) projetos.garantirPadrao(projetoPadrao);
   projetos.iniciarTodos();
-  // Relatório do dia: confere a hora a cada minuto (e uma vez logo ao abrir, para o que ficou para trás).
+  // Daily report: checks the time every minute (and once at startup, to catch up on anything missed).
   const conferirRelatorios = () => { for (const c of projetos.todosContextos()) { try { c.equipe.verificarRelatorio(); c.equipe.verificarBriefing?.(); c.equipe.rondaAssessor?.(); } catch (e) { console.error('relatório:', e.message); } } };
-  // Piloto automático: a cada minuto o app confere se há trabalho para andar (só leitura do quadro, sem modelo).
+  // Autopilot: every minute the app checks whether there is work to advance (board read only, no model call).
   const conferirPiloto = () => { for (const c of projetos.todosContextos()) { try { c.equipe.pilotoTick(); } catch (e) { console.error('piloto:', e.message); } } };
   setTimeout(conferirPiloto, 3000).unref();
   const pilotoTimer = setInterval(conferirPiloto, Number(process.env.STUDIO_PILOTO_TICK_MS) || 5000);
   pilotoTimer.unref();
-  // Jira e agenda: relê no intervalo de cada projeto e avisa antes das reuniões.
+  // Jira and calendar: re-read at each project's interval and send reminders before meetings.
   const conferirIntegracoes = () => { for (const c of projetos.todosContextos()) c.integracoes.tick().catch((e) => console.error('integrações:', e.message)); };
   setTimeout(conferirIntegracoes, 5_000).unref();
   setInterval(conferirIntegracoes, 60_000).unref();
@@ -887,7 +887,7 @@ export function iniciarServidor({ porta = PORTA, abrirNavegador = false, projeto
       if (abrirNavegador) { const u = `http://localhost:${real}`; const [c, a] = process.platform === 'win32' ? ['cmd', ['/c', 'start', '', u]] : process.platform === 'darwin' ? ['open', [u]] : ['xdg-open', [u]]; spawn(c, a, { stdio: 'ignore', detached: true, windowsHide: true }).unref(); }
       resolve({
         porta: real,
-        // Fechar o app não pode deixar agente rodando solto: cancela tudo antes de desligar.
+        // Closing the app must not leave agents running: cancel everything before shutting down.
         encerrar() {
           clearInterval(usoTimer);
           clearInterval(pilotoTimer);
@@ -896,14 +896,14 @@ export function iniciarServidor({ porta = PORTA, abrirNavegador = false, projeto
           servidor.closeAllConnections?.();
           servidor.close();
           voz.encerrarServico();
-          descarregarSync();   // o que ainda esperava para ser gravado (quadro, conversas) vai para o disco antes de fechar
+          descarregarSync();   // anything still pending a write (board, conversations) is flushed to disk before closing
         },
       });
     });
   });
 }
 
-// Rodado direto (node server.mjs): liga sozinho. Importado pelo Electron: só exporta.
+// Run directly (node server.mjs): starts itself. Imported by Electron: only exports.
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const padrao = process.env.STUDIO_PROJETO_PADRAO ? { nome: path.basename(process.env.STUDIO_PROJETO_PADRAO), caminho: process.env.STUDIO_PROJETO_PADRAO } : null;
   iniciarServidor({ abrirNavegador: process.env.STUDIO_ABRIR === '1', projetoPadrao: padrao }).catch((e) => {

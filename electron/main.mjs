@@ -1,5 +1,5 @@
-// Processo principal do aplicativo NECTAR.
-// Liga o servidor local numa porta livre, abre a janela nele e desliga tudo ao fechar.
+// Main process of the NECTAR app.
+// Starts the local server on a free port, opens the window on it, and shuts everything down on close.
 import { app, BrowserWindow, desktopCapturer, dialog, ipcMain, Menu, Tray, powerSaveBlocker, safeStorage, session, shell } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,22 +21,22 @@ const manterEmSegundoPlano=()=>{try{const c=JSON.parse(fs.readFileSync(path.join
 function mostrarJanela(){janela?.show();if(janela?.isMinimized())janela.restore();janela?.focus();}
 function criarBandeja(){if(bandeja)return;bandeja=new Tray(path.join(RAIZ_APP,'build','icon.ico'));bandeja.setToolTip('NECTAR em segundo plano');bandeja.setContextMenu(Menu.buildFromTemplate([{label:'Abrir NECTAR',click:mostrarJanela},{label:'Encerrar NECTAR e parar execuções',click:()=>{encerrando=true;app.quit();}}]));bandeja.on('double-click',mostrarJanela);}
 
-// Os dados do app ficam na mesma pasta de antes da troca de nome (%APPDATA%/Game Studio AI), para nada se perder.
+// App data stays in the same folder as before the rename (%APPDATA%/Game Studio AI), so nothing is lost.
 app.setPath('userData', process.env.STUDIO_USERDATA || path.join(app.getPath('appData'), 'Game Studio AI'));
 
-// Uma instância só: abrir de novo traz a janela que já existe.
+// Single instance: opening again brings up the existing window.
 if (!app.requestSingleInstanceLock()) { app.quit(); }
 app.on('second-instance', mostrarJanela);
 
-/* ------------------------------------------------------------ dados e projetos */
-// A versão anterior do app (Estúdio NÃO PERDI!) guardava tudo em %APPDATA%\estudio-nao-perdi.
-// Na primeira abertura do NECTAR esses dados viram o primeiro projeto, para nada se perder.
+/* ------------------------------------------------------------ data and projects */
+// An earlier version of this app, under its old name, stored everything in %APPDATA%\estudio-nao-perdi.
+// On NECTAR's first launch that data becomes the first project, so nothing is lost.
 function projetoLegado() {
   const base = path.join(app.getPath('appData'), 'estudio-nao-perdi');
   try {
     const raiz = JSON.parse(fs.readFileSync(path.join(base, 'estudio.json'), 'utf8')).raiz;
     if (raiz && fs.statSync(raiz).isDirectory()) return { nome: path.basename(raiz), caminho: raiz, legados: [path.join(base, 'data')] };
-  } catch { /* sem dados antigos */ }
+  } catch { /* no legacy data */ }
   return null;
 }
 
@@ -44,14 +44,14 @@ ipcMain.handle('studio:escolher-pasta', async () => {
   const r = await dialog.showOpenDialog(janela, { title: 'Escolha a pasta do projeto', properties: ['openDirectory'] });
   return r.canceled || !r.filePaths[0] ? null : r.filePaths[0];
 });
-// Com o piloto automático ligado, o Windows não pode suspender o app (a tela pode apagar, o trabalho continua).
+// With autopilot on, Windows must not suspend the app (the display may turn off, work continues).
 let bloqueioSono = null;
 ipcMain.handle('studio:manter-acordado', (_e, ligar) => {
   if (ligar && bloqueioSono === null) bloqueioSono = powerSaveBlocker.start('prevent-app-suspension');
   if (!ligar && bloqueioSono !== null) { powerSaveBlocker.stop(bloqueioSono); bloqueioSono = null; }
   return bloqueioSono !== null;
 });
-// Voltar a um ponto de salvamento exige reabrir o app: a restauração é aplicada antes de o projeto carregar.
+// Restoring a save point requires restarting the app: the restore is applied before the project loads.
 ipcMain.handle('studio:reiniciar', () => {
   app.relaunch({ execPath: process.env.PORTABLE_EXECUTABLE_FILE || process.execPath });
   setTimeout(() => app.quit(), 400);
@@ -61,11 +61,11 @@ ipcMain.handle('studio:abrir-pasta', async (_e, dir) => {
   if (typeof dir !== 'string' || !fs.existsSync(dir)) return false;
   return (await shell.openPath(dir)) === '';
 });
-// Compartilhar tela na chamada: a página lista telas e janelas (com miniatura), a pessoa escolhe, e o pedido de getDisplayMedia
-// que vem em seguida recebe essa fonte. No Windows o Chromium não tem seletor próprio, por isso o seletor é nosso.
+// Screen sharing in calls: the page lists screens and windows (with thumbnails), the user picks one, and the getDisplayMedia
+// request that follows receives that source. On Windows Chromium has no built-in picker, so we provide our own.
 let fonteTelaEscolhida = null;
 let entrevistaTela=null, entrevistaProc=null, entrevistaInicio=0, entrevistaCps=12;
-// O pacote de teste não disputa a parada de emergência da instância usada pela pessoa.
+// The test build does not compete for the emergency stop of the instance the user is running.
 const ATALHO_ENTREVISTA=process.env.STUDIO_FAKE==='1'?'CommandOrControl+Alt+Shift+F12':'CommandOrControl+Shift+F12';
 function pararEntrevista(motivo='Controle interrompido',notificar=true){
   const estavaAtivo=!!entrevistaTela;
@@ -118,13 +118,13 @@ async function entregarTela(_pedido, responder) {
   responder(f ? { video: f } : {});
 }
 
-/* ------------------------------------------------------------ janela */
+/* ------------------------------------------------------------ window */
 async function criarJanela() {
-  // O servidor lê esta variável ao carregar, então ela vem antes do import.
+  // The server reads this variable on load, so it must be set before the import.
   process.env.STUDIO_DATA = path.join(app.getPath('userData'), 'data');
-  // A pasta de cada projeto (memória, quadro, conversas) fica dentro da pasta do programa, em Documentos.
+  // Each project's folder (memory, board, conversations) lives inside the program folder, in Documents.
   process.env.STUDIO_PROJETOS ??= path.join(app.getPath('documents'), 'Game Studio AI', 'projetos');
-  // O token do Jira é cifrado pelo Windows (conta do usuário); o servidor pede o cofre por aqui.
+  // The Jira token is encrypted by Windows (user account); the server requests the vault through here.
   globalThis.studioCofre = {
     disponivel: () => safeStorage.isEncryptionAvailable(),
     cifrar: (t) => safeStorage.encryptString(t).toString('base64'),
@@ -140,7 +140,7 @@ async function criarJanela() {
     backgroundColor: '#090B10',
     title: MARCA,
     icon: path.join(RAIZ_APP, 'build', 'icon.png'),
-    // Barra de título própria: o app desenha a faixa; o Windows põe só os botões por cima.
+    // Custom title bar: the app draws the strip; Windows only overlays the buttons.
     titleBarStyle: 'hidden',
     titleBarOverlay: { color: '#06080C', symbolColor: '#A3ACBE', height: 36 },
     webPreferences: {
@@ -157,9 +157,9 @@ async function criarJanela() {
   janela.on('close',e=>{if(!encerrando&&manterEmSegundoPlano()){e.preventDefault();criarBandeja();janela.hide();}});
   janela.on('closed', () => { janela = null; });
 
-  // A janela só navega dentro do próprio app. Link externo abre no navegador.
+  // The window only navigates within the app. External links open in the browser.
   janela.webContents.setWindowOpenHandler(({ url }) => {
-    // arquivo do próprio app (anexo, relatório, entrega): baixa direto, sem abrir navegador
+    // the app's own file (attachment, report, deliverable): download directly, without opening a browser
     if (url.startsWith(origem) && /\/(anexo|relatorio|teamwork\/artifacts)\b/.test(url)) { janela.webContents.downloadURL(url); return { action: 'deny' }; }
     if (/^https?:\/\//.test(url)) shell.openExternal(url);
     return { action: 'deny' };
@@ -168,7 +168,7 @@ async function criarJanela() {
     if (!url.startsWith(origem)) { e.preventDefault(); if (/^https?:\/\//.test(url)) shell.openExternal(url); }
   });
 
-  // Atalhos de desenvolvedor só fora do pacote.
+  // Developer shortcuts only outside the packaged build.
   if (!EMPACOTADO) {
     janela.webContents.on('before-input-event', (e, i) => {
       if (i.type !== 'keyDown') return;
@@ -184,11 +184,11 @@ async function criarJanela() {
 app.whenReady().then(async () => {
   globalShortcut.register(ATALHO_ENTREVISTA,()=>pararEntrevista('Interrompido pelo atalho Ctrl+Shift+F12'));
   Menu.setApplicationMenu(null);
-  // O app não precisa de câmera, microfone, localização etc. Só copiar texto e mostrar aviso quando um agente pede a Game Director.
-  // microfone ("media"): só a chamada de voz pede, e só enquanto ela está aberta
+  // The app needs no camera, microphone, location, etc. Only clipboard writes and notifications when an agent asks for the Game Director.
+  // microphone ("media"): only the voice call requests it, and only while it is open
   session.defaultSession.setPermissionRequestHandler((_wc, permissao, ok) => ok(['clipboard-sanitized-write', 'notifications', 'media', 'audioCapture', 'display-capture'].includes(permissao)));
   session.defaultSession.setDisplayMediaRequestHandler(entregarTela);
-  // Download de anexo/relatório: vai direto para Downloads (sem diálogo, sem sobrescrever) e abre quando termina
+  // Attachment/report download: goes straight to Downloads (no dialog, no overwrite) and opens when finished
   session.defaultSession.on('will-download', (_e, item) => {
     const pasta = app.getPath('downloads');
     const ext = path.extname(item.getFilename()); const base = path.basename(item.getFilename(), ext);
@@ -201,5 +201,5 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => app.quit());
-// Fechar o app não pode deixar agente rodando solto: o servidor cancela tudo antes de desligar.
-app.on('before-quit', () => {pararEntrevista();encerrando=true;bandeja?.destroy();bandeja=null;try { servidor?.encerrar(); } catch { /* já encerrado */ } });
+// Closing the app must not leave agents running: the server cancels everything before shutting down.
+app.on('before-quit', () => {pararEntrevista();encerrando=true;bandeja?.destroy();bandeja=null;try { servidor?.encerrar(); } catch { /* already shut down */ } });

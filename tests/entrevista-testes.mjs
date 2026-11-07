@@ -27,4 +27,4 @@ assert.equal(validarSubmissaoProgramacao(submit,[...historico,{executada:true,ac
 const espera=Array.from({length:80},()=>evento('aguardar','verificar'));
 assert.equal(validarSubmissaoProgramacao(submit,[...historico,...espera]),submit);
 assert.throws(()=>validarSubmissaoProgramacao({...submit,avaliacaoTeste:{resultado:'talvez'}},historico),/Avaliação/);
-console.log('Submissão: exige execução seguida de avaliação aprovada; bloqueia ausência, resultado pendente/falho, alterações, troca de questão/linguagem e reaproveitamento após Submit.');
+console.log('Submission: requires a run followed by a passing evaluation; blocks absence, pending/failed result, edits, question/language change and reuse after Submit.');

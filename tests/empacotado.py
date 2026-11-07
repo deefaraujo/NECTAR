@@ -1,4 +1,4 @@
-﻿"""Abre o Electron empacotado com dados isolados e sem usar modelos."""
+﻿"""Opens the packaged Electron app with isolated data and without using models."""
 import json, os, pathlib, socket, subprocess, tempfile, time, urllib.request
 from playwright.sync_api import sync_playwright, expect
 
@@ -41,9 +41,9 @@ with tempfile.TemporaryDirectory(prefix='work-ia-package-') as temp:
 Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;public class NectarTestWindow{[DllImport("user32.dll")]public static extern bool ShowWindow(IntPtr h,int n);[DllImport("user32.dll")]public static extern bool IsIconic(IntPtr h);}'
 $p=[Diagnostics.Process]::GetProcessById($TargetPid)
 $p.Refresh()
-if($p.MainWindowHandle -eq [IntPtr]::Zero){throw 'Janela de teste ausente'}
+if($p.MainWindowHandle -eq [IntPtr]::Zero){throw 'Test window missing'}
 [void][NectarTestWindow]::ShowWindow($p.MainWindowHandle,$WindowState)
-if($WindowState -eq 6 -and -not [NectarTestWindow]::IsIconic($p.MainWindowHandle)){throw 'A janela de teste não foi minimizada'}
+if($WindowState -eq 6 -and -not [NectarTestWindow]::IsIconic($p.MainWindowHandle)){throw 'The test window was not minimized'}
 ''', encoding='utf-8')
             def mostrar_janela(estado):
                 subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-File', str(helper), str(proc.pid), str(estado)], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
@@ -53,16 +53,16 @@ if($WindowState -eq 6 -and -not [NectarTestWindow]::IsIconic($p.MainWindowHandle
             page.wait_for_function('() => window.ticksTeste >= 5', polling=100, timeout=3000)
             page.evaluate('clearInterval(window.timerTeste)')
             mostrar_janela(9)
-            print('PASS: processamento da página continua com a janela minimizada.')
-            print('PASS: currículo PDF extraído e exibido no laboratório do aplicativo empacotado.')
+            print('PASS: page processing continues with the window minimized.')
+            print('PASS: PDF resume extracted and shown in the packaged app lab.')
             fonte = page.evaluate("async () => (await studioApp.fontesTela()).find(f => f.tipo === 'tela')?.id")
-            assert fonte, 'Nenhuma tela disponível para validar a contagem'
+            assert fonte, 'No screen available to validate the countdown'
             preparo = page.evaluate('(id) => studioApp.entrevistaArmar(id)', fonte)
             assert preparo['inicioEm'] > 0
             page.evaluate("window.paradasRecebidas=[]; window.removerListenerTeste=studioApp.aoPararEntrevista(m=>window.paradasRecebidas.push(m))")
             preparo = page.evaluate('(id) => studioApp.entrevistaArmar(id)', fonte)
-            assert page.evaluate('paradasRecebidas.length') == 0, 'Rearmar não deve cancelar a nova execução'
-            assert len(context.pages) == 1, 'O agente não deve abrir indicadores ou janelas extras'
+            assert page.evaluate('paradasRecebidas.length') == 0, 'Re-arming must not cancel the new run'
+            assert len(context.pages) == 1, 'The agent must not open indicators or extra windows'
             erro = page.evaluate("async () => { try { await studioApp.entrevistaAcao({tipo:'aguardar'}); return ''; } catch(e) { return e.message; } }")
             assert 'cinco segundos' in erro
             page.wait_for_function('(inicio) => Date.now() >= inicio', arg=preparo['inicioEm'], polling=100, timeout=8000)
@@ -72,7 +72,7 @@ if($WindowState -eq 6 -and -not [NectarTestWindow]::IsIconic($p.MainWindowHandle
             erro = page.evaluate("async () => { try { await studioApp.entrevistaAcao({tipo:'aguardar'}); return ''; } catch(e) { return e.message; } }")
             assert 'Controle parado' in erro
             page.evaluate('() => studioApp.entrevistaParar()')
-            print('PASS: preparação de cinco segundos, controle e parada sem indicadores nem janelas extras (sem mover mouse/teclado).')
+            print('PASS: five-second preparation, control and stop with no indicators or extra windows (without moving mouse/keyboard).')
             base_url = page.url.split('/')[0] + '//' + page.url.split('/')[2]
             page.goto(base_url + '/avaliacoes.html')
             expect(page.locator('h1')).to_have_text('Tarefas de avaliação')
@@ -84,8 +84,8 @@ if($WindowState -eq 6 -and -not [NectarTestWindow]::IsIconic($p.MainWindowHandle
             page.reload()
             page.locator('#lista-tarefas button').click()
             expect(page.locator('#proximoPasso')).to_have_value('Retomar o trabalho manual')
-            print('PASS: organizador manual carregou e preservou o checkpoint no aplicativo empacotado.')
-            print('PASS: Electron empacotado abriu, servidor respondeu, template software carregou e controles de uso/perfil apareceram.')
+            print('PASS: manual organizer loaded and preserved the checkpoint in the packaged app.')
+            print('PASS: packaged Electron opened, server responded, software template loaded and usage/profile controls appeared.')
     finally:
         subprocess.run(['taskkill', '/PID', str(proc.pid), '/T', '/F'], capture_output=True)
         proc.wait(timeout=15)

@@ -8,5 +8,5 @@ const tasks=['bug','backend','fullstack','refactor','external_integration','prof
 const manifest=path.join(tmp,'manifest.json'),output=path.join(tmp,'results.json');fs.writeFileSync(manifest,JSON.stringify({schema:'nectar.benchmark.v1',mode:'stub',seed:20261103,repeats:1,tasks}));
 const r=spawnSync(process.execPath,[path.join(import.meta.dirname,'../scripts/benchmark-teamwork.mjs'),'--manifest',manifest,'--run','--output',output],{encoding:'utf8',windowsHide:true,timeout:60000});assert.equal(r.status,0,r.stderr);
 const report=JSON.parse(fs.readFileSync(output));assert.equal(report.runs.length,18);assert.equal(report.runs.filter(r=>r.validated).length,17);assert(report.fullCoverage);assert(report.comparison.every(c=>c.promotion==='insufficient_evidence'&&c.speedup===null));assert.equal(git('status','--porcelain'),'');assert.equal(git('worktree','list','--porcelain').split('worktree ').length,2);
-console.log('PASS: benchmark cobre seis classes e três variantes, ordem determinística, worktrees limpos, aceite independente e falha preservada; stub não demonstra desempenho.');
+console.log('PASS: benchmark covers six classes and three variants, deterministic order, clean worktrees, independent acceptance and preserved failure; the stub does not demonstrate performance.');
 fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});

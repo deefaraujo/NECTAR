@@ -1,4 +1,4 @@
-// Ponte mínima entre a página e o processo principal. A página só ganha o que está aqui.
+// Minimal bridge between the page and the main process. The page gets only what is exposed here.
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('studioApp', {

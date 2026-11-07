@@ -1,4 +1,4 @@
-// Prova do sandbox do SO sem inferência/modelos e sem tocar dados reais.
+// Proof of the OS sandbox with no inference/models and without touching real data.
 import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {spawnSync} from 'node:child_process';
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'nectar-sandbox-')),cwd=path.join(tmp,'workspace');fs.mkdirSync(cwd);
 process.env.STUDIO_DATA=path.join(tmp,'data');
@@ -18,4 +18,4 @@ console.log(JSON.stringify({job}));
 fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});
 if(!ok)throw new Error('Sandbox real não demonstrou a política esperada. Não habilitar autonomia elevada.');
 if(job.code!==0||!job.out.includes('"outside":"denied"'))throw new Error('Job não respeitou sandbox ou não conseguiu iniciar');
-console.log('PASS: sandbox real Windows permitiu escrita no workspace e recusou escrita fora. Sem modelo.');
+console.log('PASS: real Windows sandbox allowed writes in the workspace and denied writes outside. No model.');

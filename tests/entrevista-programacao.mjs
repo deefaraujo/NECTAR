@@ -32,4 +32,4 @@ assert.throws(()=>validarObservacaoProgramacao({...final,observacao:{...observac
 assert.throws(()=>validarObservacaoProgramacao({...final,observacao:{...observacao,evidencia:''}},c,historico));
 assert.throws(()=>validarObservacaoProgramacao({tipo:'aguardar'},c));
 assert.throws(()=>validarObservacaoProgramacao({...final,memoria:'x'.repeat(24001)},c,historico));
-console.log('Programação: easy/medium/hard, protocolo, teclas sem clipboard, código multilinha e conclusão após submissão validados.');
+console.log('Programming: easy/medium/hard, protocol, keys without clipboard, multiline code and completion after submission validated.');

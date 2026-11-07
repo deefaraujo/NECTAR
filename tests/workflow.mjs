@@ -15,14 +15,14 @@ const fluxo = (c,acao,dados,autor) => {const r=q.fluxo(c.id,acao,{revisao:c.work
 const entrega = (c,chave, checks=[{comando:'node teste.mjs',status:'aprovado',evidencia:'Cenário principal e falha passaram.'}]) => fluxo(c,'entrega',{chave,resumo:'Implementação verificada.',arquivos:['src/app.mjs'],verificacoes:checks},c.dono);
 const a=criar('Base'), b=criar('Depende da base',{dependeDe:[a.id]});
 assert.equal(q.mover(b.id,'andamento','backend').ok,false);
-assert.equal(q.atualizar(a.id,{dependeDe:[b.id]},'po').ok,false,'Rejeita ciclos');
+assert.equal(q.atualizar(a.id,{dependeDe:[b.id]},'po').ok,false,'Rejects cycles');
 assert.equal(q.atualizar(b.id,{dependeDe:['T-999']},'po').ok,false);
 const x=criar('Vai ser cancelada'), y=criar('Depende da cancelada',{dependeDe:[x.id]});
-assert.equal(q.arquivar(x.id).ok,true,'Cancelar é excluir, mesmo com dependente');
-assert.equal(q.obter(x.id),null,'O card cancelado sai do quadro');
-assert.deepEqual(q.obter(y.id).dependeDe,[],'O dependente perde a dependência cancelada');
-assert(q.cancelados().some(c=>c.id===x.id&&c.titulo==='Vai ser cancelada'),'Fica o registro mínimo para ninguém recriar');
-assert.equal(q.arquivar(x.id).ok,false,'Cancelar de novo não faz nada');
+assert.equal(q.arquivar(x.id).ok,true,'Cancelling deletes, even with a dependent');
+assert.equal(q.obter(x.id),null,'The cancelled card leaves the board');
+assert.deepEqual(q.obter(y.id).dependeDe,[],'The dependent loses the cancelled dependency');
+assert(q.cancelados().some(c=>c.id===x.id&&c.titulo==='Vai ser cancelada'),'A minimal record stays so nobody recreates it');
+assert.equal(q.arquivar(x.id).ok,false,'Cancelling again does nothing');
 assert.equal(q.criar({titulo:'Inválido',dependeDe:['T-999']},'po').ok,false);
 const c=criar('Entrega',{chave:'tarefa-estavel',validacoesObrigatorias:['node teste.mjs']});
 assert.equal(q.criar({titulo:'Entrega repetida',chave:'tarefa-estavel'},'po').card.id,c.id);
@@ -30,13 +30,13 @@ assert.equal(q.mover(c.id,'concluido','backend').ok,false);
 assert.equal(q.mover(c.id,'concluido','backend',{forcar:true,motivo:'pular'}).ok,false);
 const titulo=c.titulo;
 assert.equal(q.atualizar(c.id,{titulo:'MUTOU',dono:'desconhecido'},'po').ok,false);
-assert.equal(q.obter(c.id).titulo,titulo,'Atualização inválida é atômica');
+assert.equal(q.obter(c.id).titulo,titulo,'An invalid update is atomic');
 assert.equal(q.atualizar(c.id,{validacoesObrigatorias:[]},'backend').ok,false);
 fluxo(c,'checkpoint',{resumo:'Estado salvo',proximoPasso:'Implementar a validação',branch:'T-003-teste',worktree:'C:/scratch'},'backend');
-await (await import('../lib/store.mjs')).descarregar();   // os .md derivados são gravados em segundo plano
+await (await import('../lib/store.mjs')).descarregar();   // derived .md files are written in the background
 assert(fs.readFileSync(path.join(projetos.ctx(projeto.id).pasta,'workflow',c.id,'progress.md'),'utf8').includes('Implementar a validação'));
 entrega(c,'tentativa-1');
-assert(entrega(c,'tentativa-1').repetido,'Entrega repetida não cria revisão');
+assert(entrega(c,'tentativa-1').repetido,'A repeated delivery does not create a revision');
 assert.equal(c.workflow.revisao,1);
 assert(q.mover(c.id,'revisao','backend').ok);
 assert.equal(q.fluxo(c.id,'revisao',{revisao:1,status:'aprovado',evidencia:'Autorrevisão'},'backend').ok,false);
@@ -50,23 +50,23 @@ fluxo(c,'revisao',{status:'reprovado',evidencia:'Corrigir contrato.'},'revisor')
 assert(q.mover(c.id,'andamento','revisor').ok);
 entrega(c,'tentativa-2');
 assert.equal(c.workflow.retrabalhos,1);
-assert.equal(c.workflow.achados[0].revisao,2,'Achado material não some com nova entrega');
+assert.equal(c.workflow.achados[0].revisao,2,'A material finding does not disappear with a new delivery');
 assert.equal(c.workflow.qa.status,'pendente');
-assert.equal(q.fluxo(c.id,'documentacao',{revisao:1,status:'atual',evidencia:'Antiga'},'curador').ok,false,'Não aceita evidência de revisão antiga');
+assert.equal(q.fluxo(c.id,'documentacao',{revisao:1,status:'atual',evidencia:'Antiga'},'curador').ok,false,'Does not accept evidence from an old revision');
 fluxo(c,'verificar-achado',{chave:'contrato',veredito:'resolvido',evidencia:'Correção verificada no diff e teste negativo.'},'qa');
 assert(q.mover(c.id,'revisao','backend').ok);
 fluxo(c,'revisao',{status:'aprovado',evidencia:'Diff e contrato conferidos.'},'revisor');
-assert.equal(q.mover(c.id,'qa','revisor').ok,false,'Documentação precisa ser conferida');
+assert.equal(q.mover(c.id,'qa','revisor').ok,false,'Documentation must be checked');
 assert.equal(eq.proximaTarefa(c).tipo,'documentacao');
 fluxo(c,'documentacao',{status:'sem_alteracao',evidencia:'README e contrato continuam corretos.'},'curador');
 assert(q.mover(c.id,'qa','curador').ok);
 fluxo(c,'qa',{status:'aprovado',evidencia:'Caminho principal e falhas validados.'},'qa');
-assert.equal(q.mover(c.id,'concluido','qa').ok,false,'Aceite incompleto impede conclusão');
+assert.equal(q.mover(c.id,'concluido','qa').ok,false,'Incomplete acceptance blocks completion');
 q.atualizar(c.id,{aceiteOk:[0]},'qa');
 assert(q.mover(c.id,'concluido','qa').ok);
 const falha=criar('Sem infraestrutura');
 entrega(falha,'t1',[{comando:'pytest integração',status:'nao_executado',evidencia:'Postgres indisponível.'}]);
-assert.equal(q.mover(falha.id,'revisao','backend').ok,false,'Não executado nunca é aprovado');
+assert.equal(q.mover(falha.id,'revisao','backend').ok,false,'Not run is never approved');
 const posterior=criar('Evidencia posterior');
 entrega(posterior,'t1',[{comando:'node teste.mjs',status:'falhou',evidencia:'falha inicial'}]);
 const ev={revisao:1,chave:'execucao-2',ambiente:'worktree de teste',verificacoes:[{comando:'node teste.mjs',status:'aprovado',evidencia:'exit 0'}]};
@@ -116,14 +116,14 @@ const {criarDecisoes}=await import('../lib/decisoes.mjs');
 const d=criarDecisoes({pasta:projetos.ctx(projeto.id).pasta,lead:'po'});
 const proposta={id:'escopo',tipo:'humana',contexto:'Escolher escopo',cards:[b.id],opcoes:[{id:'a',texto:'A',consequencia:'Menor escopo'},{id:'b',texto:'B',consequencia:'Mais prazo'}]};
 assert.equal(d.propor(proposta,'po').revisao,1);
-assert.equal(d.propor(proposta,'po').revisao,1,'Proposta idempotente');
+assert.equal(d.propor(proposta,'po').revisao,1,'Idempotent proposal');
 assert.throws(()=>d.aceitar('escopo',1,'a','po'));
 assert.throws(()=>d.aceitar('escopo',0,'a','voce'));
 d.aceitar('escopo',1,'a','voce');
 assert.throws(()=>d.propor({...proposta,contexto:'Troca',revisaoEsperada:1},'po'));
 const nova=d.propor({...proposta,contexto:'Troca',revisaoEsperada:1,substituir:true},'voce');assert.equal(nova.revisao,2);
 assert.equal(criarDecisoes({pasta:projetos.ctx(projeto.id).pasta,lead:'po'}).obter('escopo').revisao,2);
-// Conhecimento selecionado por assunto/card, sem empurrar notas de outra área.
+// Knowledge selected by topic/card, without pushing notes from another area.
 memoria.salvar({escopo:'projeto',agente:'po',autor:'po',tipo:'aprendizado',titulo:'Contrato autenticação',texto:'Token deve ter validade.',tags:['autenticacao'],card:c.id});
 memoria.salvar({escopo:'projeto',agente:'po',autor:'po',tipo:'aprendizado',titulo:'Paleta animação personagens',texto:'Cor da capa.',tags:['animacao']});
 const contexto=memoria.paraPrompt('backend',{consulta:'contrato autenticação',card:c.id,compacto:true});
@@ -136,12 +136,12 @@ assert(orientacao.includes('- card.entrega:'));
 const creditos=await import('../lib/creditos.mjs');
 creditos.registrarTarefa({engine:'codex',modelo:'teste',esforco:'low',tipo:'feature/execucao',projeto:projeto.id,card:c.id,resultado:{duracaoMs:100,tokens:{entrada:10,saida:5,cache:0,criacaoCache:0}}});
 assert.match(creditos.analiseConsumo(projeto.id),/1\/1 cards com QA atual aprovado/);
-// Limita repetições sem avanço, sem afetar outros cards executáveis.
+// Caps repeats without progress, without affecting other runnable cards.
 for(const card of q.listar()) if(card.id!==c.id) q.bloquear(card.id,'Isolado para o teste.');
 const parado=criar('Teste de repetição');
 const esperar=async()=>{for(let n=0;n<100 && eq.ocupada();n++)await new Promise(r=>setTimeout(r,50));assert(!eq.ocupada());};
 for(let n=0;n<3;n++){assert(eq.pilotoTick({forcar:true}));await esperar();}
 eq.pilotoTick({forcar:true});assert(q.obter(parado.id).bloqueio.includes('Três tentativas'));
 eq.cancelar();
-console.log('PASS: DAG, atomicidade, checkpoints, idempotência, entregas/reparos, revisão independente, verificação de achados, documentação, QA, decisões humanas revisionadas, contexto relevante, qualidade/custo e limite de repetição.');
+console.log('PASS: DAG, atomicity, checkpoints, idempotency, deliveries/repairs, independent review, finding verification, documentation, QA, versioned human decisions, relevant context, quality/cost and repeat limit.');
 assert.equal(path.dirname(tmp),os.tmpdir());assert(path.basename(tmp).startsWith('work-ia-workflow-'));fs.rmSync(tmp,{recursive:true,force:true});

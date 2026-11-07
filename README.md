@@ -10,11 +10,21 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/deefaraujo/NECTAR/releases/latest"><img src="https://img.shields.io/github/v/release/deefaraujo/NECTAR?label=release&color=F5A623" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white" alt="Platform: Windows">
+  <img src="https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white" alt="Node.js 22 or later">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-source--available-8A63D2" alt="License: source-available"></a>
+  <img src="https://img.shields.io/badge/languages-8-4C9AFF" alt="Interface in 8 languages">
+</p>
+
+<p align="center">
   <a href="#getting-started">Getting started</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#ready-made-teams">Ready-made teams</a> ·
   <a href="#support-the-project">Support the project</a> ·
   <a href="#license">License</a> ·
+  <a href="docs/README.md">Docs</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
   <a href="#contact">Contact</a>
 </p>
 
@@ -57,7 +67,9 @@ Agents run through the **CLIs you already have installed** (Claude Code and Code
 
 ## Getting started
 
-Prerequisites: Windows, Node.js 22, npm, and Git. To run real agents, have [Claude Code](https://docs.claude.com/en/docs/claude-code) or the [Codex CLI](https://github.com/openai/codex) installed and logged in.
+**Download:** grab `NECTAR-<version>-win-x64.zip` from the [latest release](https://github.com/deefaraujo/NECTAR/releases/latest), unzip it, and run `NECTAR.exe`.
+
+**From source:** Windows, Node.js 22, npm, and Git. To run real agents, have [Claude Code](https://docs.claude.com/en/docs/claude-code) or the [Codex CLI](https://github.com/openai/codex) installed and logged in.
 
 ```powershell
 git clone https://github.com/deefaraujo/NECTAR.git
@@ -90,7 +102,7 @@ you ──► team chat ──► lead ──► cards on the board ──► sp
 - **Interface** ([public/](public/)) is plain HTML, CSS, and JavaScript, served by a local loopback server.
 - **Desktop** ([electron/](electron/)) wraps it all in a window with context isolation.
 
-More in [docs/architecture.md](docs/architecture.md).
+More in [docs/architecture.md](docs/architecture.md). The full documentation index is in [docs/](docs/README.md), starting with the [user guide](docs/user-guide.md).
 
 ## Ready-made teams
 
@@ -103,14 +115,14 @@ More in [docs/architecture.md](docs/architecture.md).
 | **Game development** | 2D games in Ren'Py for mobile: script, code, touch UI, sprites, VFX, and game feel | 14 |
 | **Vertical Series** | A 9:16 series studio: from the story to the animated storyboard of each scene, with a series bible | 7 |
 
-Each template is just configuration: copy one and build your own team.
+Each template is just configuration: copy one and build your own team. See [docs/templates.md](docs/templates.md).
 
 ## Checks
 
 ```powershell
 npm test               # main suite (simulated mode, no model calls)
 npm run test:teamwork  # contracts, worktrees, security policy
-npm run check:publicacao
+npm run check:publication
 ```
 
 Simulated tests do not prove the behavior of real models. See [docs/development.md](docs/development.md).

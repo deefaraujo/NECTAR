@@ -15,7 +15,7 @@ assert(argsCodex({ cwd: tmp, modo: 'conversar', somenteLeitura: true, total: fal
 assert(!argsCodex({ cwd: tmp, total: false }).some(a => a.includes('dangerously')));
 assert(argsClaude({ modo: 'conversar', somenteLeitura: true, total: false }).includes('dontAsk'));
 assert(!argsClaude({ total: false }).some(a => a.includes('dangerously')));
-assert(argsCodex({ cwd: tmp }).includes('--dangerously-bypass-approvals-and-sandbox') && argsClaude({}).includes('--dangerously-skip-permissions'), 'acesso total é o padrão: agente não trava em permissão');
+assert(argsCodex({ cwd: tmp }).includes('--dangerously-bypass-approvals-and-sandbox') && argsClaude({}).includes('--dangerously-skip-permissions'), 'full access is the default: agents do not get stuck on permissions');
 const reset = Math.floor(Date.now()/1000) + 3600;
 c.registrar({ unifiedWindows: { five_hour: { utilization: .8, resetsAt: reset }, seven_day: { utilization: .2, resetsAt: reset } } });
 assert(c.registrarCodex({ rateLimits: { primary: { usedPercent: 15, windowDurationMins: 300, resetsAt: reset }, secondary: { usedPercent: 42, windowDurationMins: 10080, resetsAt: reset } } }));
@@ -62,15 +62,15 @@ const projetos = await import('../lib/projetos.mjs');
 const alvo = path.join(tmp, 'alvo'); fs.mkdirSync(alvo);
 const p = projetos.criar({ nome: 'Teste autonomia', caminho: alvo, template: 'software' }); assert(p.ok);
 const ctx = projetos.ctx(p.projeto.id);
-assert.equal(ctx.equipe.pilotoTick({ forcar: true }), false, 'Sem demanda não chama modelo');
+assert.equal(ctx.equipe.pilotoTick({ forcar: true }), false, 'No demand, no model call');
 const worker = ctx.elenco.ROSTER.find(a => !['po','qa','curador','creditos'].includes(a.id)).id;
 const card = ctx.quadro.criar({ titulo: 'Demanda clara', descricao: 'Implementar o comportamento pedido.', dono: worker, coluna: 'pronto', aceite: ['Comportamento validado pelo teste automatizado'] }, 'voce'); assert(card.ok);
 assert(ctx.equipe.pilotoTick({ forcar: true }));
 await new Promise(resolve => setTimeout(resolve, 2300));
 assert.equal(ctx.quadro.obter(card.card.id).coluna, 'andamento');
 ctx.equipe.cancelar();
-assert.equal(ctx.equipe.pilotoTick(), false, 'Parar deve suspender o piloto');
-// Continuação persistente: duas chamadas por rodada, sem precisar pedir ao usuário para seguir.
+assert.equal(ctx.equipe.pilotoTick(), false, 'Stop must suspend the autopilot');
+// Persistent continuation: two calls per round, without asking the user to continue.
 const alvo2 = path.join(tmp, 'alvo2'); fs.mkdirSync(alvo2);
 const p2 = projetos.criar({ nome: 'Continuação', caminho: alvo2, template: 'software' }); assert(p2.ok);
 store.gravar(path.join(p2.projeto.pastaProjeto || projetos.listar().find(x=>x.id===p2.projeto.id).pastaProjeto, 'continuacao.json'), { lista: Array.from({length: 4}, () => ({ agente: 'po', tipo: 'status', instrucao: 'Continuar', canalSaida: 'equipe', origem: 'teste', card: null })) });
@@ -81,8 +81,8 @@ assert(ctx2.equipe.pilotoTick({ forcar: true }));
 await new Promise(resolve => setTimeout(resolve, 4500));
 assert.equal(ctx2.equipe.historico('equipe').filter(m=>m.de==='po' && m.status==='ok').length, 4);
 ctx2.equipe.cancelar();
-console.log('PASS: acesso, cotas independentes, equilíbrio, alertas, métricas, perfil persistente, regras, piloto ocioso/ativo e continuação automática.');
-// Só o diretório temporário criado por este teste pode ser removido.
+console.log('PASS: access, independent quotas, balancing, alerts, metrics, persistent profile, rules, idle/active autopilot and automatic continuation.');
+// Only the temp directory created by this test may be removed.
 assert.equal(path.dirname(tmp), os.tmpdir());
 assert(path.basename(tmp).startsWith('work-ia-tests-'));
 fs.rmSync(tmp, { recursive: true, force: true });

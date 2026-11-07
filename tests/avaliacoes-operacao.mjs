@@ -14,4 +14,4 @@ assert.throws(()=>validarRegistroOperacional({...b,titulo:''}));
 assert.throws(()=>validarRegistroOperacional({...b,status:'aprovado_pela_ia'}));
 assert.throws(()=>validarRegistroOperacional({...b,turno:0}));
 assert.throws(()=>validarRegistroOperacional({...b,checks:{login:'sim'}}));
-console.log('Organizador manual: persistência, retomada, versão concorrente, whitelist de campos e validação passaram. Nenhum modelo é chamado.');
+console.log('Manual organizer: persistence, resume, concurrent version, field whitelist and validation passed. No model is called.');

@@ -1,5 +1,5 @@
-﻿// Fase 2 (contrato de template): o núcleo não pergunta "é software?"; pergunta ao template. Domínio → cargo, playbook e
-// "o que é entrega" no prompt, revisão com o nome do domínio (crítica de design) e checagem determinística de arquivo antes da revisão.
+﻿// Phase 2 (template contract): the core does not ask "is this software?"; it asks the template. Domain → role, playbook and
+// "what counts as delivery" in the prompt, review named after the domain (design critique) and a deterministic file check before review.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -10,9 +10,9 @@ const store = await import('../lib/store.mjs');
 store.gravarConfig({ piloto: { ativo: true, maxChamadasHora: 0 }, ciclo: { statusPO: false, fechamento: false, orcamento: 10, revisaoAuto: true, versionar: false, curadoriaAuto: false } });
 const projetos = await import('../lib/projetos.mjs');
 const { criarElenco } = await import('../lib/agentes.mjs');
-const espera = async (cond, ms = 15000) => { for (let t = 0; t < ms / 50 && !cond(); t++) await new Promise((x) => setTimeout(x, 50)); assert(cond(), 'tempo esgotado'); };
+const espera = async (cond, ms = 15000) => { for (let t = 0; t < ms / 50 && !cond(); t++) await new Promise((x) => setTimeout(x, 50)); assert(cond(), 'timed out'); };
 
-// ---- software: fluxo técnico e roteamento por domínio vêm do contrato
+// ---- software: the technical flow and domain routing come from the contract
 const sw = criarElenco('software');
 assert.equal(sw.contrato.fluxo, 'tecnico');
 assert.equal(sw.contrato.especialistaDe('o postgres na porta 5432 recusa conexão e a migration alembic não roda').agente, 'dados');
@@ -22,35 +22,35 @@ assert.equal(sw.contrato.especialistaDe('bom dia'), null);
 assert(sw.contrato.playbookDe('backend').includes('Diff mínimo'));
 for (const t of ['jogos', 'visual-graphic-design', 'product-design', 'professional-operations']) assert.equal(criarElenco(t).contrato.fluxo, 'leve', t);
 
-// ---- prompt: quem cobre o quê, playbook e o que é entrega (trabalho em card), e nada disso na conversa leve
+// ---- prompt: who covers what, playbook and what counts as delivery (card work), and none of it in light chat
 fs.mkdirSync(path.join(tmp, 'alvo-sw'));
 const ps = projetos.criar({ nome: 'Contrato software', caminho: path.join(tmp, 'alvo-sw'), template: 'software' }); assert(ps.ok);
 const cs = projetos.ctx(ps.projeto.id);
 const cardS = cs.quadro.criar({ titulo: 'Endpoint', descricao: 'x', dono: 'backend', coluna: 'andamento', aceite: ['GET /x responde 200'] }, 'voce').card;
 const cheio = cs.equipe.teste.montar({ agente: 'backend', tipo: 'execucao', card: cardS.id, canalSaida: 'equipe', instrucao: 'implemente', origem: 'po' });
-assert(/## Quem cobre o quê/.test(cheio.sistema) && /banco: /.test(cheio.sistema), 'domínios no prompt');
-assert(/## Playbook do seu cargo/.test(cheio.sistema) && /Diff mínimo/.test(cheio.sistema), 'playbook do cargo no prompt');
-assert(/## O que conta como entrega/.test(cheio.sistema), 'o que é entrega no prompt');
+assert(/## Quem cobre o quê/.test(cheio.sistema) && /banco: /.test(cheio.sistema), 'domains in the prompt');
+assert(/## Playbook do seu cargo/.test(cheio.sistema) && /Diff mínimo/.test(cheio.sistema), 'role playbook in the prompt');
+assert(/## O que conta como entrega/.test(cheio.sistema), 'what counts as delivery is in the prompt');
 const leve = cs.equipe.teste.montar({ agente: 'backend', tipo: 'mencao', card: null, canalSaida: 'grp-9', instrucao: 'oi', origem: 'frontend' });
-assert(!/## Playbook do seu cargo/.test(leve.sistema), 'conversa leve não carrega playbook');
+assert(!/## Playbook do seu cargo/.test(leve.sistema), 'light chat does not load the playbook');
 cs.equipe.cancelar();
 
-// ---- visual design: fluxo leve, revisão é crítica de design, e o app confere os arquivos antes da revisão
+// ---- visual design: light flow, review is a design critique, and the app checks the files before review
 const alvo = path.join(tmp, 'alvo-vd'); fs.mkdirSync(alvo);
 const pv = projetos.criar({ nome: 'Marca', caminho: alvo, template: 'visual-graphic-design' }); assert(pv.ok);
 const cv = projetos.ctx(pv.projeto.id); const eq = cv.equipe;
 const sistema = (re) => eq.historico('equipe').some((m) => m.de === 'sistema' && re.test(m.texto));
 const card = cv.quadro.criar({ titulo: 'Logo principal', descricao: 'Logo em PNG.', dono: 'designer_grafico', coluna: 'andamento', aceite: ['O arquivo pecas/logo.png existe na pasta do projeto e abre como imagem'], arquivos: ['pecas/logo.png'] }, 'voce').card;
 const rev = eq.teste.montar({ agente: 'lider_criativo', tipo: 'revisao', card: card.id, canalSaida: 'equipe', instrucao: '', origem: 'workflow' });
-assert(/CRÍTICA DE DESIGN: Revise como crítica de design/.test(rev.pedido), 'a revisão leva o nome e a instrução do domínio');
-// aceite cumprido com arquivo que não existe: o app devolve sem gastar a revisão
+assert(/CRÍTICA DE DESIGN: Revise como crítica de design/.test(rev.pedido), 'the review carries the domain name and instruction');
+// acceptance met with a file that does not exist: the app sends it back without spending the review
 cv.quadro.atualizar(card.id, { aceiteOk: [0] }, 'designer_grafico');
 assert(eq.pilotoTick({ forcar: true }));
 await espera(() => sistema(/conferiu a entrega de .* e devolveu/), 15000);
 await espera(() => cv.quadro.obter(card.id).coluna === 'andamento');
 const fx = eq.fatos.listar().cards[card.id] || {};
-assert(Object.values(fx).some((f) => f.origem === 'app' && /FALHOU/.test(f.valor)), 'a checagem ficou na ficha como medida');
-// agora o arquivo existe (PNG real de 1x1): passa, a revisão segue
+assert(Object.values(fx).some((f) => f.origem === 'app' && /FALHOU/.test(f.valor)), 'the check landed in the fact sheet as measured');
+// now the file exists (a real 1x1 PNG): it passes and review proceeds
 fs.mkdirSync(path.join(alvo, 'pecas'), { recursive: true });
 fs.writeFileSync(path.join(alvo, 'pecas', 'logo.png'), Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64'));
 fs.writeFileSync(path.join(alvo, 'pecas', 'logo.svg'), '<svg xmlns="http://www.w3.org/2000/svg"/>');
@@ -59,9 +59,9 @@ for (let n = 0; n < 60 && eq.ocupada(); n++) await new Promise((x) => setTimeout
 assert(eq.pilotoTick({ forcar: true }));
 await espera(() => sistema(/conferiu a entrega de .*: arquivos da entrega existem ok, imagens abrem/), 15000);
 assert.equal(cv.quadro.obter(card.id).coluna, 'revisao');
-assert(Object.values(eq.fatos.listar().cards[card.id]).some((f) => /1x1/.test(f.valor)), 'as dimensões medidas estão na ficha');
+assert(Object.values(eq.fatos.listar().cards[card.id]).some((f) => /1x1/.test(f.valor)), 'the measured dimensions are in the fact sheet');
 
 eq.cancelar();
-console.log('PASS: fase 2 (contrato de template: fluxo e domínios do template, domínio → cargo, playbook e entrega no prompt, revisão com nome do domínio, checagem de arquivo e imagem pelo app antes da revisão).');
-try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* o Windows ainda segura a pasta */ }
+console.log('PASS: phase 2 (template contract: template flow and domains, domain → role, playbook and delivery in the prompt, review named after the domain, file and image check by the app before review).');
+try { fs.rmSync(tmp, { recursive: true, force: true }); } catch { /* Windows still holds the folder */ }
 process.exit(0);

@@ -1,6 +1,6 @@
-/* Vista do registro do projeto ("Produção" na equipe de novela): as fichas que a equipe anotou uma vez e que chegam prontas
-   a cada agente. Aqui a Game Director lê, corrige, aprova referências de imagem, vê o que a equipe gerou e dispara o próximo
-   pedido já com a ficha certa. Carrega depois de app.js e usa os mesmos ajudantes ($, esc, md, api, P, av…). */
+/* Project registry view ("Produção" in the soap opera team): the entries the team wrote down once and that reach
+   each agent ready-made. Here the Game Director reads, corrects, approves image references, sees what the team generated and fires the next
+   request with the right entry already attached. Loads after app.js and uses the same helpers ($, esc, md, api, P, av…). */
 /* global $, $$, esc, md, api, P, U, J, ic, av, ha, agente, rosterAtual, liderAtual, primeiroNome, nomeAgente, projetoAtual, abrirModal, fecharModal, perguntar, aviso, irPara, abrirIssue, modalCriar, depois, VFX */
 
 const REG = { dados: null, galeria: null, editando: false, pendente: false };
@@ -13,7 +13,7 @@ const regPlural = (t) => regTipo(t).plural || regTipo(t).titulo || t;
 const regEntradas = () => REG.dados?.entradas || [];
 const regSel = () => regEntradas().find((e) => e.chave === U.regSel) || null;
 
-/** Tipos na ordem do template, depois os que a equipe inventou (em ordem alfabética). */
+/** Types in template order, then the ones the team invented (alphabetical). */
 function regTipos() {
   const doTemplate = Object.keys(REG.dados?.tipos || {});
   const usados = [...new Set(regEntradas().map((e) => e.tipo))];
@@ -21,7 +21,7 @@ function regTipos() {
 }
 
 async function renderRegistro(carregando = true) {
-  // quem está no meio de uma edição não perde o que digitou por causa de um evento
+  // someone in the middle of an edit does not lose what they typed because of an event
   if (REG.editando || ($('#centro .producao') && $('#centro').contains(document.activeElement) && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))) { REG.pendente = true; return; }
   if (carregando && !REG.dados) $('#centro').innerHTML = `<div class="planner"><div class="mem-barra"><div class="info">Carregando o registro…</div></div></div>`;
   const [d, g] = await Promise.all([
@@ -68,7 +68,7 @@ function desenharRegistro() {
   ligarArrastar();
   void naoLidos;
 }
-// só a lista (a busca redesenha sem mexer no resto)
+// just the list (search redraws without touching the rest)
 function desenharListaSo() {
   const d = REG.dados; const q = (U.regBusca || '').trim().toLowerCase();
   const casa = (e) => !q || `${e.nome} ${e.apelidos.join(' ')} ${e.resumo} ${e.chave}`.toLowerCase().includes(q);
@@ -140,7 +140,7 @@ function geradosHtml() {
   }).join('')}</div>`;
 }
 
-/* ------------------------------------------------------------ ações */
+/* ------------------------------------------------------------ actions */
 async function regAnotar(corpo) {
   const r = await api('POST', P('/registro'), corpo);
   if (!r._ok) { aviso(r.erro || I18N.t('Não consegui anotar.')); return null; }
@@ -180,7 +180,7 @@ async function regPedir(e, i) {
   const t = REG.dados.tipos[e.tipo] || {}; const lider = liderAtual();
   const pedidos = (t.pedidos && t.pedidos.length ? t.pedidos : [{ agente: lider, texto: 'sobre {nome}: ' }]).filter((p) => agente(p.agente));
   const p = pedidos[i]; if (!p) return;
-  const ag = agente(p.agente);   // o @ pelo token do agente: o servidor reescreve para o nome atual
+  const ag = agente(p.agente);   // the @ by agent token: the server rewrites it to the current name
   const texto = `@${ag?.token || primeiroNome(ag?.nome || p.agente)} ${p.texto.replace(/\{nome\}/g, e.nome)}`;
   U.rascunhos[`${U.proj}/equipe`] = texto;
   irPara('chat', 'equipe');
@@ -234,7 +234,7 @@ async function modalLerDoc(arq) {
     <div class="mem-leitor"><div class="texto corpo">${r.texto != null ? md(String(r.texto).replace(/^---[\s\S]*?---\s*/, '')) : `<p class="mudo">${esc(r.erro || I18N.t('Não encontrei esse arquivo. O caminho é relativo à pasta do projeto.'))}</p>`}</div></div></div>`, 'issue reg-doc');
 }
 
-/* ------------------------------------------------------------ eventos */
+/* ------------------------------------------------------------ events */
 document.addEventListener('click', async (ev) => {
   const t = ev.target.closest('[data-reg]'); if (!t || !$('#centro .producao') && !t.closest('.modal')) return;
   const d = t.dataset; const e = regSel();

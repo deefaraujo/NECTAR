@@ -1,6 +1,6 @@
-// Ponta a ponta: o time toca seis cards sozinho, em piloto automático. Cards independentes andam em paralelo (antes o piloto só começava
-// trabalho novo com o time inteiro parado, e um card passava fome), nenhum card recebe a mesma etapa duas vezes e o fluxo usa o mínimo
-// de chamadas: execução, revisão, documentação, QA e versionamento.
+// End to end: the team runs six cards on its own, on autopilot. Independent cards move in parallel (the autopilot used to start new
+// work only when the whole team was idle, and one card starved), no card gets the same step twice, and the flow uses the minimum
+// number of calls: execution, review, documentation, QA and versioning.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -33,12 +33,12 @@ while (!fim() && Date.now() - t0 < 90_000) {
   for (const id of cards) if (!inicio[id] && c.quadro.obter(id).coluna !== 'pronto') inicio[id] = Date.now() - t0;
   await new Promise((r) => setTimeout(r, 250));
 }
-await new Promise((r) => setTimeout(r, 4000));   // o versionamento começa 2,5 s depois da conclusão
+await new Promise((r) => setTimeout(r, 4000));   // versioning starts 2.5 s after completion
 for (let i = 0; i < 80 && c.equipe.ocupada(); i++) await new Promise((r) => setTimeout(r, 250));
 
-assert(fim(), `todos os cards concluídos (${cards.map((id) => `${id}:${c.quadro.obter(id).coluna}`).join(' ')})`);
-assert(maxSimultaneos >= 2, `cards independentes trabalham ao mesmo tempo (máximo simultâneo: ${maxSimultaneos})`);
-assert(inicio[g.id] < inicio[d.id], 'o card independente (Pipeline) não espera a cadeia de dependências terminar');
+assert(fim(), `all cards done (${cards.map((id) => `${id}:${c.quadro.obter(id).coluna}`).join(' ')})`);
+assert(maxSimultaneos >= 2, `independent cards work at the same time (max concurrent: ${maxSimultaneos})`);
+assert(inicio[g.id] < inicio[d.id], 'the independent card (Pipeline) does not wait for the dependency chain to finish');
 const porEtapa = {};
 for (const n of fs.readdirSync(dump)) {
   const txt = fs.readFileSync(path.join(dump, n), 'utf8'); const tipo = n.replace('.txt', '').split('-')[2];
@@ -46,9 +46,9 @@ for (const n of fs.readdirSync(dump)) {
   porEtapa[`${id}/${tipo}`] = (porEtapa[`${id}/${tipo}`] || 0) + 1;
 }
 const duplicadas = Object.entries(porEtapa).filter(([, n]) => n > 1);
-assert.deepEqual(duplicadas, [], 'nenhuma etapa rodou duas vezes no mesmo card');
-for (const id of cards) for (const tipo of ['execucao', 'revisao', 'documentacao', 'qa', 'versionar']) assert.equal(porEtapa[`${id}/${tipo}`], 1, `${id} passou uma vez por ${tipo}`);
-assert.equal(c.equipe.perguntasAbertas().length, 0, 'nada parou esperando a Game Director');
+assert.deepEqual(duplicadas, [], 'no step ran twice on the same card');
+for (const id of cards) for (const tipo of ['execucao', 'revisao', 'documentacao', 'qa', 'versionar']) assert.equal(porEtapa[`${id}/${tipo}`], 1, `${id} went through ${tipo} once`);
+assert.equal(c.equipe.perguntasAbertas().length, 0, 'nothing stopped waiting on the Game Director');
 c.equipe.cancelar(); await store.descarregar();
-console.log(`PASS: paralelo ponta a ponta (6 cards concluídos sozinhos, até ${maxSimultaneos} agentes ao mesmo tempo, card independente sem fome, 5 chamadas por card e nenhuma etapa duplicada).`);
+console.log(`PASS: parallel end to end (6 cards done unattended, up to ${maxSimultaneos} agents at once, independent card not starved, 5 calls per card and no duplicated step).`);
 process.exit(0);

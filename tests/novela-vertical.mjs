@@ -1,5 +1,5 @@
-// Produtora de novela vertical: o template carrega a equipe e a bíblia, e o storyboard animado sai como GIF anexado no
-// chat (gif.montar), inclusive numa conversa direta sem card. Quadro único ou arquivo que não existe vira aviso, não GIF vazio.
+// Vertical drama studio: the template loads the team and the bible, and the animated storyboard comes out as a GIF attached in
+// chat (gif.montar), even in a direct chat with no card. A single frame or a missing file becomes a warning, not an empty GIF.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -14,15 +14,15 @@ const projetos = await import('../lib/projetos.mjs');
 const dorme = (ms) => new Promise((x) => setTimeout(x, ms));
 const espera = async (cond, ms = 25000) => { for (let i = 0; i < ms / 50 && !cond(); i++) await dorme(50); return cond(); };
 
-// o template existe, tem a equipe certa e nenhum agente da novela vira agente geral (a bíblia é da série, não de todo o app)
-assert(listarTemplates().some((t) => t.id === 'novela-vertical' && !t.rascunho), 'template novela-vertical listado');
+// the template exists, has the right team, and no drama agent becomes a global agent (the bible belongs to the series, not the whole app)
+assert(listarTemplates().some((t) => t.id === 'novela-vertical' && !t.rascunho), 'novela-vertical template listed');
 const el = criarElenco('novela-vertical');
-assert.deepEqual(['showrunner', 'roteiro', 'continuidade', 'diretor_arte', 'storyboard'].filter((id) => !el.POR_ID[id]), [], 'equipe completa');
-assert(!el.POR_ID.continuidade.geral && !el.ROSTER.some((a) => a.geral === 'memorizador' || a.geral === 'assessor'), 'continuidade não vira o memorizador geral');
-assert(el.POR_ID.mcp, 'agente de MCP presente (Higgsfield e outras conexões)');
-assert(el.POR_ID.continuidade.skills.includes('series-continuity')&&skillDisponivelOuOpcional('novela-vertical','series-continuity'), 'skill de continuidade configurada, disponível ou opcional declarada');
+assert.deepEqual(['showrunner', 'roteiro', 'continuidade', 'diretor_arte', 'storyboard'].filter((id) => !el.POR_ID[id]), [], 'full team');
+assert(!el.POR_ID.continuidade.geral && !el.ROSTER.some((a) => a.geral === 'memorizador' || a.geral === 'assessor'), 'continuity does not become the global memory keeper');
+assert(el.POR_ID.mcp, 'MCP agent present (Higgsfield and other connections)');
+assert(el.POR_ID.continuidade.skills.includes('series-continuity')&&skillDisponivelOuOpcional('novela-vertical','series-continuity'), 'continuity skill configured, available or declared optional');
 const regras = fs.readFileSync(path.resolve(import.meta.dirname, '..', 'templates', 'novela-vertical', 'regras.md'), 'utf8');
-assert(/biblia\/personagens\/<nome>\/referencias/.test(regras) && /referencias\[\]/.test(regras), 'regras da bíblia e da geração com referência');
+assert(/biblia\/personagens\/<nome>\/referencias/.test(regras) && /referencias\[\]/.test(regras), 'rules for the bible and reference-based generation');
 
 const alvo = path.join(tmp, 'novela'); const qd = path.join(alvo, 'episodios', 'ep01', 'cena01', 'quadros'); fs.mkdirSync(qd, { recursive: true });
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
@@ -30,22 +30,22 @@ for (const q of ['q01.png', 'q02.png', 'q03.png']) fs.writeFileSync(path.join(qd
 const r = projetos.criar({ nome: 'Minha novela', caminho: alvo, template: 'novela-vertical' }); assert(r.ok, r.erro);
 const eq = projetos.ctx(r.projeto.id).equipe;
 
-// conversa direta com a Nina, sem card: o GIF volta anexado na resposta
+// direct chat with Nina, no card: the GIF comes back attached to the reply
 const rel = (q) => `episodios/ep01/cena01/quadros/${q}`;
 eq.enviar({ canal: 'dm:storyboard', texto: `[teste:gif:${rel('q01.png')},${rel('q02.png')},${rel('q03.png')}] monta a cena 1` });
 const gifMsg = () => eq.historico('dm:storyboard').find((m) => m.de === 'storyboard' && m.anexos?.some((a) => /cena01\.gif$/.test(a.nome)));
-assert(await espera(gifMsg), 'GIF da cena anexado na mensagem da Nina');
+assert(await espera(gifMsg), "scene GIF attached to Nina's message");
 const anexo = gifMsg().anexos.find((a) => /\.gif$/.test(a.nome));
-assert(anexo.imagem && anexo.tipo === 'image/gif', 'anexo aparece como imagem');
-assert(fs.existsSync(path.join(projetos.ctx(r.projeto.id).pasta, 'anexos', ...anexo.rel.split('/'))), 'arquivo do GIF existe nos anexos');
+assert(anexo.imagem && anexo.tipo === 'image/gif', 'attachment shows as an image');
+assert(fs.existsSync(path.join(projetos.ctx(r.projeto.id).pasta, 'anexos', ...anexo.rel.split('/'))), 'GIF file exists in attachments');
 
-// um quadro só: aviso claro, sem anexo
+// a single frame: clear warning, no attachment
 eq.enviar({ canal: 'dm:storyboard', texto: `[teste:gif:${rel('q01.png')}] só esse` });
-assert(await espera(() => eq.historico('dm:storyboard').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /pelo menos 2 quadros/.test(x.texto)))), 'quadro único avisa');
+assert(await espera(() => eq.historico('dm:storyboard').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /pelo menos 2 quadros/.test(x.texto)))), 'single frame warns');
 eq.enviar({ canal: 'dm:storyboard', texto: `[teste:gif:${rel('q01.png')},${rel('q09.png')}] com um que não existe` });
-assert(await espera(() => eq.historico('dm:storyboard').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /não encontrei .*q09\.png/.test(x.texto)))), 'quadro inexistente avisa qual');
+assert(await espera(() => eq.historico('dm:storyboard').some((m) => m.resumo?.some((x) => x.tipo === 'aviso' && /não encontrei .*q09\.png/.test(x.texto)))), 'missing frame warns which one');
 
 await dorme(300);
-try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* pasta temporária */ }
-console.log('PASS: novela vertical (template e bíblia carregam, GIF da cena anexado na DM sem card, quadro único e quadro inexistente avisam).');
+try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* temp folder */ }
+console.log('PASS: vertical drama (template and bible load, scene GIF attached in a DM without a card, single and missing frames warn).');
 process.exit(0);

@@ -1,4 +1,4 @@
-// Opt-in explícito: duas inferências curtas em diretórios sintéticos.
+// Explicit opt-in: two short inferences in synthetic directories.
 import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
 if(process.env.NECTAR_REAL_MODELS!=='1')throw new Error('Use NECTAR_REAL_MODELS=1 para autorizar este teste pago.');
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'nectar-model-probe-')),cwd=path.join(tmp,'scope');fs.mkdirSync(cwd);
@@ -13,5 +13,5 @@ try{for(const engine of (process.env.NECTAR_REAL_ENGINES||'claude,codex').split(
   outputs.push({engine,error:r.erro||null,text:r.texto,cost:r.custo,tokens:r.tokens,policyAudit:r.policyAudit});
   assert(!r.erro,`${engine}: ${r.erro}`);assert.equal(fs.readFileSync(file,'utf8').trim(),'PROBE_OK');assert.equal(fs.readFileSync(outside,'utf8'),'PRESERVE');
   if(engine==='claude')assert(r.policyAudit?.some(e=>e.decision==='allow'));
-}console.log('PASS: smoke com Claude/Codex reais, escrita permitida e alvo externo preservado.');}
+}console.log('PASS: smoke test with real Claude/Codex, allowed write and outside target preserved.');}
 finally{console.log(JSON.stringify(outputs));fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});}

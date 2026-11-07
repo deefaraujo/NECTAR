@@ -1,4 +1,4 @@
-// Confere os blobs do índice/HEAD, não apenas os arquivos visíveis no disco.
+// Checks the index/HEAD blobs, not just the files visible on disk.
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -9,7 +9,7 @@ const git=(args,extra={})=>execFileSync('git',args,{cwd:root,maxBuffer:128*1024*
 const entries=git(head?['ls-tree','-r','-z','HEAD']:['ls-files','--stage','-z']).toString('utf8').split('\0').filter(Boolean).map(line=>{
   const [meta,name]=line.split('\t');const parts=meta.split(' ');return {name,mode:parts[0],oid:parts[head?2:1]};
 });
-const roots=new Set(['.gitignore','.gitattributes','.github','.githooks','README.md','LICENSE','CONTRIBUTING.md','SECURITY.md','THIRD_PARTY_NOTICES.md','package.json','package-lock.json','marca.json','server.mjs','docs','electron','lib','public','scripts','tests','templates','build','vozes']);
+const roots=new Set(['.gitignore','.editorconfig','CHANGELOG.md','.gitattributes','.github','.githooks','README.md','LICENSE','CONTRIBUTING.md','SECURITY.md','THIRD_PARTY_NOTICES.md','package.json','package-lock.json','marca.json','server.mjs','docs','electron','lib','public','scripts','tests','templates','build','vozes']);
 const ownSkills=new Set(['jogos/assets-abertos','jogos/renpy-codigo','jogos/renpy-mobile','jogos/renpy-sprites','jogos/renpy-ui-acabada','jogos/renpy-vfx','professional-operations/pacote-apresentacao','professional-operations/render-slides','software/midia-de-entrega','jogos/direcao-de-experiencia','software/versionamento-git','professional-operations/brand-presentation-registry','professional-operations/contribution-attribution','professional-operations/cross-source-correlation','professional-operations/documentos-editaveis','professional-operations/enterprise-data-governance','professional-operations/enterprise-source-discovery','professional-operations/enterprise-sync-health','professional-operations/fluxos-assessoria','professional-operations/jira-work-history','professional-operations/notion-project-knowledge','professional-operations/presentation-evidence-qa','professional-operations/presentation-rehearsal','professional-operations/review-intelligence','professional-operations/teams-project-context','professional-operations/work-activity-ledger']);
 const issues=[];
 for(const e of entries){

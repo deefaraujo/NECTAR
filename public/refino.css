@@ -1,9 +1,9 @@
 /* =====================================================================
-   REFINO VISUAL: mais sóbrio e plano, cor só onde guia o olhar.
-   Carrega depois do style.css e sobrescreve valores, sem mexer na estrutura.
-   Regras: superfícies planas, um acento frio (azul/violeta) para navegação,
-   o ouro só para o que pede ação da Game Director, gradiente em poucos pontos,
-   movimento com saída suave (nunca linear), tudo curto e respeitando reduced-motion.
+   VISUAL REFINEMENT: more sober and flat, color only where it guides the eye.
+   Loads after style.css and overrides values, without touching the structure.
+   Rules: flat surfaces, one cool accent (blue/violet) for navigation,
+   gold only for what calls for Game Director action, gradients in few places,
+   motion with smooth easing (never linear), everything short and respecting reduced-motion.
    ===================================================================== */
 :root {
   --bg-0: #090B10;
@@ -34,12 +34,12 @@ body {
 ::selection { background: rgba(245, 166, 35, .35); }
 ::-webkit-scrollbar-thumb { background: #262D3D; }
 
-/* ---------- barra de título: um filete fino que vai do azul ao âmbar ---------- */
+/* ---------- title bar: a thin strip going from blue to amber ---------- */
 .titulo-app { background: rgba(6, 8, 12, .8); backdrop-filter: blur(10px); }
 .titulo-app::after { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(245, 166, 35, .6) 32%, rgba(240, 162, 75, .55) 68%, transparent 100%); opacity: 1; }
 .nome-app { font-size: 13px; letter-spacing: .13em; }
 
-/* ---------- trilho ---------- */
+/* ---------- rail ---------- */
 .rail { background: var(--bg-0); box-shadow: inset -1px 0 0 var(--linha); gap: 10px; }
 .rail-btn { background: var(--bg-3); transition: border-radius .3s var(--sai), background .2s, color .2s, transform .3s var(--sai), box-shadow .3s var(--sai); }
 .rail-btn:hover { background: var(--bg-4); transform: translateY(-1px); }
@@ -56,7 +56,7 @@ body {
 [data-tip]:hover::after { background: #05070B; box-shadow: var(--sombra), inset 0 0 0 1px var(--linha-2); animation: dica .18s var(--sai); }
 @keyframes dica { from { opacity: 0; margin-left: -6px; } }
 
-/* ---------- painéis: planos, sem névoa ---------- */
+/* ---------- panels: flat, no haze ---------- */
 .lista, .membros { background: var(--bg-1); }
 .lista { border-right: 0; box-shadow: inset -1px 0 0 var(--linha); }
 .membros { border-left: 0; box-shadow: inset 1px 0 0 var(--linha); }
@@ -66,7 +66,7 @@ body {
 .cat { font-size: 10.5px; letter-spacing: .1em; padding-top: 18px; }
 .usuario { background: var(--bg-0); border-top: 0; box-shadow: 0 -1px 0 var(--linha); }
 
-/* ---------- canais ---------- */
+/* ---------- channels ---------- */
 .canal { height: 34px; border-radius: 8px; transition: background .2s, color .2s, padding-left .25s var(--sai); }
 .canal:hover { background: rgba(255, 255, 255, .045); padding-left: 11px; }
 .canal.ativo { background: linear-gradient(90deg, rgba(245, 166, 35, .17), rgba(245, 166, 35, .02)); padding-left: 8px; }
@@ -78,11 +78,11 @@ body {
 .btn-ic { transition: background .15s, color .15s, transform .25s var(--sai); }
 .btn-ic:active { transform: scale(.9); }
 
-/* ---------- avatares ---------- */
+/* ---------- avatars ---------- */
 .av { background: linear-gradient(150deg, color-mix(in srgb, var(--c) 88%, #fff 12%), color-mix(in srgb, var(--c) 52%, #05070B)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 0 0 1px rgba(0, 0, 0, .25); }
 .av .dot { transition: background .3s; }
 
-/* ---------- mensagens ---------- */
+/* ---------- messages ---------- */
 .msg { animation: chega .42s var(--entra); }
 @keyframes chega { from { opacity: 0; transform: translateY(9px); } }
 .msg:hover { background: rgba(255, 255, 255, .02); }
@@ -114,7 +114,7 @@ button.embed:hover { transform: translateX(3px); box-shadow: 0 10px 26px -16px c
 .opcoes button:active { transform: scale(.96); }
 .opcoes button.sec { box-shadow: none; }
 
-/* ---------- compositor ---------- */
+/* ---------- composer ---------- */
 .caixa { background: var(--bg-3); border-radius: 12px; box-shadow: inset 0 0 0 1px var(--linha-2); transition: box-shadow .3s var(--sai); }
 .caixa:focus-within { box-shadow: inset 0 0 0 1px rgba(245, 166, 35, .6), 0 0 0 4px rgba(245, 166, 35, .09), 0 12px 32px -18px rgba(245, 166, 35, .7); }
 .seg { background: rgba(0, 0, 0, .28); }
@@ -126,7 +126,7 @@ button.embed:hover { transform: translateX(3px); box-shadow: 0 10px 26px -16px c
 @keyframes sobe-s { from { opacity: 0; transform: translateY(6px) scale(.98); } }
 .sugestoes button { transition: background .12s; border-radius: 6px; }
 
-/* ---------- painel de andamento ---------- */
+/* ---------- progress panel ---------- */
 .mini, .membro { border-radius: 8px; transition: background .2s, transform .25s var(--sai); }
 .mini:hover, .membro:hover { transform: translateX(2px); }
 .mini.vivo { background: linear-gradient(90deg, rgba(243, 170, 60, .10), transparent 80%); }
@@ -166,7 +166,7 @@ button.embed:hover { transform: translateX(3px); box-shadow: 0 10px 26px -16px c
 .lista-t th { background: var(--bg-2); }
 .lista-t tr.linha:hover td { background: rgba(255, 255, 255, .035); }
 
-/* ---------- modais ---------- */
+/* ---------- modals ---------- */
 .modal-fundo { background: rgba(3, 5, 9, .7); backdrop-filter: blur(6px); animation: fundo .2s var(--sai); }
 .modal { background: var(--bg-2); border-radius: 14px; box-shadow: var(--sombra), inset 0 0 0 1px var(--linha-2); animation: sobe .32s var(--entra); }
 @keyframes sobe { from { opacity: 0; transform: translateY(14px) scale(.975); } }
@@ -187,7 +187,7 @@ select.in option { background: var(--bg-3); }
 .aviso { background: var(--bg-3); border-radius: 10px; animation: aviso-in .4s var(--entra); }
 @keyframes aviso-in { from { opacity: 0; transform: translateX(18px); } }
 
-/* ---------- memória, bastidores, caixa de entrada ---------- */
+/* ---------- memory, backstage, inbox ---------- */
 .mem-arvore { background: var(--bg-1); }
 .nota { border-radius: 8px; transition: background .2s, color .2s; }
 .nota.ativa { background: linear-gradient(90deg, rgba(245, 166, 35, .18), rgba(245, 166, 35, .04)); }
@@ -199,7 +199,7 @@ select.in option { background: var(--bg-3); }
 .interruptor input::after { transition: transform .3s var(--sai); }
 .sem-projeto .caixa-b { animation: chega .6s var(--entra); }
 
-/* colunas vão até o fim da tela: a área de soltar fica inteira e o quadro não parece cortado */
+/* columns run to the bottom of the screen: the drop area is complete and the board does not look cut off */
 .centro > .planner { flex: 1; }
 .quadro { align-items: stretch; }
 .coluna { max-height: none; min-height: 0; }
@@ -210,7 +210,7 @@ select.in option { background: var(--bg-3); }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
-/* ---------- perfil do agente ---------- */
+/* ---------- agent profile ---------- */
 .perfil { width: min(560px, 94vw); }
 .perfil-topo { display: flex; align-items: center; gap: 14px; padding: 20px 22px 14px; box-shadow: 0 1px 0 var(--linha); }
 .perfil-topo h2 { margin: 0; }
@@ -218,7 +218,7 @@ select.in option { background: var(--bg-3); }
 .perfil-papel { color: var(--mudo); font-size: 13px; }
 .perfil-corpo { padding: 18px 22px 22px; overflow-y: auto; }
 
-/* ---------- Jira e agenda ---------- */
+/* ---------- Jira and calendar ---------- */
 .etq.jira { --c: #4C9AFF; text-transform: none; letter-spacing: .02em; }
 .ag-i { display: flex; gap: 9px; align-items: baseline; width: 100%; padding: 5px 8px; border-radius: 8px; text-align: left; transition: background .18s; }
 .ag-i:hover { background: rgba(255, 255, 255, .05); }
@@ -248,7 +248,7 @@ select.in option { background: var(--bg-3); }
 .dem-acoes .btn-sec { height: 28px; font-size: 12.5px; }
 .dem-ok { color: #86EBC4; font-size: 12.5px; font-weight: 600; }
 
-/* ---------- piloto automático ---------- */
+/* ---------- autopilot ---------- */
 .piloto { display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px 4px 6px 2px; font-size: 12.5px; color: var(--suave); text-align: left; }
 .piloto span { flex: 1; font-weight: 600; }
 .piloto em { font-style: normal; font-size: 11.5px; color: var(--mudo); }
@@ -259,7 +259,7 @@ select.in option { background: var(--bg-3); }
 .piloto.on em { color: #86EBC4; }
 .piloto.on span { color: var(--texto); }
 
-/* ---------- esforço, modelo e uso de créditos ---------- */
+/* ---------- effort, model and credit usage ---------- */
 .uso-b b.ok { background: linear-gradient(90deg, #12805F, #34D399); }
 .uso-pausa { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(242, 96, 108, .12); color: #FFADB4; font-size: 12px; font-weight: 600; }
 .uso-pausa svg.ic { width: 15px; height: 15px; }
@@ -276,7 +276,7 @@ select.in option { background: var(--bg-3); }
 .uso-b b.crit { background: linear-gradient(90deg, #D9435A, #F2606C); }
 .cabeca .topico a.ref, .ref { cursor: pointer; }
 
-/* ---------- nomes, cargos e fotos ---------- */
+/* ---------- names, roles and photos ---------- */
 .av img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .av.foto { background: var(--bg-4); }
 .av .dot { z-index: 1; }
@@ -307,7 +307,7 @@ label.arquivo { cursor: pointer; display: inline-flex; align-items: center; }
 .toast.saindo { animation: toast-sai .35s var(--sai) forwards; }
 @keyframes toast-sai { to { opacity: 0; transform: translateX(26px); } }
 
-/* ---------- central de notificações ---------- */
+/* ---------- notification hub ---------- */
 .inbox { width: min(740px, 94vw); }
 .central-abas { display: flex; gap: 4px; padding: 6px 18px 0; box-shadow: 0 1px 0 var(--linha); }
 .central-abas button { position: relative; display: flex; gap: 7px; align-items: center; padding: 10px 12px 12px; font: 600 13.5px/1 var(--fonte); color: var(--mudo); transition: color .2s; }
@@ -324,7 +324,7 @@ label.arquivo { cursor: pointer; display: inline-flex; align-items: center; }
 .notif-rel { margin-bottom: 18px; }
 .notif-quando { color: var(--mudo); font-size: 12px; margin: 0 0 6px; }
 
-/* ---------- relatório do dia ---------- */
+/* ---------- daily report ---------- */
 .embed.relatorio { --c: #F5A623; max-width: 580px; cursor: default; }
 .rel-hora { margin-left: auto; color: var(--mudo); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .rel-prog { display: flex; align-items: center; gap: 10px; margin: 9px 0 2px; font-size: 12.5px; color: var(--suave); }
@@ -338,7 +338,7 @@ label.arquivo { cursor: pointer; display: inline-flex; align-items: center; }
 .rel-vazio { color: var(--mudo); font-size: 13px; }
 .rel-rodape { margin-top: 11px; padding-top: 9px; box-shadow: 0 -1px 0 var(--linha); color: var(--mudo); font-size: 12px; }
 
-/* ---------- cards vivos: o que mudou aparece ---------- */
+/* ---------- live cards: what changed shows ---------- */
 .card { animation: none; }
 .card.chegou { animation: chega-card .55s var(--entra); }
 @keyframes chega-card { from { opacity: 0; transform: translateY(-12px) scale(.96); } }
@@ -358,20 +358,20 @@ label.arquivo { cursor: pointer; display: inline-flex; align-items: center; }
 .part-i .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .part-i select.in { width: auto; padding: 3px 24px 3px 8px; font-size: 12px; background-position: calc(100% - 13px) 11px, calc(100% - 8px) 11px; }
 
-/* cabeçalho da coluna: uma linha só, sem quebrar */
+/* column header: a single line, no wrapping */
 .col-topo { flex-wrap: nowrap; gap: 6px; }
 .col-topo h3 { white-space: nowrap; letter-spacing: .06em; }
 .col-topo .max, .col-topo .n { white-space: nowrap; flex: none; }
 .col-topo .max { font-size: 10px; letter-spacing: .02em; }
 
-/* links de referência (chave do card, do Jira, link do Teams) em qualquer lugar */
+/* reference links (card key, Jira key, Teams link) anywhere */
 a.ref { color: var(--acento); font-weight: 600; text-decoration: none; cursor: pointer; border-radius: 4px; transition: background .15s, color .15s; }
 a.ref:hover { color: #fff; background: rgba(245, 166, 35, .2); }
 
 .skills-lista { display: flex; flex-wrap: wrap; gap: 6px; }
 .skill-chip { padding: 3px 9px; border-radius: 6px; background: rgba(245, 166, 35, .12); color: #BFD0FF; font-size: 12px; font-weight: 600; }
 
-/* ---------- a Game Director no rodapé, e anexos ---------- */
+/* ---------- the Game Director in the footer, and attachments ---------- */
 .usuario .eu { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; text-align: left; border-radius: 8px; padding: 3px 6px 3px 4px; margin-left: -4px; transition: background .2s; }
 .usuario .eu:hover { background: rgba(255, 255, 255, .06); }
 .usuario .eu .info { min-width: 0; display: block; }
@@ -410,7 +410,7 @@ a.ref:hover { color: #fff; background: rgba(245, 166, 35, .2); }
 .workflow-check p { margin:5px 0; overflow-wrap:anywhere; }
 .decisao { padding:12px 0; border-bottom:1px solid var(--linha-2); }
 
-/* trilha do card no quadro */
+/* card track on the board */
 .trilha { display:flex; gap:3px; margin-top:8px; }
 .trilha i { flex:1; height:4px; border-radius:2px; background:var(--linha-2); transition:background .3s; }
 .trilha i.ok { background:var(--verde, #34D399); }
@@ -424,7 +424,7 @@ a.ref:hover { color: #fff; background: rgba(245, 166, 35, .2); }
 .trilha-det .ok { color:inherit; } .trilha-det .ok i { background:var(--verde, #34D399); }
 .trilha-det .falhou i { background:#EF5B5B; }
 
-/* motores do projeto: ligar, desligar e limite de esforço */
+/* project engines: on, off and effort limit */
 .motor-ctl { margin:10px 0; display:flex; flex-direction:column; gap:8px; }
 .motor-liga { display:flex; align-items:center; gap:9px; width:100%; padding:8px 10px; border:1px solid var(--linha-2); border-radius:9px; background:transparent; color:inherit; font:inherit; font-size:12px; text-align:left; cursor:pointer; }
 .motor-liga em { margin-left:auto; font-style:normal; color:var(--mudo); font-size:11px; }
@@ -437,7 +437,7 @@ a.ref:hover { color: #fff; background: rgba(245, 166, 35, .2); }
 .motor-teto { display:flex; }
 .motor-teto button { flex:1; font-size:11.5px; padding:5px 0; }
 
-/* ressalvas e validação final */
+/* caveats and final validation */
 .ressalva { border-left:2px solid var(--linha-2); padding:8px 12px; margin:8px 0; font-size:12px; }
 .ressalva.aberta { border-left-color:#EF5B5B; }
 .ressalva.resolvida, .ressalva.aceita { border-left-color:var(--verde, #34D399); opacity:.85; }
@@ -445,7 +445,7 @@ a.ref:hover { color: #fff; background: rgba(245, 166, 35, .2); }
 .valida { border:1px solid var(--ambar, #F3AA3C); border-radius:10px; padding:12px 14px; margin:12px 0; }
 .valida.ok { border-color:var(--verde, #34D399); }
 
-/* canal Posts */
+/* Posts channel */
 .posts { flex:1; min-height:0; overflow-y:auto; padding:18px 28px 40px; display:flex; flex-direction:column; gap:14px; }
 .post { background:var(--painel-2, rgba(255,255,255,.03)); border:1px solid var(--linha-2); border-left:3px solid var(--ambar, #F3AA3C); border-radius:10px; padding:14px 18px 10px; max-width:860px; width:100%; }
 .post-topo { display:flex; align-items:center; gap:10px; font-size:12.5px; }
@@ -466,7 +466,7 @@ a.ref:hover { color: #fff; background: rgba(245, 166, 35, .2); }
 .post-resp-i { display:flex; gap:10px; font-size:13px; } .post-resp-i .texto p { margin:2px 0; }
 .post-resp { border-top:1px solid var(--linha-2); margin-top:10px; padding-top:10px; }
 
-/* documento estilo Notion: tabela de propriedades, callout, checklist, divisória */
+/* Notion-style document: property table, callout, checklist, divider */
 .texto table.md-t, .corpo table.md-t { border-collapse:collapse; margin:10px 0; font-size:13px; width:auto; max-width:100%; }
 table.md-t th, table.md-t td { border:1px solid var(--linha-2); padding:6px 12px; text-align:left; vertical-align:top; }
 table.md-t th { background:rgba(255,255,255,.04); font-weight:600; }
@@ -478,7 +478,7 @@ li.tarefa { list-style:none; margin-left:-18px; } li.tarefa .cx { margin-right:6
 .post-visto { font-size:12px; color:var(--mudo); margin:6px 0 2px; }
 .av.todos { display:inline-flex; align-items:center; justify-content:center; background:var(--ambar, #F3AA3C); color:#111; font-weight:700; }
 
-/* regras em lista e documentos de contexto */
+/* list-based rules and context documents */
 .regras-lista { list-style: decimal; margin: 0 0 8px; padding-left: 22px; max-height: 260px; overflow: auto; }
 .regras-lista.refs { list-style: none; padding-left: 0; }
 .regras-lista li { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
@@ -487,7 +487,7 @@ li.tarefa { list-style:none; margin-left:-18px; } li.tarefa .cx { margin-right:6
 .regras-lista li .btn-ic { flex: none; opacity: .5; }
 .regras-lista li:hover .btn-ic { opacity: 1; }
 
-/* menu da conversa (botão direito) e escolha de membros */
+/* conversation menu (right click) and member picker */
 .ctx-menu { position: fixed; z-index: 90; min-width: 200px; padding: 6px; border-radius: 10px; background: #111318; box-shadow: 0 12px 34px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .07); animation: pcard-entra .12s ease-out; }
 .ctx-tit { padding: 6px 10px 8px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--mudo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
 .ctx-menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 6px; background: none; color: var(--txt, #e8eaf0); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
@@ -503,7 +503,7 @@ li.tarefa { list-style:none; margin-left:-18px; } li.tarefa .cx { margin-right:6
 .mb-op span { flex: 1; display: flex; flex-direction: column; }
 .mb-op small { color: var(--mudo); font-size: 11px; }
 
-/* página Modelos: contas do Claude e do Codex */
+/* Models page: Claude and Codex accounts */
 .conta { display: flex; align-items: center; gap: 14px; margin: 14px 0 10px; padding: 14px 16px; border-radius: 12px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .08); }
 .conta.on { border-color: rgba(52, 211, 153, .35); background: rgba(52, 211, 153, .06); }
 .conta-ic { flex: none; width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 18px; color: #fff; }
@@ -518,14 +518,14 @@ li.tarefa { list-style:none; margin-left:-18px; } li.tarefa .cx { margin-right:6
 fieldset.aj-motor { border: 0; margin: 0; padding: 0; min-width: 0; }
 fieldset.aj-motor:disabled { opacity: .45; pointer-events: none; }
 
-/* página MCP */
+/* MCP page */
 .mcp-lista { display: grid; gap: 8px; margin-top: 12px; }
 .mcp-i { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .07); }
 .mcp-i.on { border-color: rgba(38, 198, 218, .4); }
 .mcp-i small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mcp-i .interruptor span { min-width: 0; }
 
-/* página Conexões */
+/* Connections page */
 .conta-ic.cx-teams { background: linear-gradient(140deg, #7b83eb, #4b53bc); }
 .conta-ic.cx-jira { background: linear-gradient(140deg, #2684ff, #0052cc); }
 .conta-ic.cx-trello { background: linear-gradient(140deg, #3b8de0, #0c66e4); }
@@ -535,7 +535,7 @@ fieldset.aj-motor:disabled { opacity: .45; pointer-events: none; }
 .cx-app summary { cursor: pointer; color: var(--mudo); font-size: 13px; }
 .cx-app[open] summary { margin-bottom: 10px; }
 
-/* campo de mensagem: botões Modelo e Modo (listas) e painel de emoji */
+/* message field: Model and Mode buttons (lists) and emoji panel */
 .sel-btn { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px 4px 10px; border-radius: 7px; background: rgba(0, 0, 0, .28); color: var(--texto); font: 600 12.5px/20px var(--fonte); cursor: pointer; transition: background .15s; }
 .sel-btn:hover { background: rgba(255, 255, 255, .08); }
 .sel-btn .sel-rot { color: var(--mudo); font-weight: 500; }
@@ -558,7 +558,7 @@ fieldset.aj-motor:disabled { opacity: .45; pointer-events: none; }
 .emoji-grade button { padding: 5px 0; border: 0; border-radius: 6px; background: none; font-size: 21px; line-height: 1.2; cursor: pointer; }
 .emoji-grade button:hover { background: rgba(255, 255, 255, .1); transform: scale(1.15); }
 
-/* Salvar projeto */
+/* Save project */
 .lista-topo .btn-salvar { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--mudo); cursor: pointer; }
 .lista-topo .btn-salvar:hover { background: rgba(255, 255, 255, .08); color: #fff; }
 .pontos-lista { margin-top: 6px; max-height: 260px; overflow-y: auto; }
@@ -568,18 +568,18 @@ fieldset.aj-motor:disabled { opacity: .45; pointer-events: none; }
 .ponto-info span { color: var(--mudo); font-size: 12px; }
 .ponto-acoes { display: flex; gap: 6px; flex: none; }
 
-/* Parar a chamada direto na mensagem em andamento (inclusive na fila) */
+/* Stop the call right from the in-progress message (including in the queue) */
 .pensando .parar-msg { margin-left: 8px; width: 22px; height: 22px; opacity: .55; }
 .pensando .parar-msg:hover { opacity: 1; color: #ff6b6b; }
 
-/* Conexões: um clique, estado claro */
+/* Connections: one click, clear state */
 .conta .cx-botoes { display: flex; gap: 6px; flex: none; }
 .conta.alerta { border-color: rgba(229, 184, 75, .5); }
 .conta .cx-erro { margin-top: 6px; font-size: 12px; color: #ff9b9b; }
 .conta-ic.cx-notion { background: #e9e9e7; color: #191919; }
 .conta-ic.cx-github { background: #24292f; color: #fff; }
 
-/* ---- Equipes dentro do projeto ---- */
+/* ---- Teams inside the project ---- */
 .equipes-bar { flex: none; padding: 8px 10px 6px; border-bottom: 1px solid var(--linha); }
 .equipes-bar .eq-cab { display: flex; align-items: center; justify-content: space-between; font: 600 11px/1 var(--fonte-tit); letter-spacing: .06em; text-transform: uppercase; color: var(--mudo); margin: 0 2px 6px; }
 .equipes-bar .eq-cab .btn-ic { width: 22px; height: 22px; }
@@ -600,11 +600,11 @@ fieldset.aj-motor:disabled { opacity: .45; pointer-events: none; }
 .eq-opcao small { color: var(--mudo); font-size: 12px; line-height: 1.35; }
 .eq-linha { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--linha); }
 .eq-linha .eq-nome small { color: var(--mudo); }
-/* trilho de projetos: com muitos projetos, a lista rola em vez de empurrar os botões de vista para fora da tela */
+/* projects rail: with many projects, the list scrolls instead of pushing the view buttons off screen */
 #rail { overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 #rail::-webkit-scrollbar { display: none; }
 
-/* ---- agenda: semana, dia inteiro em cima, próximos ao lado ---- */
+/* ---- calendar: week, all-day on top, upcoming on the side ---- */
 .agenda { display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 14px 18px 0; gap: 12px; }
 .ag-topo { display: flex; align-items: center; gap: 8px; }
 .ag-topo h2 { display: flex; align-items: center; gap: 8px; margin: 0 10px 0 0; font: 700 18px/1 var(--fonte-tit); }
@@ -646,7 +646,7 @@ fieldset.aj-motor:disabled { opacity: .45; pointer-events: none; }
 .ag-prox-i small { font-size: 11px; color: var(--mudo); }
 .modal.evento .acoes { display: flex; gap: 8px; align-items: center; }
 
-/* ---- chamada de voz: palco dentro da DM (como um canal de voz), quadros com o perfil de cada um, tela compartilhada e controles ---- */
+/* ---- voice call: stage inside the DM (like a voice channel), tiles with each person's profile, shared screen and controls ---- */
 #chamada.dock { flex: none; height: clamp(320px, 46vh, 560px); box-shadow: 0 1px 0 var(--linha); }
 #chamada [hidden] { display: none !important; }
 #chamada .ch-palco { position: relative; height: 100%; background: #0b0e14; display: flex; flex-direction: column; overflow: hidden; }
@@ -659,14 +659,14 @@ fieldset.aj-motor:disabled { opacity: .45; pointer-events: none; }
 #chamada .ch-ico.on { background: rgba(255, 255, 255, .1); color: var(--texto); }
 #chamada .ch-mini { display: none; align-items: center; }
 #chamada .ch-mini .av + .av { margin-left: -6px; }
-/* cheio: a chamada toma o lugar das mensagens (o compositor continua); compacto: só a faixa de cima, com os avatares, e o chat inteiro */
+/* full: the call takes the place of the messages (the composer stays); compact: only the top strip, with the avatars, and the full chat */
 #chamada.dock.cheio { height: auto; flex: 1; min-height: 0; }
 #chamada.dock.cheio ~ .mensagens, #chamada.dock.cheio ~ .digitando { display: none; }
 #chamada.dock.compacto { height: 44px; }
 #chamada.dock.compacto .ch-corpo, #chamada.dock.compacto .ch-controles, #chamada.dock.compacto .ch-erro { display: none; }
 #chamada.dock.compacto .ch-mini { display: inline-flex; }
 #chamada.dock.compacto .ch-cabecalho { border-bottom: 0; height: 44px; }
-/* Ajustes > Dispositivos: medidor do microfone e controles deslizantes */
+/* Settings > Devices: microphone meter and sliders */
 .disp-medidor { position: relative; height: 14px; border-radius: 7px; background: rgba(255, 255, 255, .07); overflow: hidden; }
 .disp-medidor b { display: block; height: 100%; width: 0; border-radius: 7px; background: linear-gradient(90deg, #7986cb, #9fb0ff); transition: width .06s linear, background .15s; }
 .disp-medidor b.fala { background: linear-gradient(90deg, #3ba55c, #7ad67a); }
@@ -683,11 +683,11 @@ input.faixa { width: 100%; accent-color: #7c9cff; margin: 6px 0; }
 #chamada .ch-ico svg { width: 18px; height: 18px; }
 #chamada .ch-corpo { flex: 1; min-height: 0; display: flex; }
 #chamada .ch-grade { flex: 1; min-width: 0; min-height: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 12px; padding: 14px 16px; }
-/* quadro de participante: o tema do perfil (duas cores ou a cor do agente) de fundo, a capa por trás, a foto com decoração e o nome com a fonte dele */
+/* participant tile: the profile theme (two colors or the agent's color) as background, the banner behind, the photo with decoration and the name in its font */
 #chamada .ch-tile { position: relative; min-height: 0; border-radius: 14px; overflow: hidden; background: linear-gradient(160deg, color-mix(in srgb, var(--p1) 38%, #11141b), color-mix(in srgb, var(--p2) 45%, #0c0e13)); display: grid; place-items: center; border: 2px solid transparent; transition: border-color .15s, box-shadow .15s; isolation: isolate; }
 #chamada .ch-tile .ch-capa { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .28; filter: blur(2px) saturate(1.1); z-index: -1; }
 #chamada .ch-tile.falando { border-color: #3ba55c; box-shadow: 0 0 0 1px rgba(59, 165, 92, .35), 0 0 30px -8px rgba(59, 165, 92, .6); }
-/* a borda viva: cresce e brilha com o nível do som (--nivel de 0 a 1), tanto no seu microfone quanto na voz do agente */
+/* the live border: grows and glows with the sound level (--nivel from 0 to 1), both on your microphone and on the agent's voice */
 #chamada .ch-av .av, .voz-painel .vp-canal .av { --nivel: 0; box-shadow: 0 0 0 calc(3px + var(--nivel) * 9px) rgba(59, 165, 92, calc(.12 + var(--nivel) * .8)), 0 0 calc(6px + var(--nivel) * 30px) calc(var(--nivel) * 6px) rgba(59, 165, 92, calc(var(--nivel) * .7)), 0 14px 34px -14px #000; transition: box-shadow .09s linear; }
 #chamada .ch-av .av { --t: 96px; }
 #chamada .ch-tile.mudo .ch-av .av { box-shadow: 0 0 0 3px rgba(237, 66, 69, .5), 0 14px 34px -14px #000; }
@@ -733,7 +733,7 @@ input.faixa { width: 100%; accent-color: #7c9cff; margin: 6px 0; }
 #chamada .ch-pk-item:hover { border-color: #3ba55c; }
 #chamada .ch-pk-item img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 6px; background: #000; }
 #chamada .ch-pk-item span { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* painel "Voz conectada" na barra lateral, acima do seu perfil: a chamada segue em qualquer canal */
+/* "Voz conectada" panel in the sidebar, above your profile: the call follows you into any channel */
 .voz-painel { flex: none; display: flex; align-items: center; gap: 6px; padding: 8px 8px 8px 10px; background: rgba(4, 7, 12, .55); box-shadow: 0 -1px 0 var(--linha); }
 .voz-painel .vp-canal { flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; border: 0; background: transparent; color: var(--texto); padding: 2px 4px; border-radius: 8px; cursor: pointer; text-align: left; }
 .voz-painel .vp-canal:hover { background: rgba(255, 255, 255, .06); }
@@ -750,7 +750,7 @@ input.faixa { width: 100%; accent-color: #7c9cff; margin: 6px 0; }
 .voz-painel .btn-ic.sair { color: #ed4245; }
 .voz-painel .btn-ic.sair svg { transform: rotate(135deg); }
 @media (max-width: 900px) { #chamada .ch-lado { position: absolute; right: 0; top: 41px; bottom: 67px; background: #0b0e14; } }
-/* Execuções: estado durável e downloads, sem cortar listas longas. */
+/* Runs: durable state and downloads, without truncating long lists. */
 .teamwork-list { display:grid; gap:12px; max-height:65vh; overflow:auto; min-height:0; }
 .teamwork-task { padding:12px; border:1px solid var(--borda,#49404b); border-radius:8px; overflow-wrap:anywhere; }
 .teamwork-task p { margin:6px 0; }

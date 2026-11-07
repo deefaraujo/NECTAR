@@ -10,4 +10,4 @@ assert.match((await lerCurriculoPdf(maior.toString('base64'))).texto,/NECTAR PDF
 await assert.rejects(()=>lerCurriculoPdf(Buffer.from('não é um PDF').toString('base64')),/PDF válido/);
 await assert.rejects(()=>lerCurriculoPdf('a'.repeat(14000000)),/10 MB/);
 await assert.rejects(()=>lerCurriculoPdf(Buffer.from('%PDF-1.4\ncorrompido').toString('base64')),/íntegro/);
-console.log('Currículo: extração de PDF real, arquivo acima de 160 KB, limites e PDF inválido validados.');
+console.log('Resume: real PDF extraction, file above 160 KB, limits and invalid PDF validated.');

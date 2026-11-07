@@ -1,4 +1,4 @@
-// Somente fixtures descartáveis da suíte de interface.
+// Disposable fixtures for the UI suite only.
 import fs from 'node:fs';import os from 'node:os';import path from 'node:path';
 import {criarTeamwork} from '../../lib/teamwork.mjs';
 const [pasta,workspaceId,projectId,count='20',prefix='ui']=process.argv.slice(2);
@@ -10,4 +10,4 @@ for(let n=0;n<Number(count);n++){
   const artifact=t.artifacts.publicar({taskId:task.taskId,executionId:attempt.executionId,producer:'backend',conteudo:'SIMULADO: fixture de interface; não é entrega de produto.'});
   t.tasks.resultado(attempt.executionId,'backend',{artifacts:[artifact.artifactId],evidence:[artifact.artifactId]});
 }
-console.log('Fixtures UI registradas.');
+console.log('UI fixtures registered.');

@@ -1,5 +1,5 @@
-// Jogos em Ren'Py para celular: equipe com Pesquisa, skills de Ren'Py nos cargos certos e sem engine de fora, aba Produção com
-// os tipos do template, pedidos apontando agente real, e a ferramenta de sprites alinhando um lote (mesma escala, mesma base).
+// Ren'Py mobile games: team with Pesquisa, Ren'Py skills on the right roles and no outside engine, Produção tab with
+// the template types, requests pointing to a real agent, and the sprite tool aligning a batch (same scale, same baseline).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -15,20 +15,20 @@ const projetos = await import('../lib/projetos.mjs');
 const RAIZ = path.resolve(import.meta.dirname, '..', 'templates', 'jogos');
 
 const el = criarElenco('jogos');
-assert(el.POR_ID.pesquisa, 'agente de Pesquisa existe');
+assert(el.POR_ID.pesquisa, 'Pesquisa agent exists');
 const sk = (id) => (el.POR_ID[id]?.skills||[]).filter(s=>skillDisponivelOuOpcional('jogos',s));
-for (const [ag, s] of [['developer', 'renpy-codigo'], ['developer', 'renpy-mobile'], ['uiux', 'renpy-mobile'], ['sprites', 'renpy-sprites'], ['qa', 'renpy-mobile'], ['pesquisa', 'documentation']]) assert(sk(ag).includes(s), `${ag} tem ${s}`);
-for (const [ag, s] of [['sprites', 'assets-abertos'], ['uiux', 'renpy-ui-acabada'], ['gamefeel', 'renpy-vfx'], ['visual_novel', 'renpy-vn'], ['developer', 'renpy-recursos'], ['gamefeel', 'maximizing-game-feel'], ['gamefeel', 'designing-mini-games'], ['qa', 'auditing-game-screen-readability']]) assert(sk(ag).includes(s), `${ag} tem ${s}`);
+for (const [ag, s] of [['developer', 'renpy-codigo'], ['developer', 'renpy-mobile'], ['uiux', 'renpy-mobile'], ['sprites', 'renpy-sprites'], ['qa', 'renpy-mobile'], ['pesquisa', 'documentation']]) assert(sk(ag).includes(s), `${ag} has ${s}`);
+for (const [ag, s] of [['sprites', 'assets-abertos'], ['uiux', 'renpy-ui-acabada'], ['gamefeel', 'renpy-vfx'], ['visual_novel', 'renpy-vn'], ['developer', 'renpy-recursos'], ['gamefeel', 'maximizing-game-feel'], ['gamefeel', 'designing-mini-games'], ['qa', 'auditing-game-screen-readability']]) assert(sk(ag).includes(s), `${ag} has ${s}`);
 for (const [skill, ex] of [['renpy-vn', ['estrutura.rpy', 'telas.rpy', 'minijogos.rpy', 'sistemas.rpy', 'testes_exemplos.rpy']], ['renpy-recursos', ['recursos.rpy', 'testes_recursos.rpy']], ['renpy-vfx', ['vfx.rpy', 'testes_vfx.rpy']], ['renpy-ui-acabada', ['ui_acabada.rpy', 'testes_ui.rpy']]]) {
-  if(!fs.existsSync(path.join(RAIZ,'skills',skill,'SKILL.md'))){assert(skillDisponivelOuOpcional('jogos',skill));console.log(`Pacote opcional não distribuído: ${skill}; exemplos externos não executados.`);continue;}
-  for (const f of ex) assert(fs.existsSync(path.join(RAIZ, 'skills', skill, 'exemplos', f)), `${skill}/exemplos/${f} existe`);
+  if(!fs.existsSync(path.join(RAIZ,'skills',skill,'SKILL.md'))){assert(skillDisponivelOuOpcional('jogos',skill));console.log(`Optional package not shipped: ${skill}; external examples not run.`);continue;}
+  for (const f of ex) assert(fs.existsSync(path.join(RAIZ, 'skills', skill, 'exemplos', f)), `${skill}/exemplos/${f} exists`);
 }
-for (const a of el.ROSTER || Object.values(el.POR_ID)) assert(!(a.skills || []).some((s) => /^(godot|unity|unreal)-/.test(s)), `${a.id} sem skill de outra engine`);
+for (const a of el.ROSTER || Object.values(el.POR_ID)) assert(!(a.skills || []).some((s) => /^(godot|unity|unreal)-/.test(s)), `${a.id} has no skill from another engine`);
 const regras = fs.readFileSync(path.join(RAIZ, 'regras.md'), 'utf8');
-for (const t of ["Ren'Py 2D para celular", 'RENPY_VARIANT', 'docs/', '_padronizado/', 'Nível de produto', 'assets-abertos', 'MANIFESTO.md', 'Estúdio, não fábrica', 'direcao-de-experiencia', 'Revisão olha a tela']) assert(regras.includes(t), `regras citam ${t}`);
+for (const t of ["Ren'Py 2D para celular", 'RENPY_VARIANT', 'docs/', '_padronizado/', 'Nível de produto', 'assets-abertos', 'MANIFESTO.md', 'Estúdio, não fábrica', 'direcao-de-experiencia', 'Revisão olha a tela']) assert(regras.includes(t), `rules mention ${t}`);
 const tpl = JSON.parse(fs.readFileSync(path.join(RAIZ, 'template.json'), 'utf8'));
-for (const id of ['po', 'narrative', 'architect', 'gamefeel', 'uiux', 'sprites', 'pesquisa']) assert(tpl.agentes.find((a) => a.id === id).skills.includes('direcao-de-experiencia'), `${id} tem a skill de direção de experiência`);
-for (const [tipo, cfg] of Object.entries(tpl.registro.tipos)) for (const p of cfg.pedidos || []) assert(el.POR_ID[p.agente], `pedido "${p.rotulo}" de ${tipo} aponta agente que existe`);
+for (const id of ['po', 'narrative', 'architect', 'gamefeel', 'uiux', 'sprites', 'pesquisa']) assert(tpl.agentes.find((a) => a.id === id).skills.includes('direcao-de-experiencia'), `${id} has the experience direction skill`);
+for (const [tipo, cfg] of Object.entries(tpl.registro.tipos)) for (const p of cfg.pedidos || []) assert(el.POR_ID[p.agente], `request "${p.rotulo}" of ${tipo} points to an existing agent`);
 
 const alvo = path.join(tmp, 'jogo'); fs.mkdirSync(alvo);
 const r = projetos.criar({ nome: 'Jogo celular', caminho: alvo, template: 'jogos' }); assert(r.ok, r.erro);
@@ -38,9 +38,9 @@ assert.deepEqual(Object.keys(eq.registro.tipos).sort(), ['cena', 'cenario', 'doc
 eq.registro.anotar({ tipo: 'jogo', nome: 'Jogo teste', resumo: 'Retrato 1080x1920, Android.', por: 'voce' });
 eq.registro.anotar({ tipo: 'tela', nome: 'Menu principal', resumo: 'Jogar, Continuar, Opções.', por: 'voce' });
 const p = eq.registro.paraPrompt(eq.registro.selecionar({ textos: ['implemente a tela Menu principal'] }));
-assert(/Retrato 1080x1920/.test(p) && /Menu principal/.test(p), 'ficha Jogo sempre e a tela citada chegam ao prompt');
+assert(/Retrato 1080x1920/.test(p) && /Menu principal/.test(p), 'the Jogo entry always and the cited screen reach the prompt');
 
-// ferramenta de sprites: dois "quadros" de alturas diferentes saem com a mesma escala e a mesma base
+// sprite tool: two "frames" of different heights come out with the same scale and the same baseline
 const py = process.platform === 'win32' ? 'python' : 'python3';
 const temPil = spawnSync(py, ['-c', 'import PIL'], { encoding: 'utf8' }).status === 0;
 if (temPil) {
@@ -53,26 +53,26 @@ Image.new('RGB', (100, 100), (0, 0, 0)).save(sys.argv[1] + '/opaca.png')`;
   assert.equal(spawnSync(py, ['-c', gera, ent]).status, 0);
   const script = path.join(RAIZ, 'skills', 'renpy-sprites', 'scripts', 'sprites.py');
   const pad = spawnSync(py, ['-X', 'utf8', '-I', script, 'padronizar', ent, '--saida', sai, '--altura', '150', '--canvas', '300x200'], { encoding: 'utf8' });
-  assert.notEqual(pad.status, 0, 'imagem opaca derruba o código de saída');
-  assert(/SEM TRANSPAR/.test(pad.stderr), 'avisa imagem sem transparência');
+  assert.notEqual(pad.status, 0, 'an opaque image fails the exit code');
+  assert(/SEM TRANSPAR/.test(pad.stderr), 'warns about an image without transparency');
   const info = JSON.parse(spawnSync(py, ['-X', 'utf8', '-I', script, 'info', sai], { encoding: 'utf8' }).stdout.split('\n]')[0] + '\n]');
-  assert.deepEqual(info.map((x) => x.util), ['50x150', '50x100'], 'uma escala para o lote: a mais alta vira 150 e a outra mantém a proporção');
-  assert(info.every((x) => x.margem.base === info[0].margem.base), 'mesma linha de base');
-  assert(!fs.existsSync(path.join(sai, 'opaca.png')), 'opaca não é gravada');
-} else console.log('aviso: Python com Pillow ausente, ferramenta de sprites não testada');
+  assert.deepEqual(info.map((x) => x.util), ['50x150', '50x100'], 'one scale for the batch: the tallest becomes 150 and the other keeps its ratio');
+  assert(info.every((x) => x.margem.base === info[0].margem.base), 'same baseline');
+  assert(!fs.existsSync(path.join(sai, 'opaca.png')), 'the opaque one is not written');
+} else console.log('warning: Python with Pillow missing, sprite tool not tested');
 {
   const baixar = path.join(RAIZ, 'skills', 'assets-abertos', 'scripts', 'baixar.py');
   const r1 = spawnSync(py, ['-X', 'utf8', '-I', baixar, 'https://example.invalid/x.zip', '--para', path.join(tmp, 'a1'), '--licenca', 'Proprietaria', '--origem', 'x'], { encoding: 'utf8' });
-  assert.notEqual(r1.status, 0, 'licença fora da lista é recusada'); assert(/não está na lista/.test(r1.stderr + r1.stdout), 'explica a recusa');
+  assert.notEqual(r1.status, 0, 'a license outside the list is rejected'); assert(/não está na lista/.test(r1.stderr + r1.stdout), 'explains the rejection');
   const r2 = spawnSync(py, ['-X', 'utf8', '-I', baixar, 'https://example.invalid/x.zip', '--para', path.join(tmp, 'a2'), '--licenca', 'CC-BY-4.0', '--origem', 'x'], { encoding: 'utf8' });
-  assert.notEqual(r2.status, 0, 'CC-BY sem atribuição é recusado antes de baixar'); assert(/atribuicao/.test(r2.stderr + r2.stdout));
+  assert.notEqual(r2.status, 0, 'CC-BY without attribution is rejected before downloading'); assert(/atribuicao/.test(r2.stderr + r2.stdout));
 }
 
 await new Promise((x) => setTimeout(x, 300));
-try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* pasta temporária */ }
-console.log("PASS: jogos Ren'Py celular (regras de nível de produto, download de asset só com licença aceita, Pesquisa na equipe, skills de Ren'Py com exemplos conferidos, game feel e legibilidade nos cargos certos, sem outra engine, aba Produção com os tipos do jogo, pedidos com agente real, ferramenta de sprites alinha o lote e recusa imagem opaca).");
+try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* temp folder */ }
+console.log("PASS: Ren'Py mobile games (product-level rules, asset download only with an accepted license, Pesquisa on the team, Ren'Py skills with checked examples, game feel and readability on the right roles, no other engine, Produção tab with the game types, requests with a real agent, sprite tool aligns the batch and rejects opaque images).");
 
-// verificador de arquivos do Ren'Py: acusa arquivo citado que não existe, provisório e teste dentro de game/
+// Ren'Py file checker: flags a cited file that does not exist, placeholders and tests inside game/
 {
   const { execFileSync } = await import('node:child_process');
   const os = await import('node:os');
@@ -87,9 +87,9 @@ console.log("PASS: jogos Ren'Py celular (regras de nível de produto, download d
   const chk = path.join(RAIZ, 'skills', 'renpy-codigo', 'scripts', 'checar_assets.py');
   let saida = '', codigo = 0;
   try { saida = execFileSync('python', ['-X', 'utf8', '-I', chk, proj], { encoding: 'utf8' }); } catch (e) { codigo = e.status; saida = String(e.stdout); }
-  assert.equal(codigo, 1, 'com problema, o verificador sai com 1');
-  assert(/falta\.png/.test(saida) && /PROV_icone/.test(saida) && /teste_x\.rpy/.test(saida), 'acusa arquivo que falta, provisório e teste no build');
-  assert(saida.includes('p01.rpy') && saida.includes('não encenada'), 'acusa cena com direção só em comentário');
-  assert(!/existe\.png/.test(saida), 'não acusa arquivo que existe');
+  assert.equal(codigo, 1, 'with a problem, the checker exits with 1');
+  assert(/falta\.png/.test(saida) && /PROV_icone/.test(saida) && /teste_x\.rpy/.test(saida), 'flags a missing file, a placeholder and a test in the build');
+  assert(saida.includes('p01.rpy') && saida.includes('não encenada'), 'flags a scene with direction only in comments');
+  assert(!/existe\.png/.test(saida), 'does not flag a file that exists');
 }
 process.exit(0);

@@ -1,5 +1,5 @@
-"""Executa as rotinas reais de PowerShell com SendInput substituído por um coletor.
-Não envia nenhuma tecla à área de trabalho do usuário.
+"""Runs the real PowerShell routines with SendInput replaced by a collector.
+Sends no keystroke to the user's desktop.
 """
 import json, pathlib, subprocess, tempfile
 
@@ -14,7 +14,7 @@ collector = '''public static uint SendInput(uint count,INPUT[] inputs,int size) 
 }'''
 guard = 'if($a.tipo -in @(\'clicar\',\'digitar\',\'codigo\',\'tecla\',\'rolar\')) { [NectarInput]::AssertBrowser($a.tipo,$a.px,$a.py) }'
 assert source.count(guard) == 1
-# A proteção de foco é compilada, mas não consulta a janela real neste teste.
+# The focus guard is compiled, but does not query the real window in this test.
 isolated = source.replace(declaration, collector).replace(guard, '# Teste isolado sem consulta ao foco da área de trabalho')
 with tempfile.TemporaryDirectory(prefix='nectar-input-') as temp:
     script = pathlib.Path(temp) / 'input.ps1'
@@ -25,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-input-') as temp:
         assert p.returncode == 0, p.stderr
         if acao['tipo'] == 'digitar':
             tempos = [int(line.split('|')[1]) for line in p.stdout.splitlines() if line.startswith('AT|')]
-            assert tempos[-1] - tempos[0] >= 2_000_000, 'Os caracteres devem aparecer ao longo do tempo, não em um bloco instantâneo'
+            assert tempos[-1] - tempos[0] >= 2_000_000, 'Characters must appear over time, not in one instant block'
         return [tuple(map(int, line.split('|')[1:])) for line in p.stdout.splitlines() if line.startswith('KEY|')]
     texto = 'Olá 😀'
     eventos = executar({'tipo': 'digitar', 'texto': texto})
@@ -38,11 +38,11 @@ with tempfile.TemporaryDirectory(prefix='nectar-input-') as temp:
     assert digitado == 'if (x) {    return 42;}'
     assert not any(vk == 8 for vk, scan, flags in codigo)
     assert executar({'tipo': 'tecla', 'tecla': 'CTRL+A'}) == [(17, 0, 0), (65, 0, 0), (65, 0, 2), (17, 0, 2)]
-    # A proteção real consulta apenas janelas; um ponto fora da tela nunca envia entradas.
+    # The real guard only queries windows; an off-screen point never sends input.
     guard_test = isolated + '''
 try {
  [NectarInput]::AssertBrowser('clicar',[Int32]::MinValue,[Int32]::MinValue)
- throw 'Clique fora da tela não foi bloqueado'
+ throw 'Off-screen click was not blocked'
 } catch {
  if($_.Exception.ToString() -notmatch 'NECTAR_BROWSER_(FOCUS|TARGET)'){throw}
  Write-Output 'BROWSER_GUARD_OK'
@@ -51,4 +51,4 @@ try {
     script.write_text(guard_test, encoding='utf-8-sig')
     p = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-File', str(script)], input='{"tipo":"aguardar"}', capture_output=True, text=True, timeout=20, creationflags=subprocess.CREATE_NO_WINDOW)
     assert p.returncode == 0 and 'BROWSER_GUARD_OK' in p.stdout, p.stderr
-print('PASS: Windows PowerShell executou digitar, codigo multilinha Unicode e atalho; eventos coletados sem injetar teclas reais.')
+print('PASS: Windows PowerShell ran digitar, multiline Unicode codigo and a shortcut; events collected without injecting real keys.')

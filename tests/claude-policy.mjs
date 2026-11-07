@@ -11,5 +11,5 @@ const outside=path.join(tmp,'private');fs.mkdirSync(outside);fs.symlinkSync(outs
 const file=path.join(tmp,'policy.json');fs.writeFileSync(file,JSON.stringify(policy));
 const result=spawnSync(process.execPath,[path.join(import.meta.dirname,'../lib/claude-policy-hook.cjs'),file],{input:JSON.stringify({tool_name:'Read',tool_input:{file_path:path.join(root,'.env')}}),encoding:'utf8',windowsHide:true});
 assert.equal(JSON.parse(result.stdout).hookSpecificOutput.permissionDecision,'deny');
-console.log('PASS: guard Claude em processo real, escopo, segredos, modo leitura, shell/MCP desconhecido e escape por junction recusados.');
+console.log('PASS: Claude guard in a real process; scope, secrets, read mode, unknown shell/MCP and junction escape are refused.');
 fs.rmSync(tmp,{recursive:true,force:true,maxRetries:5,retryDelay:100});

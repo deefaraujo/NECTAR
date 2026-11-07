@@ -73,8 +73,8 @@ switch ($a.tipo) {
      if($c -eq "`n") {
        [NectarInput]::Key(13,0,0)
        Start-Sleep -Milliseconds 30
-       # Seleciona a indentação automática; o próximo caractere a substitui.
-       # Não usa Backspace: sem indentação isso apagaria a quebra de linha.
+       # Select the auto-indentation; the next character replaces it.
+       # Don't use Backspace: with no indentation it would delete the line break.
        [NectarInput]::Chord(16,36)
      } else { [NectarInput]::Key(0,[System.UInt16]$c,4) }
      Esperar-Digitacao $c

@@ -1,5 +1,5 @@
-// Cards objetivos: nenhuma fala ou entrega vira relatório anexado; só a conclusão gera um relatório curto, enviado por DM.
-// Cards antigos, que acumularam dezenas de relatórios, são enxugados sem perder texto.
+// Lean cards: no message or delivery becomes an attached report; only completion produces a short report, sent by DM.
+// Old cards that piled up dozens of reports are trimmed without losing text.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -17,17 +17,17 @@ const ok = (r) => { assert(r.ok, r.erro); return r; };
 const fluxo = (c, acao, dados, autor) => q.fluxo(c.id, acao, { revisao: c.workflow.revisao, ...dados }, autor);
 const OK = [{ comando: 'node teste.mjs', status: 'aprovado', evidencia: 'Cenário principal e falha passaram.' }];
 
-// ---- ciclo completo: várias entregas e relatos, nenhum anexo no card até a conclusão
+// ---- full cycle: several deliveries and updates, no attachment on the card until completion
 const card = ok(q.criar({ titulo: 'Tela de perfil', descricao: 'Mostrar o perfil.', dono: 'backend', coluna: 'pronto', aceite: ['Mostra o nome'] }, 'po')).card;
 for (const n of [1, 2, 3]) {
   ok(fluxo(card, 'entrega', { chave: `e${n}`, resumo: `Entrega ${n}: ${'detalhe '.repeat(200)}`, arquivos: ['src/perfil.mjs'], verificacoes: OK }, 'backend'));
   ok(q.relatar(card.id, { chave: `r${n}`, resumo: `Relato ${n} do que foi feito.` }, 'backend'));
   q.relatar(card.id, { chave: `auto${n}`, resumo: 'fala longa '.repeat(500), automatico: true }, 'backend');
-  assert.equal((q.obter(card.id).relatorios || []).length, 0, `depois da entrega ${n} o card continua sem relatório anexado`);
+  assert.equal((q.obter(card.id).relatorios || []).length, 0, `after delivery ${n} the card still has no attached report`);
 }
-assert(q.obter(card.id).historico.some((h) => /^Relato: Relato 1/.test(h.txt)), 'o relato vira uma linha curta no histórico');
-assert.equal(ok(q.relatar(card.id, { chave: 'r1', resumo: 'Relato 1 do que foi feito.' }, 'backend')).repetido, true, 'o mesmo relato não se repete');
-assert(!eq.historico('equipe').some((m) => m.tipo === 'relatorio_tarefa'), 'nada de aviso de relatório no #equipe');
+assert(q.obter(card.id).historico.some((h) => /^Relato: Relato 1/.test(h.txt)), 'the update becomes a short line in the history');
+assert.equal(ok(q.relatar(card.id, { chave: 'r1', resumo: 'Relato 1 do que foi feito.' }, 'backend')).repetido, true, 'the same update is not repeated');
+assert(!eq.historico('equipe').some((m) => m.tipo === 'relatorio_tarefa'), 'no report notice in #equipe');
 
 ok(q.mover(card.id, 'revisao', 'backend'));
 ok(fluxo(card, 'revisao', { status: 'aprovado', evidencia: 'Diff pontual, sem achados.' }, 'revisor'));
@@ -37,15 +37,15 @@ ok(fluxo(card, 'qa', { status: 'aprovado', evidencia: 'Caminho principal e falha
 q.atualizar(card.id, { aceiteOk: [0] }, 'qa');
 ok(q.mover(card.id, 'concluido', 'qa'));
 const rels = q.obter(card.id).relatorios;
-assert.equal(rels.length, 1, 'um relatório só, o de conclusão'); assert.equal(rels[0].tipo, 'final');
-assert(rels[0].texto.length < 4500, `relatório curto (${rels[0].texto.length} caracteres)`);
+assert.equal(rels.length, 1, 'a single report, the completion one'); assert.equal(rels[0].tipo, 'final');
+assert(rels[0].texto.length < 4500, `short report (${rels[0].texto.length} characters)`);
 const dm = eq.historico('dm:backend').filter((m) => m.tipo === 'relatorio_tarefa');
-assert.equal(dm.length, 1, 'a conclusão chega por DM do responsável');
-assert.match(dm[0].texto, /^Concluí T-\d+: Tela de perfil/); assert(dm[0].texto.length < 700, 'a DM é um resumo, não o relatório inteiro');
-assert.equal(dm[0].relatorioTarefa.tipo, 'final', 'e leva o link do relatório curto');
-assert(!eq.historico('equipe').some((m) => m.tipo === 'relatorio_tarefa'), 'e continua sem aviso no #equipe');
+assert.equal(dm.length, 1, 'completion arrives via the owner DM');
+assert.match(dm[0].texto, /^Concluí T-\d+: Tela de perfil/); assert(dm[0].texto.length < 700, 'the DM is a summary, not the full report');
+assert.equal(dm[0].relatorioTarefa.tipo, 'final', 'and carries the link to the short report');
+assert(!eq.historico('equipe').some((m) => m.tipo === 'relatorio_tarefa'), 'and still no notice in #equipe');
 
-// ---- cards antigos inchados: enxuga, guarda tudo em arquivo e mantém só a conclusão
+// ---- bloated old cards: trim, save everything to files and keep only the completion report
 await store.descarregar();
 const pasta = c0.pasta; const arqBoard = path.join(pasta, 'board.json');
 const b = JSON.parse(fs.readFileSync(arqBoard, 'utf8'));
@@ -59,19 +59,19 @@ velho.relatorios = [
 ];
 const pesoAntes = JSON.stringify(velho).length;
 fs.writeFileSync(arqBoard, JSON.stringify(b, null, 2));
-// outro projeto com o mesmo arquivo: reabre o quadro como o app faz ao iniciar
+// another project with the same file: reopens the board the way the app does on startup
 const { criarQuadro } = await import('../lib/quadro.mjs');
 const q2 = criarQuadro({ dir: pasta, raiz: pasta, pasta, limiteDe: () => null, emitir: () => {}, elenco: c0.elenco });
 const novo = q2.obter(card.id);
-assert.equal(novo.relatorios.length, 1, 'ficou só o relatório de conclusão'); assert.equal(novo.relatorios[0].tipo, 'final'); assert.equal(novo.relatorios[0].revisao, 3, 'o mais novo');
-assert(novo.relatorios[0].texto.length < 4200, 'e curto no card');
-assert.equal(novo.relatoriosArquivados, 7, 'o card diz quantos relatórios foram para a pasta');
-assert(JSON.stringify(novo).length < pesoAntes / 3, 'o card ficou bem menor');
-assert(fs.existsSync(`${arqBoard}.antes-de-enxugar`), 'uma cópia do quadro antigo foi guardada');
+assert.equal(novo.relatorios.length, 1, 'only the completion report is left'); assert.equal(novo.relatorios[0].tipo, 'final'); assert.equal(novo.relatorios[0].revisao, 3, 'the newest one');
+assert(novo.relatorios[0].texto.length < 4200, 'and short on the card');
+assert.equal(novo.relatoriosArquivados, 7, 'the card says how many reports went to the folder');
+assert(JSON.stringify(novo).length < pesoAntes / 3, 'the card got much smaller');
+assert(fs.existsSync(`${arqBoard}.antes-de-enxugar`), 'a copy of the old board was saved');
 const dirRel = path.join(pasta, 'relatorios', card.id);
-for (let n = 1; n <= 5; n++) assert.equal(fs.readFileSync(path.join(dirRel, `${card.id}-atividade-backend-auto-r${n}.md`), 'utf8'), longo(`atividade ${n}`), `relatório ${n} guardado inteiro em arquivo`);
+for (let n = 1; n <= 5; n++) assert.equal(fs.readFileSync(path.join(dirRel, `${card.id}-atividade-backend-auto-r${n}.md`), 'utf8'), longo(`atividade ${n}`), `report ${n} saved in full to a file`);
 assert.equal(fs.readFileSync(path.join(dirRel, `${card.id}-entrega-r3.md`), 'utf8'), longo('entrega 3'));
-assert(fs.readdirSync(dirRel).some((n) => fs.readFileSync(path.join(dirRel, n), 'utf8') === longo('final novo')), 'o texto completo do final mantido também fica em arquivo (sem sobrescrever o que já existia)');
-assert(fs.readdirSync(dirRel).some((n) => fs.readFileSync(path.join(dirRel, n), 'utf8') === longo('final antigo')), 'e o final antigo também');
+assert(fs.readdirSync(dirRel).some((n) => fs.readFileSync(path.join(dirRel, n), 'utf8') === longo('final novo')), 'the full text of the kept final report is also saved to a file (without overwriting what existed)');
+assert(fs.readdirSync(dirRel).some((n) => fs.readFileSync(path.join(dirRel, n), 'utf8') === longo('final antigo')), 'and the old final report too');
 await store.descarregar();
-console.log('PASS: relatórios enxutos (fala e entrega não anexam nada, conclusão gera um relatório curto por DM, sem aviso no #equipe, cards antigos enxugados sem perder texto).');
+console.log('PASS: lean reports (messages and deliveries attach nothing, completion produces a short report by DM, no notice in #equipe, old cards trimmed without losing text).');

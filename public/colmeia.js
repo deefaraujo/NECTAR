@@ -1,37 +1,37 @@
 /* =====================================================================
-   NECTAR, Colmeia: o projeto inteiro visto como uma colmeia viva, num canvas infinito.
+   NECTAR, Hive: the whole project seen as a living hive, on an infinite canvas.
 
-   Só desenho. Lê o estado que o app já tem (PJ, E, U, CH) e os eventos que app.js repassa em colmeiaEvento().
-   Nenhuma linha daqui fala com modelo ou com o servidor: a colmeia não custa crédito.
+   Drawing only. Reads the state the app already has (PJ, E, U, CH) and the events app.js forwards in colmeiaEvento().
+   No line here talks to a model or to the server: the hive costs no credits.
 
-   O que cada coisa representa:
-   - Você é a rainha, no centro. O favo dela enche de mel conforme o projeto é concluído (cards concluídos / total).
-   - Cada equipe é um favo em volta; a liderança fica na célula mais perto da rainha.
-   - Cada agente tem uma célula e uma abelha. Abelha parada na célula = em repouso. Pairando sobre a célula, com
-     o card de tarefa ao lado = trabalhando. Rodeando a célula = na fila. Ao lado da célula de outro = foi ajudar
-     (presença "consultando fulano"). Vermelho = bloqueio no card. Âmbar com "?" = aguardando a Game Director.
-   - Quando alguém fala com alguém (menção, DM, sala), a abelha voa até lá levando pólen e volta; fica um fio
-     entre as duas células que esmaece com o tempo. Card concluído: a abelha leva mel à rainha.
-   - Ligação de voz: fio dourado entre a rainha e quem está na chamada.
+   What each thing represents:
+   - You are the queen, at the center. Her comb fills with honey as the project gets done (done cards / total).
+   - Each team is a comb around her; the lead sits in the cell closest to the queen.
+   - Each agent has a cell and a bee. Bee resting on the cell = idle. Hovering over the cell, with
+     the task card beside it = working. Circling the cell = queued. Next to someone else's cell = went to help
+     (presence "consulting so-and-so"). Red = card blocked. Amber with "?" = waiting on the Game Director.
+   - When someone talks to someone (mention, DM, room), the bee flies there carrying pollen and comes back; a thread
+     stays between the two cells and fades over time. Card done: the bee takes honey to the queen.
+   - Voice call: golden thread between the queen and whoever is on the call.
 
-   Canvas infinito: arrasta para percorrer, roda para dar zoom (ou pinça), duplo clique aproxima, "0" enquadra tudo.
-   Longe, nomes e cards somem e as abelhas crescem para continuarem visíveis; perto, aparece o detalhe.
+   Infinite canvas: drag to pan, wheel to zoom (or pinch), double click zooms in, "0" frames everything.
+   Far away, names and cards disappear and bees grow to stay visible; up close, the detail shows.
    ===================================================================== */
 const CO = {
   cv: null, ctx: null, raiz: null, raf: 0, ultimo: 0, t: 0, dpr: 1, W: 0, H: 0,
   cam: { x: 0, y: 0, z: 1 }, alvoCam: null, vel: { x: 0, y: 0 },
   equipes: [], favos: [], celulas: new Map(), abelhas: new Map(), rainha: { x: 0, y: 0, r: 51, raio: 51, pulso: 0 },
   fios: [], particulas: [], ondas: [], registro: [], cards: new Map(), entregas: 0, progresso: 0,
-  cartas: new Map(), zonas: null,   // canteiro: os cards do quadro vivem em três áreas (a fazer, em andamento, concluído)
+  cartas: new Map(), zonas: null,   // garden: the board's cards live in three areas (to do, in progress, done)
   hover: null, hits: [], ponteiros: new Map(), arrasto: null, pinca: null,
   cores: {}, fonte: 'sans-serif', fonteTit: 'sans-serif', imgs: new Map(), proximoSync: 0, montadoPara: '', tot: {},
 };
 const HEX_R = 34, PASSO = HEX_R + 4;
 const TAU = Math.PI * 2;
-const ZONA = { cols: 3, sw: 120, sh: 48, pad: 16, cab: 36, maxLinhas: 6, cw: 108, ch: 36 };   // medidas do canteiro e dos cards
-const CONCLUIDO_FICA_S = 30 * 60;   // um card concluído fica meia hora no canteiro e depois some
+const ZONA = { cols: 3, sw: 120, sh: 48, pad: 16, cab: 36, maxLinhas: 6, cw: 108, ch: 36 };   // garden and card dimensions
+const CONCLUIDO_FICA_S = 30 * 60;   // a done card stays in the garden for half an hour and then disappears
 
-/* ------------------------------------------------------------ utilidades */
+/* ------------------------------------------------------------ utilities */
 const coVar = (n, fb) => (getComputedStyle(document.documentElement).getPropertyValue(n) || '').trim() || fb;
 function coCores() {
   CO.cores = {
@@ -55,38 +55,38 @@ const coChave = (cid, id) => `${cid}:${id}`;
 const coAgora = () => performance.now() / 1000;
 const coEase = (t) => (t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const coAleat = (a, b) => a + Math.random() * (b - a);
-// espiral de anéis em coordenadas axiais: 0 é o centro do favo; 1..6 o primeiro anel; e assim por diante
+// ring spiral in axial coordinates: 0 is the comb center; 1..6 the first ring; and so on
 function espiralHex(n) {
   const out = [[0, 0]]; const dirs = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]];
-  // cada anel começa no topo (0, -anel) e anda os seis lados na ordem das direções; assim o passeio fecha sem repetir casa
+  // each ring starts at the top (0, -ring) and walks the six sides in direction order; that way the walk closes without repeating a cell
   for (let anel = 1; out.length < n; anel++) { let q = 0, r = -anel; for (let lado = 0; lado < 6 && out.length < n; lado++) for (let k = 0; k < anel && out.length < n; k++) { out.push([q, r]); q += dirs[lado][0]; r += dirs[lado][1]; } }
   return out.slice(0, n);
 }
 const axialParaXY = (q, r, R) => [R * Math.sqrt(3) * (q + r / 2), R * 1.5 * r];
 const aneisPara = (k) => { let r = 0; while (1 + 3 * r * (r + 1) < k) r++; return r; };
 
-/* ------------------------------------------------------------ montagem: equipes viram favos, agentes viram células e abelhas */
+/* ------------------------------------------------------------ layout: teams become combs, agents become cells and bees */
 function coMontar() {
   const p = projetoAtual(); if (!p) return;
   CO.equipes = equipesDoProjeto(p);
   const n = CO.equipes.length;
   const grupos = CO.equipes.map((eq) => {
     const j = PJ[eq.cid] || {};
-    const membros = (j.roster || []).filter((a) => !(a.sistema || a.id === 'mcp') || eq.cid === p.id);   // Cris e Max só no favo principal
+    const membros = (j.roster || []).filter((a) => !(a.sistema || a.id === 'mcp') || eq.cid === p.id);   // Cris and Max only in the main comb
     const lider = j.lider || 'po';
     const ordem = [...membros].sort((a, b) => (a.id === lider ? -1 : b.id === lider ? 1 : 0));
     return { eq, ordem, lider, raio: (aneisPara(ordem.length + (n === 1 ? 1 : 0)) + 1) * PASSO * 1.75 + 8 };
   });
   const antigas = CO.celulas; CO.celulas = new Map(); CO.favos = [];
   CO.rainha.r = HEX_R * 1.6; CO.rainha.x = 0; CO.rainha.y = 0;
-  // Formação: a rainha no centro; um anel de lideranças (uma por equipe) ligadas a ela; e cada equipe dentro de um hexágono grande,
-  // com contorno e preenchimento leve, atrás da sua liderança. Com mais equipes, os hexágonos ocupam anéis mais externos.
+  // Formation: the queen at the center; a ring of leads (one per team) linked to her; and each team inside a large hexagon,
+  // with an outline and a light fill, behind its lead. With more teams, the hexagons take outer rings.
   const R_LIDER = HEX_R * 1.2;
   const anelLider = CO.rainha.r + R_LIDER + 54;
-  const CAB = 30;   // faixa do nome dentro do hexágono da equipe
+  const CAB = 30;   // name strip inside the team hexagon
   const tam = grupos.map((g) => { const k = Math.max(1, g.ordem.length - 1); const a = aneisPara(k); return a * PASSO * Math.sqrt(3) + HEX_R + 26 + CAB / 2; });
   const maior = Math.max(...tam, HEX_R * 2.5);
-  // anéis de equipes: cada anel recebe quantas couberem sem se tocar; os raios crescem com o maior hexágono
+  // team rings: each ring takes as many as fit without touching; radii grow with the largest hexagon
   const aneisEq = []; let resto = grupos.map((g, i) => i); let R = anelLider + R_LIDER + 40 + maior;
   while (resto.length) {
     const cabem = Math.max(1, Math.floor(Math.PI / Math.asin(Math.min(1, (maior + 28) / R))));
@@ -101,7 +101,7 @@ function coMontar() {
       const liderCel = { key: coChave(g.eq.cid, g.ordem[0].id), cid: g.eq.cid, agente: g.ordem[0], equipe: g.eq, x: Math.cos(ang) * anelLider, y: Math.sin(ang) * anelLider, lider: g.ordem[0].id === g.lider, r: R_LIDER, favo: null, pulso: 0, ang };
       const demais = g.ordem.slice(1); const esp = espiralHex(Math.max(demais.length, 1));
       const celulas = [liderCel, ...demais.map((a, q) => { const [dx, dy] = axialParaXY(esp[q][0], esp[q][1], PASSO); return { key: coChave(g.eq.cid, a.id), cid: g.eq.cid, agente: a, equipe: g.eq, x: fx + dx, y: fy + dy + CAB / 2, lider: a.id === g.lider, r: HEX_R, favo: null, pulso: 0 }; })];
-      // cera: completa o último anel do favo
+      // wax: fills out the comb's last ring
       const anelN = aneisPara(Math.max(demais.length, 1)); const usados = new Set(esp.map((o) => o.join(',')));
       const vazias = espiralHex(1 + 3 * anelN * (anelN + 1)).filter((o) => !usados.has(o.join(','))).map((o) => { const [dx, dy] = axialParaXY(o[0], o[1], PASSO); return [fx + dx, fy + dy + CAB / 2]; });
       const favo = { eq: g.eq, cid: g.eq.cid, nome: g.eq.nome, x: fx, y: fy, R: tam[gi], raio: tam[gi], celulas, vazias, lider: g.lider, ang, tom: gi % 2 ? 'violeta' : 'ambar' };
@@ -110,8 +110,8 @@ function coMontar() {
     });
   });
 
-  // Canteiro: três áreas abaixo da colmeia. Os cards do quadro ficam aqui (não em cima dos agentes); a abelha vai até o card para
-  // trabalhar e carrega o card de uma área para a outra. Concluído fica 30 minutos e some, para liberar espaço.
+  // Garden: three areas below the hive. The board's cards live here (not on top of the agents); the bee goes to the card to
+  // work and carries the card from one area to another. Done stays 30 minutes and disappears, to free up space.
   {
     const baixo = Math.max(CO.rainha.r, ...CO.favos.map((f) => f.y + f.R)) + 150;
     const w = ZONA.cols * ZONA.sw + ZONA.pad * 2, h0 = ZONA.cab + ZONA.pad * 2 + 3 * ZONA.sh;
@@ -120,7 +120,7 @@ function coMontar() {
     CO.zonas = {};
     defs.forEach(([id, titulo, tom], i) => { CO.zonas[id] = { id, titulo: I18N.t(titulo), tom, x: -total / 2 + i * (w + 44), y: baixo, w, h: h0, n: 0, extra: 0 }; });
   }
-  // abelhas: uma por célula; quem já existia continua de onde estava
+  // bees: one per cell; existing ones continue from where they were
   const novas = new Map();
   for (const [k, c] of CO.celulas) {
     const b = CO.abelhas.get(k) || { key: k, x: c.x + 21, y: c.y - 7, ang: -Math.PI / 2, asa: 0, modo: 'repouso', base: 'repouso', fase: Math.random() * TAU, rota: null, fila: [], carga: null, balao: 0, estadoAnt: null, alvo: null };
@@ -131,7 +131,7 @@ function coMontar() {
   CO.montadoPara = `${p.id}|${[...CO.celulas.keys()].join(',')}`;
 }
 
-/* ------------------------------------------------------------ leitura do estado: o que cada célula está fazendo agora */
+/* ------------------------------------------------------------ state reading: what each cell is doing right now */
 function coCelulaPorNome(nome, cid) {
   const alvo = semAcento(String(nome || '').trim()); if (!alvo) return null;
   const bate = (c) => semAcento(c.agente.nome) === alvo || semAcento(primeiroNome(c.agente.nome)) === alvo || semAcento(c.agente.tokenNome || '') === alvo || c.agente.id === alvo;
@@ -141,7 +141,7 @@ function coCardDe(c, pr) {
   const cs = PJ[c.cid]?.cartoes || [];
   return (pr?.card && cs.find((k) => k.id === pr.card)) || cs.find((k) => k.coluna === 'andamento' && k.dono === c.agente.id) || cs.find((k) => k.coluna === 'impedimento' && k.dono === c.agente.id) || null;
 }
-/** Situação de uma célula: estado da presença, card em mãos, bloqueio, a quem está ajudando. */
+/** A cell's situation: presence state, card in hand, block, whom it is helping. */
 function coSituacao(c) {
   const pr = (PJ[c.cid]?.presenca || {})[c.agente.id] || null;
   const card = coCardDe(c, pr);
@@ -156,7 +156,7 @@ function coProgresso() {
   return tot ? ok / tot : 0;
 }
 
-/* ------------------------------------------------------------ registro de acontecimentos (canto da tela) */
+/* ------------------------------------------------------------ event log (corner of the screen) */
 function coRegistrar(texto, cor) {
   CO.registro.push({ t: coAgora(), texto, cor: cor || CO.cores.suave });
   if (CO.registro.length > 40) CO.registro.splice(0, CO.registro.length - 40);
@@ -164,7 +164,7 @@ function coRegistrar(texto, cor) {
   el.innerHTML = CO.registro.slice(-7).map((r) => `<div class="co-reg" style="--c:${esc(r.cor)}"><i></i>${esc(r.texto)}</div>`).join('');
 }
 
-/* ------------------------------------------------------------ movimento: voos, fios, ondas, partículas */
+/* ------------------------------------------------------------ motion: flights, threads, waves, particles */
 function coFio(de, para, cor, dur = 14, forca = 1) {
   if (!de || !para || de === para) return;
   const f = CO.fios.find((x) => x.de === de && x.para === para);
@@ -176,14 +176,14 @@ function coFio(de, para, cor, dur = 14, forca = 1) {
 function coOnda(x, y, cor, r0 = HEX_R, r1 = HEX_R * 2.2, dur = .9) { CO.ondas.push({ x, y, cor, r0, r1, dur, t0: coAgora() }); }
 function coParticulas(x, y, cor, n = 8, forca = 60, vida = .9) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, v = coAleat(.3, 1) * forca; CO.particulas.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, cor, t0: coAgora(), vida: vida * coAleat(.6, 1.2), r: coAleat(1.4, 3) }); } }
 const coPonto = (key) => (key && typeof key === 'object' ? key : key === 'rainha' ? CO.rainha : String(key).startsWith('carta:') ? (CO.cartas.get(key.slice(6)) || null) : CO.celulas.get(key) || null);
-/** A abelha de `deKey` voa até `paraKey` (célula ou 'rainha'), fica um instante e volta. carga: 'polen' | 'mel'. */
+/** The bee of `deKey` flies to `paraKey` (a cell or 'rainha'), stays a moment and comes back. carga: 'polen' | 'mel'. */
 function coVoar(deKey, paraKey, cor, carga = 'polen') {
   const b = CO.abelhas.get(deKey), para = coPonto(paraKey); if (!b || !para) return;
-  if (b.fila.length > 3) return;   // uma abelha não acumula viagens sem fim
+  if (b.fila.length > 3) return;   // a bee does not pile up endless trips
   b.fila.push({ para: paraKey, cor: cor || CO.cores.ambar, carga });
   coFio(deKey, paraKey, cor, carga === 'mel' ? 10 : 16);
 }
-function polen(deKey, paraKey, cor) { coVoar(deKey, paraKey, cor); }   // nome antigo, mantido para quem chama de fora
+function polen(deKey, paraKey, cor) { coVoar(deKey, paraKey, cor); }   // old name, kept for external callers
 function coIniciarRota(b, para, cor, carga, volta = false, missao = null) {
   const alvo = coPonto(para); if (!alvo) return false;
   const ponto = para && typeof para === 'object';
@@ -193,7 +193,7 @@ function coIniciarRota(b, para, cor, carga, volta = false, missao = null) {
   b.rota = { x0: b.x, y0: b.y, x1: ax, y1: ay, cx: (b.x + ax) / 2 + (ay - b.y) * .28 * lado, cy: (b.y + ay) / 2 - (ax - b.x) * .28 * lado, t0: coAgora(), dur: Math.min(2.6, Math.max(.7, d / 260)), para, cor, carga, volta, missao };
   b.modo = 'voo'; return true;
 }
-/** A abelha do dono leva o card de onde está até a vaga nova no canteiro: vai até o card, pega, voa até a vaga, solta, volta. */
+/** The owner's bee carries the card from where it is to its new slot in the garden: goes to the card, picks it up, flies to the slot, drops it, comes back. */
 function coMissao(b, carta) {
   if (!b || !carta) return false;
   if (b.missao) return false;
@@ -201,32 +201,32 @@ function coMissao(b, carta) {
   return coIniciarRota(b, { x: carta.x, y: carta.y }, carta.cor, null, false, 'ir');
 }
 
-/* ------------------------------------------------------------ sincronização periódica com o estado do app */
+/* ------------------------------------------------------------ periodic sync with the app state */
 function coSincronizar() {
   const agora = coAgora();
   const tot = { trabalhando: 0, fila: 0, bloqueado: 0, parado: 0 };
   for (const [k, c] of CO.celulas) {
     const s = coSituacao(c); c.sit = s; tot[s.estado]++;
     const b = CO.abelhas.get(k); if (!b) continue;
-    // transições viram acontecimentos
+    // transitions become events
     const ant = b.estadoAnt; b.estadoAnt = s.estado;
     if (ant && ant !== s.estado) {
       if (s.estado === 'trabalhando' && ant !== 'bloqueado') { coParticulas(c.x, c.y - HEX_R, c.agente.cor, 10, 50); coOnda(c.x, c.y, c.agente.cor); if (s.pr?.atividade && !/^(na fila|abrindo)/.test(s.pr.atividade)) coRegistrar(`${primeiroNome(c.agente.nome)}: ${s.pr.atividade}`, c.agente.cor); }
       if (s.estado === 'bloqueado') { coOnda(c.x, c.y, CO.cores.verm, HEX_R, HEX_R * 2.6, 1.2); coRegistrar(I18N.t('{nome} travou em {card}: {motivo}', { nome: primeiroNome(c.agente.nome), card: s.card?.id || I18N.t('um card'), motivo: String(s.card?.bloqueio || '').slice(0, 60) }), CO.cores.verm); }
       if (ant === 'bloqueado' && s.estado !== 'bloqueado') { coOnda(c.x, c.y, CO.cores.verde); coRegistrar(I18N.t('{nome} destravou', { nome: primeiroNome(c.agente.nome) }), CO.cores.verde); }
     }
-    // modo base da abelha
+    // the bee's base mode
     let base = s.estado === 'trabalhando' ? 'trabalho' : s.estado === 'fila' ? 'fila' : s.estado === 'bloqueado' ? 'bloqueado' : 'repouso';
     if (s.ajudando && s.ajudando.key !== k) { base = 'ajuda'; b.alvo = s.ajudando.key; coFio(k, s.ajudando.key, c.agente.cor, 1.5, .4); if (b.base !== 'ajuda') coRegistrar(I18N.t('{nome} foi falar com {outro}', { nome: primeiroNome(c.agente.nome), outro: primeiroNome(s.ajudando.agente.nome) }), c.agente.cor); }
     else if (s.respondendo && s.respondendo.key !== k) coFio(s.respondendo.key, k, s.respondendo.agente.cor, 1.5, .4);
     if (s.aguardando) coFio(k, 'rainha', CO.cores.ambar, 1.5, .3);
-    // trabalhando num card que está no canteiro: a abelha vai até ele e fica lá, com um fio até a célula dela
+    // working on a card that is in the garden: the bee goes to it and stays there, with a thread back to its cell
     b.carta = s.card && CO.cartas.has(`${c.cid}:${s.card.id}`) && (base === 'trabalho' || base === 'bloqueado') ? `${c.cid}:${s.card.id}` : null;
     if (b.carta && base === 'trabalho') coFio(k, `carta:${b.carta}`, c.agente.cor, 1.5, .5);
     b.base = base; if (b.modo !== 'voo' && b.modo !== 'pouso') b.modo = base;
   }
   CO.tot = tot; CO.progresso = coProgresso();
-  // diferenças no quadro: quem pegou, quem concluiu, o que bloqueou
+  // board differences: who picked up, who finished, what got blocked
   for (const eq of CO.equipes) for (const k of PJ[eq.cid]?.cartoes || []) {
     const id = `${eq.cid}:${k.id}`; const ant = CO.cards.get(id);
     const atual = { coluna: k.coluna, bloqueio: !!k.bloqueio, aguardando: !!k.aguardando, dono: k.dono };
@@ -242,7 +242,7 @@ function coSincronizar() {
   }
   coSincronizarCanteiro();
   CO.cardsProntos = true;
-  // ligação de voz: fio dourado entre a rainha e quem está na chamada
+  // voice call: golden thread between the queen and whoever is on the call
   if (typeof CH !== 'undefined' && CH.aberta && CH.lider && CO.celulas.has(coChave(U.proj, CH.lider))) coFio('rainha', coChave(U.proj, CH.lider), CO.cores.ouro, 1.5, .6);
   // HUD
   const h = CO.raiz; if (h) {
@@ -254,14 +254,14 @@ function coSincronizar() {
   void agora;
 }
 
-/* ------------------------------------------------------------ canteiro: cards nas áreas, vagas e mudanças de área */
+/* ------------------------------------------------------------ garden: cards in the areas, slots and area changes */
 function coSincronizarCanteiro() {
   if (!CO.zonas) return;
   const agora = coAgora(); const vistos = new Set();
   for (const eq of CO.equipes) for (const k of PJ[eq.cid]?.cartoes || []) {
     if (k.arquivado) continue;
     const id = `${eq.cid}:${k.id}`; let carta = CO.cartas.get(id);
-    // concluído: lembra quando concluiu (ao abrir, usa a data do card) para somer depois de meia hora
+    // done: remember when it was done (on open, use the card's date) so it disappears after half an hour
     if (k.coluna === 'concluido' && !carta?.concluidoEm) { const ha = (Date.now() - Date.parse(k.atualizado || Date.now())) / 1000; if (ha > CONCLUIDO_FICA_S) continue; if (carta) carta.concluidoEm = agora - ha; }
     const zona = ['backlog', 'pronto'].includes(k.coluna) ? (k.coluna === 'pronto' || k.dono ? 'fazer' : null) : ['andamento', 'revisao', 'qa', 'impedimento'].includes(k.coluna) ? 'andamento' : k.coluna === 'concluido' ? 'concluido' : null;
     if (!zona) continue;
@@ -272,21 +272,21 @@ function coSincronizarCanteiro() {
     if (!carta) {
       const z = CO.zonas[zona];
       carta = { id, cid: eq.cid, card: k, zona, cor, x: z.x + z.w / 2, y: z.y + z.h / 2, tx: 0, ty: 0, portador: null, nasc: agora, alfa: 0, concluidoEm: k.coluna === 'concluido' ? agora - (Date.now() - Date.parse(k.atualizado || Date.now())) / 1000 : null };
-      if (CO.cardsProntos && cel) { const b = CO.abelhas.get(cel.key); if (b && zona !== 'concluido') { carta.x = cel.x; carta.y = cel.y; } }   // card novo "sai" da célula do dono
+      if (CO.cardsProntos && cel) { const b = CO.abelhas.get(cel.key); if (b && zona !== 'concluido') { carta.x = cel.x; carta.y = cel.y; } }   // a new card "comes out" of the owner's cell
       CO.cartas.set(id, carta);
     }
     carta.card = k; carta.cor = cor; carta.dono = cel?.key || null;
     if (carta.zona !== zona) {
       const de = carta.zona; carta.zona = zona; carta.mudouEm = agora;
       if (zona === 'concluido') carta.concluidoEm = agora;
-      // quem leva o card: a abelha do dono (se não houver, o card vai sozinho)
+      // who carries the card: the owner's bee (if there is none, the card moves on its own)
       const b = cel && CO.abelhas.get(cel.key);
       if (b && CO.cardsProntos) { carta.pendente = { de, para: zona }; coMissao(b, carta); }
     }
   }
-  // cards que saíram do quadro (ou passaram da meia hora): somem suavemente
+  // cards that left the board (or passed the half hour): fade out smoothly
   for (const [id, carta] of CO.cartas) { if (!vistos.has(id) && !carta.sumindo) { carta.sumindo = agora; } if (carta.sumindo && agora - carta.sumindo > .8) { if (carta.portador) { const b = CO.abelhas.get(carta.portador); if (b) { b.missao = null; b.modo = b.base; } } CO.cartas.delete(id); } }
-  // vagas por área: ordem estável (em andamento primeiro os bloqueados, depois por atualização; concluído, o mais novo primeiro)
+  // slots per area: stable order (in progress: blocked first, then by update; done: newest first)
   for (const z of Object.values(CO.zonas)) {
     const lista = [...CO.cartas.values()].filter((c) => c.zona === z.id && !c.sumindo);
     if (z.id === 'concluido') lista.sort((a, b) => (b.concluidoEm || 0) - (a.concluidoEm || 0));
@@ -299,11 +299,11 @@ function coSincronizarCanteiro() {
   }
 }
 
-/* ------------------------------------------------------------ física das abelhas */
+/* ------------------------------------------------------------ bee physics */
 function coMoverAbelha(b, dt) {
   const c = CO.celulas.get(b.key); if (!c) return;
   const t = CO.t + b.fase;
-  if (CO.puxando?.key === b.key) {   // a Game Director está puxando esta abelha pelo fio
+  if (CO.puxando?.key === b.key) {   // the Game Director is pulling this bee by the thread
     const f = 1 - Math.exp(-dt * 14); const ox = b.x, oy = b.y;
     b.x += (CO.puxando.x - b.x) * f; b.y += (CO.puxando.y - 10 - b.y) * f; b.asa += dt * 60;
     const vx = b.x - ox, vy = b.y - oy; if (Math.hypot(vx, vy) > .2) b.ang += ((Math.atan2(vy, vx) - b.ang + Math.PI * 3) % TAU - Math.PI) * Math.min(1, dt * 10);
@@ -314,7 +314,7 @@ function coMoverAbelha(b, dt) {
     const mt = 1 - e; const nx = mt * mt * r.x0 + 2 * mt * e * r.cx + e * e * r.x1, ny = mt * mt * r.y0 + 2 * mt * e * r.cy + e * e * r.y1;
     b.ang = Math.atan2(ny - b.y, nx - b.x) || b.ang; b.x = nx; b.y = ny; b.asa += dt * 60;
     if (Math.random() < dt * 18) CO.particulas.push({ x: b.x - Math.cos(b.ang) * 6, y: b.y - Math.sin(b.ang) * 6, vx: coAleat(-6, 6), vy: coAleat(-6, 6), cor: r.cor, t0: coAgora(), vida: .7, r: coAleat(.8, 1.8) });
-    if (u >= 1 && r.missao) {   // missão de carregar card: ir até ele, pegar, levar até a vaga, soltar, voltar
+    if (u >= 1 && r.missao) {   // card-carrying mission: go to it, pick it up, take it to the slot, drop it, come back
       const carta = CO.cartas.get(b.missao?.carta);
       if (!carta) { b.missao = null; b.rota = null; b.modo = b.base; return; }
       if (r.missao === 'ir') { carta.portador = b.key; b.missao.fase = 'levar'; coIniciarRota(b, { x: carta.tx, y: carta.ty }, carta.cor, null, false, 'levar'); return; }
@@ -329,7 +329,7 @@ function coMoverAbelha(b, dt) {
     }
     if (u >= 1) {
       const alvo = coPonto(r.para);
-      if (!r.volta) {   // chegou: pólen entregue, onda no destino, um instante de conversa, depois volta
+      if (!r.volta) {   // arrived: pollen delivered, wave at the target, a moment of conversation, then come back
         if (alvo) { coOnda(alvo.x, alvo.y, r.cor, r.para === 'rainha' ? CO.rainha.r : HEX_R, (r.para === 'rainha' ? CO.rainha.r : HEX_R) * 1.9); coParticulas(b.x, b.y, r.cor, r.carga === 'mel' ? 16 : 6, r.carga === 'mel' ? 70 : 35); }
         if (r.carga === 'mel') { CO.entregas++; CO.rainha.pulso = 1; }
         b.modo = 'pouso'; b.balao = coAgora() + (r.carga === 'mel' ? .6 : 1.1); b.pousoAte = b.balao; b.rotaVolta = { cor: r.cor }; b.rota = null;
@@ -339,23 +339,23 @@ function coMoverAbelha(b, dt) {
   }
   if (b.modo === 'pouso') { b.asa += dt * 30; b.y += Math.sin(t * 9) * dt * 6; if (coAgora() >= b.pousoAte) { if (b.fila.length) { const p = b.fila.shift(); coIniciarRota(b, p.para, p.cor, p.carga); } else coIniciarRota(b, b.key, b.rotaVolta?.cor || CO.cores.ambar, null, true); } return; }
   if (b.fila.length && b.modo !== 'voo') { const p = b.fila.shift(); if (coIniciarRota(b, p.para, p.cor, p.carga)) return; }
-  // alvo do modo
+  // target for the mode
   let tx = c.x, ty = c.y + 8, k = 6, bate = 0;
   const carta = b.carta ? CO.cartas.get(b.carta) : null;
-  if (b.modo === 'trabalho' && carta && !carta.oculta) { tx = carta.x + Math.sin(t * 1.3) * 10; ty = carta.y - 24 + Math.cos(t * 2.1) * 4; bate = 55; k = 3; }   // trabalha em cima do card, no canteiro
+  if (b.modo === 'trabalho' && carta && !carta.oculta) { tx = carta.x + Math.sin(t * 1.3) * 10; ty = carta.y - 24 + Math.cos(t * 2.1) * 4; bate = 55; k = 3; }   // works on top of the card, in the garden
   else if (b.modo === 'bloqueado' && carta && !carta.oculta) { tx = carta.x + 48 + Math.sin(t * 14) * 1.2; ty = carta.y - 6; bate = 6; k = 3; }
   else if (b.modo === 'trabalho') { tx = c.x + Math.sin(t * 1.3) * 9; ty = c.y - HEX_R * .95 + Math.cos(t * 2.1) * 4; bate = 55; }
   else if (b.modo === 'fila') { const a = t * .9; tx = c.x + Math.cos(a) * (HEX_R + 9); ty = c.y + Math.sin(a) * (HEX_R + 9) * .8; bate = 40; k = 8; }
   else if (b.modo === 'ajuda') { const al = coPonto(b.alvo); if (al) { const dx = c.x - al.x, dy = c.y - al.y, d = Math.hypot(dx, dy) || 1; tx = al.x + (dx / d) * (HEX_R + 12) + Math.sin(t * 1.7) * 4; ty = al.y + (dy / d) * (HEX_R + 12) - 10 + Math.cos(t * 2.3) * 3; bate = 50; } }
   else if (b.modo === 'bloqueado') { tx = c.x + 21 + Math.sin(t * 14) * 1.2; ty = c.y - 7; bate = 6; }
-  else { tx = c.x + 21; ty = c.y - 7; bate = 0; }   // repouso: encostada ao lado da foto, sem cobrir o nome
+  else { tx = c.x + 21; ty = c.y - 7; bate = 0; }   // idle: resting next to the photo, without covering the name
   const f = 1 - Math.exp(-dt * k); const ox = b.x, oy = b.y;
   b.x += (tx - b.x) * f; b.y += (ty - b.y) * f;
   const vx = b.x - ox, vy = b.y - oy; if (Math.hypot(vx, vy) > .15) b.ang += ((Math.atan2(vy, vx) - b.ang + Math.PI * 3) % TAU - Math.PI) * Math.min(1, dt * 8);
   b.asa += dt * bate;
 }
 
-/* ------------------------------------------------------------ desenho */
+/* ------------------------------------------------------------ drawing */
 function coDesenhar() {
   const { ctx, cam, W, H, cores } = CO; const z = cam.z;
   ctx.setTransform(CO.dpr, 0, 0, CO.dpr, 0, 0); ctx.clearRect(0, 0, W, H);
@@ -364,7 +364,7 @@ function coDesenhar() {
   const dentro = (x, y, m = 80) => x > vis.x0 - m && x < vis.x1 + m && y > vis.y0 - m && y < vis.y1 + m;
   CO.hits = [];
   const t = CO.t;
-  // fundo: grade de favo infinita, bem sutil
+  // background: infinite honeycomb grid, very subtle
   if (z > .28) {
     const G = HEX_R * 2.3; const gw = G * Math.sqrt(3), gh = G * 1.5;
     ctx.strokeStyle = cores.linha; ctx.globalAlpha = Math.min(.5, (z - .28) * 1.4); ctx.lineWidth = 1 / z;
@@ -373,7 +373,7 @@ function coDesenhar() {
     for (let r = r0; r <= r1 && n < 2500; r++) { const off = (r % 2) * gw / 2; const q0 = Math.floor((vis.x0 - off) / gw) - 1, q1 = Math.ceil((vis.x1 - off) / gw) + 1; for (let q = q0; q <= q1 && n < 2500; q++, n++) { const x = q * gw + off, y = r * gh; for (let i = 0; i < 6; i++) { const a = Math.PI / 180 * (60 * i - 30); const px = x + (G - 3) * Math.cos(a), py = y + (G - 3) * Math.sin(a); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.closePath(); } }
     ctx.stroke(); ctx.globalAlpha = 1;
   }
-  // equipes: cada uma dentro de um hexágono grande, com contorno e preenchimento leve, o nome no alto e a cera completando o favo
+  // teams: each inside a large hexagon, with an outline and a light fill, the name at the top and wax filling out the comb
   for (const f of CO.favos) {
     if (!dentro(f.x, f.y, f.R + 80)) continue;
     const tom = f.tom === 'violeta' ? cores.violeta : cores.ambar;
@@ -381,7 +381,7 @@ function coDesenhar() {
     ctx.fillStyle = coRgba(tom, ativos ? .07 : .045); coHex(ctx, f.x, f.y, f.R); ctx.fill();
     ctx.strokeStyle = coRgba(tom, ativos ? .75 : .42); ctx.lineWidth = 1.6 / Math.sqrt(z); coHex(ctx, f.x, f.y, f.R); ctx.stroke();
     ctx.strokeStyle = coRgba(tom, .12); ctx.lineWidth = 6 / Math.sqrt(z); coHex(ctx, f.x, f.y, f.R + 4); ctx.stroke();
-    CO.hits.push({ tipo: 'equipe', favo: f, x: f.x - f.R * .62, y: f.y - f.R + 2, w: f.R * 1.24, h: 46 });   // a faixa do nome: arrastar por ela move a equipe (o resto do fundo move a câmera)
+    CO.hits.push({ tipo: 'equipe', favo: f, x: f.x - f.R * .62, y: f.y - f.R + 2, w: f.R * 1.24, h: 46 });   // the name strip: dragging it moves the team (the rest of the background moves the camera)
     ctx.fillStyle = cores.cera;
     for (const [x, y] of f.vazias) { coHex(ctx, x, y, HEX_R - 1); ctx.fill(); }
     if (z > .22) {
@@ -393,19 +393,19 @@ function coDesenhar() {
       const w = ctx.measureText(nome).width; CO.hits.push({ tipo: 'favo', favo: f, x: f.x - w / 2 - 8, y: ly - 12, w: w + 16, h: 30 });
     }
   }
-  // estrutura: rainha ligada a cada liderança, e cada liderança ligada ao hexágono da sua equipe (com um nó em cada ponta)
+  // structure: queen linked to each lead, and each lead linked to its team's hexagon (with a node at each end)
   for (const f of CO.favos) {
     const l = f.celulas[0]; if (!l) continue;
     const tom = f.tom === 'violeta' ? cores.violeta : cores.ambar;
     ctx.strokeStyle = coRgba(cores.ouro, .35); ctx.lineWidth = 1.2 / Math.sqrt(z);
     ctx.beginPath(); ctx.moveTo(CO.rainha.x, CO.rainha.y); ctx.lineTo(l.x, l.y); ctx.stroke();
     const d = Math.hypot(f.x - l.x, f.y - l.y) || 1, ux = (f.x - l.x) / d, uy = (f.y - l.y) / d;
-    const bx = f.x - ux * f.R, by = f.y - uy * f.R;   // borda do hexágono da equipe, do lado da liderança
+    const bx = f.x - ux * f.R, by = f.y - uy * f.R;   // edge of the team hexagon, on the lead's side
     ctx.strokeStyle = coRgba(tom, .5); ctx.beginPath(); ctx.moveTo(l.x + ux * l.r, l.y + uy * l.r); ctx.lineTo(bx, by); ctx.stroke();
     ctx.fillStyle = cores.ouro; ctx.beginPath(); ctx.arc(bx, by, 3 / Math.sqrt(z), 0, TAU); ctx.fill();
     ctx.beginPath(); ctx.arc(CO.rainha.x + (l.x - CO.rainha.x) / Math.hypot(l.x, l.y) * CO.rainha.r, CO.rainha.y + (l.y - CO.rainha.y) / Math.hypot(l.x, l.y) * CO.rainha.r, 3 / Math.sqrt(z), 0, TAU); ctx.fill();
   }
-  // fios de comunicação
+  // communication threads
   const agora = coAgora();
   CO.fios = CO.fios.filter((f) => f.ate > agora);
   for (const f of CO.fios) {
@@ -418,19 +418,19 @@ function coDesenhar() {
     ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(mx, my, b.x, b.y); ctx.stroke();
     ctx.setLineDash([]); ctx.globalAlpha = 1;
   }
-  // ondas
+  // waves
   CO.ondas = CO.ondas.filter((o) => agora - o.t0 < o.dur);
   for (const o of CO.ondas) { const u = (agora - o.t0) / o.dur; ctx.globalAlpha = (1 - u) * .7; ctx.strokeStyle = o.cor; ctx.lineWidth = 2 / z; coHex(ctx, o.x, o.y, o.r0 + (o.r1 - o.r0) * coEase(u)); ctx.stroke(); }
   ctx.globalAlpha = 1;
-  // células
+  // cells
   const detalhe = z > .55, rotulos = z > .38; const cards = [];
   for (const c of CO.celulas.values()) {
     if (!dentro(c.x, c.y)) continue;
     const s = c.sit || { estado: 'parado' }; const cor = c.agente.cor || cores.ambar; const R = c.r || HEX_R;
     const pulso = .5 + .5 * Math.sin(t * 3.2 + c.x * .01);
-    // brilho de quem trabalha
+    // glow for whoever is working
     if (s.estado === 'trabalhando' || s.estado === 'bloqueado') { const g = s.estado === 'bloqueado' ? cores.verm : cor; ctx.globalAlpha = .10 + .14 * pulso; ctx.fillStyle = g; coHex(ctx, c.x, c.y, R + 9 + pulso * 3); ctx.fill(); ctx.globalAlpha = 1; }
-    // corpo da célula
+    // cell body
     ctx.fillStyle = s.estado === 'trabalhando' ? coRgba(cor, .20) : s.estado === 'bloqueado' ? coRgba(cores.verm, .16) : s.estado === 'fila' ? cores.bg3 : cores.bg2;
     coHex(ctx, c.x, c.y, R); ctx.fill();
     ctx.fillStyle = s.estado === 'parado' ? cores.bg3 : 'transparent'; if (s.estado === 'parado') { ctx.globalAlpha = .55; ctx.fill(); ctx.globalAlpha = 1; }
@@ -438,16 +438,16 @@ function coDesenhar() {
     ctx.strokeStyle = s.estado === 'trabalhando' ? cor : s.estado === 'bloqueado' ? cores.verm : s.estado === 'fila' ? coRgba(cores.violeta, .7) : cores.linha;
     if (s.estado === 'fila') { ctx.setLineDash([4, 6]); ctx.lineDashOffset = -t * 18; }
     coHex(ctx, c.x, c.y, R); ctx.stroke(); ctx.setLineDash([]);
-    // liderança: coroa de favo dourada em volta da célula, sempre visível
+    // lead: golden comb crown around the cell, always visible
     if (c.lider) { ctx.strokeStyle = cores.ouro; ctx.lineWidth = 2 / Math.sqrt(z); ctx.globalAlpha = .9; coHex(ctx, c.x, c.y, R + 4); ctx.stroke(); ctx.globalAlpha = .35; ctx.lineWidth = 1 / Math.sqrt(z); coHex(ctx, c.x, c.y, R + 8); ctx.stroke(); ctx.globalAlpha = 1; }
     if (c === CO.hover?.cel) { ctx.strokeStyle = cores.texto; ctx.lineWidth = 1.5 / Math.sqrt(z); coHex(ctx, c.x, c.y, R + 3); ctx.stroke(); }
-    // foto ou iniciais
+    // photo or initials
     const alfa = s.estado === 'parado' ? .5 : 1; ctx.globalAlpha = alfa;
     const img = detalhe ? coImg(c.agente.foto || (typeof avatarPadrao === 'function' ? avatarPadrao(c.agente.id) : null)) : null; const fy = c.y - (rotulos ? 6 : 0), fr = (rotulos ? 14 : 17) * (c.lider ? 1.3 : 1);
     if (img) { ctx.save(); ctx.beginPath(); ctx.arc(c.x, fy, fr, 0, TAU); ctx.clip(); ctx.drawImage(img, c.x - fr, fy - fr, fr * 2, fr * 2); ctx.restore(); }
     else { ctx.fillStyle = cor; ctx.beginPath(); ctx.arc(c.x, fy, fr - 1, 0, TAU); ctx.fill(); if (rotulos) { ctx.fillStyle = '#1B1200'; ctx.font = `700 11px ${CO.fonte}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(iniciais(c.agente.nome), c.x, fy + .5); } }
     if (c.lider) { ctx.fillStyle = cores.ouro; const cy2 = fy - fr - 2; ctx.beginPath(); ctx.moveTo(c.x - 6, cy2 + 3); ctx.lineTo(c.x - 6, cy2 - 3); ctx.lineTo(c.x - 3, cy2); ctx.lineTo(c.x, cy2 - 4.5); ctx.lineTo(c.x + 3, cy2); ctx.lineTo(c.x + 6, cy2 - 3); ctx.lineTo(c.x + 6, cy2 + 3); ctx.closePath(); ctx.fill(); }
-    // nome e atividade
+    // name and activity
     if (rotulos) {
       ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = s.estado === 'trabalhando' ? cores.texto : cores.suave; ctx.font = `600 10.5px ${CO.fonte}`; ctx.fillText(coCortar(ctx, I18N.t(primeiroNome(c.agente.nome)), R * 1.7), c.x, c.y + (c.lider ? 24 : 18));
@@ -456,7 +456,7 @@ function coDesenhar() {
       if (sub) ctx.fillText(sub, c.x, c.y + (c.lider ? 34 : 28));
     }
     ctx.globalAlpha = 1;
-    // sinais: bloqueio e aguardando
+    // signals: blocked and waiting
     if (s.estado === 'bloqueado' || s.aguardando) {
       const bx = c.x - R * .78, by = c.y - R * .55; const corS = s.estado === 'bloqueado' ? cores.verm : cores.ambar;
       ctx.fillStyle = corS; ctx.globalAlpha = .75 + .25 * pulso; ctx.beginPath(); ctx.arc(bx, by, 7, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
@@ -465,11 +465,11 @@ function coDesenhar() {
     CO.hits.push({ tipo: 'cel', cel: c, x: c.x - R, y: c.y - R, w: R * 2, h: R * 2 });
   }
   void cards;
-  // canteiro: as três áreas e os cards nelas (os carregados seguem a abelha)
+  // garden: the three areas and their cards (carried ones follow the bee)
   coDesenharCanteiro(t, z, dentro);
-  // rainha
+  // queen
   coDesenharRainha(t);
-  // seleção (clique simples): anel claro em volta do agente ou do card
+  // selection (single click): light ring around the agent or the card
   if (CO.selecionado) {
     const s = CO.selecionado; ctx.strokeStyle = cores.texto; ctx.lineWidth = 1.6 / Math.sqrt(z); ctx.globalAlpha = .9;
     if (s.tipo === 'cel' && CO.celulas.has(s.cel.key)) coHex(ctx, s.cel.x, s.cel.y, (s.cel.r || HEX_R) + 6);
@@ -477,18 +477,18 @@ function coDesenhar() {
     else if (s.tipo === 'rainha') coHex(ctx, CO.rainha.x, CO.rainha.y, CO.rainha.r + 10);
     if (CO.selecionado) ctx.stroke(); ctx.globalAlpha = 1;
   }
-  // fio de quem está sendo puxado pela Game Director, e o alvo onde ela pode soltar
+  // thread of whoever is being pulled by the Game Director, and the target where it can be dropped
   if (CO.puxando) {
     const c = CO.celulas.get(CO.puxando.key), b = CO.abelhas.get(CO.puxando.key);
     if (c && b) { ctx.strokeStyle = cores.ouro; ctx.lineWidth = 1.4 / Math.sqrt(z); ctx.setLineDash([4, 6]); ctx.lineDashOffset = -t * 30; ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.setLineDash([]); }
     const a = CO.alvoSolta;
     if (a) { ctx.strokeStyle = cores.ouro; ctx.lineWidth = 2.5 / Math.sqrt(z); ctx.globalAlpha = .6 + .4 * Math.sin(t * 6); if (a.tipo === 'cel') coHex(ctx, a.cel.x, a.cel.y, (a.cel.r || HEX_R) + 7); else coRect(ctx, a.x - 5, a.y - 5, a.w + 10, a.h + 10, 9); ctx.stroke(); ctx.globalAlpha = 1; }
   }
-  // partículas
+  // particles
   CO.particulas = CO.particulas.filter((p) => agora - p.t0 < p.vida);
   for (const p of CO.particulas) { const u = (agora - p.t0) / p.vida; ctx.globalAlpha = (1 - u) * .9; ctx.fillStyle = p.cor; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1 - u * .5) / Math.sqrt(z), 0, TAU); ctx.fill(); }
   ctx.globalAlpha = 1;
-  // abelhas por cima de tudo
+  // bees on top of everything
   for (const b of CO.abelhas.values()) { if (dentro(b.x, b.y)) coDesenharAbelha(b, z); }
 }
 function coDesenharCanteiro(t, z, dentro) {
@@ -500,22 +500,22 @@ function coDesenharCanteiro(t, z, dentro) {
     const vivo = zn.id === 'andamento' && zn.n > 0;
     ctx.fillStyle = coRgba(zn.tom === 'suave' ? '#F3EAD9' : tom, vivo ? .06 : .035); coRect(ctx, zn.x, zn.y, zn.w, zn.h, 18); ctx.fill();
     ctx.strokeStyle = coRgba(zn.tom === 'suave' ? '#F3EAD9' : tom, vivo ? .55 : .25); ctx.lineWidth = 1.4 / Math.sqrt(z); coRect(ctx, zn.x, zn.y, zn.w, zn.h, 18); ctx.stroke();
-    // filete de LED no topo e o nome da área
+    // LED strip at the top and the area name
     ctx.fillStyle = coRgba(tom, vivo ? .9 : .5); coRect(ctx, zn.x + 24, zn.y, zn.w - 48, 2, 1); ctx.fill();
-    CO.hits.push({ tipo: 'zona', zona: zn, x: zn.x, y: zn.y, w: zn.w, h: ZONA.cab + 4 });   // arrastar pela faixa do título move o quadro (os cards vão junto)
+    CO.hits.push({ tipo: 'zona', zona: zn, x: zn.x, y: zn.y, w: zn.w, h: ZONA.cab + 4 });   // dragging the title strip moves the board (the cards go along)
     if (z > .25) {
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.letterSpacing = '.14em';
       ctx.fillStyle = cores.texto; ctx.font = `700 ${Math.max(10, Math.min(14, 11 / z))}px ${CO.fonte}`; ctx.fillText(zn.titulo.toUpperCase(), zn.x + ZONA.pad, zn.y + ZONA.cab / 2 + 1); ctx.letterSpacing = '0px';
       ctx.textAlign = 'right'; ctx.fillStyle = coRgba(tom, .95); ctx.font = `700 ${Math.max(10, Math.min(13, 11 / z))}px ${CO.fonte}`;
       ctx.fillText(zn.extra ? I18N.t('{n} ({extra} fora da vista)', { n: zn.n, extra: zn.extra }) : String(zn.n), zn.x + zn.w - ZONA.pad, zn.y + ZONA.cab / 2 + 1); ctx.textAlign = 'center';
     }
-    // vagas vazias: marcação sutil de favo, para a área parecer construída
+    // empty slots: subtle honeycomb marking, so the area looks built
     if (z > .45) { ctx.strokeStyle = 'rgba(243, 234, 217, .05)'; ctx.lineWidth = 1 / z; const linhas = Math.round((zn.h - ZONA.cab - ZONA.pad * 2) / ZONA.sh); for (let li = 0; li < linhas; li++) for (let co = 0; co < ZONA.cols; co++) { const cx = zn.x + ZONA.pad + co * ZONA.sw + ZONA.sw / 2, cy = zn.y + ZONA.cab + ZONA.pad + li * ZONA.sh + ZONA.sh / 2; coRect(ctx, cx - ZONA.cw / 2, cy - ZONA.ch / 2, ZONA.cw, ZONA.ch, 6); ctx.stroke(); } }
   }
   if (z <= .3) return;
   for (const carta of CO.cartas.values()) {
     if (carta.oculta) continue;
-    // posição: carregada pela abelha, ou deslizando para a vaga
+    // position: carried by the bee, or sliding into the slot
     if (carta.portador) { const b = CO.abelhas.get(carta.portador); if (b) { carta.x = b.x; carta.y = b.y + 20; } }
     else { const f = 1 - Math.exp(-(1 / 60) * 5); carta.x += (carta.tx - carta.x) * f; carta.y += (carta.ty - carta.y) * f; }
     carta.alfa = Math.min(1, (carta.alfa || 0) + .05);
@@ -540,13 +540,13 @@ function coDesenharCard(k, x, y, cor, cid, escala = 1) {
   const okN = (k.aceite || []).filter((a) => a.ok).length, totN = (k.aceite || []).length;
   if (totN) { ctx.fillStyle = cores.mudo; ctx.font = `7px ${CO.fonte}`; ctx.textAlign = 'right'; ctx.fillText(`${okN}/${totN}`, x + w - 6, y + 11); ctx.textAlign = 'left'; }
   ctx.fillStyle = cores.texto; ctx.font = `600 9px ${CO.fonte}`; ctx.fillText(coCortar(ctx, k.titulo, w - 16), x + 9, y + 23);
-  // barra: aceite cumprido, ou só o fluxo da coluna
+  // bar: acceptance met, or just the column flow
   const prog = totN ? okN / totN : k.coluna === 'revisao' || k.coluna === 'qa' ? .8 : k.coluna === 'andamento' ? .35 : .1;
   ctx.fillStyle = cores.bg5; coRect(ctx, x + 9, y + h - 8, w - 18, 2.5, 2); ctx.fill();
   ctx.fillStyle = borda; coRect(ctx, x + 9, y + h - 8, (w - 18) * prog, 2.5, 2); ctx.fill();
   if (k.bloqueio) { ctx.save(); coRect(ctx, x, y, w, h, 6); ctx.clip(); ctx.strokeStyle = coRgba(cores.verm, .18); ctx.lineWidth = 3; for (let i = -h; i < w + h; i += 10) { ctx.beginPath(); ctx.moveTo(x + i, y); ctx.lineTo(x + i - h, y + h); ctx.stroke(); } ctx.restore(); }
   if (k.coluna === 'concluido') { ctx.fillStyle = cores.verde; ctx.beginPath(); ctx.arc(x + w - 9, y + 9, 4, 0, TAU); ctx.fill(); ctx.strokeStyle = '#1B1200'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x + w - 11, y + 9); ctx.lineTo(x + w - 9.5, y + 10.5); ctx.lineTo(x + w - 7, y + 7.5); ctx.stroke(); }
-  // de qual equipe é: chip hexagonal com a inicial e a cor da equipe, colado na borda esquerda do card
+  // which team it belongs to: hexagonal chip with the team's initial and color, stuck to the card's left edge
   const favo = CO.favos.find((f) => f.cid === cid);
   if (favo && CO.favos.length > 1) {
     const tom = favo.tom === 'violeta' ? cores.violeta : cores.ambar;
@@ -562,7 +562,7 @@ function coDesenharRainha(t) {
   const pulso = .5 + .5 * Math.sin(t * 1.6);
   ctx.globalAlpha = .10 + .10 * pulso + R.pulso * .5; ctx.fillStyle = cores.ambar; coHex(ctx, R.x, R.y, r + 16 + pulso * 4 + R.pulso * 20); ctx.fill(); ctx.globalAlpha = 1;
   ctx.fillStyle = cores.bg3; coHex(ctx, R.x, R.y, r); ctx.fill();
-  // mel: o favo da rainha enche com o progresso do projeto
+  // honey: the queen's comb fills with the project's progress
   ctx.save(); coHex(ctx, R.x, R.y, r); ctx.clip();
   const nivel = CO.progresso; const topo = R.y + r - nivel * r * 2; const onda = Math.sin(t * 1.3) * 1.5;
   const g = ctx.createLinearGradient(0, topo, 0, R.y + r); g.addColorStop(0, coRgba(cores.ouro, .55)); g.addColorStop(1, coRgba(cores.laranja, .55));
@@ -573,7 +573,7 @@ function coDesenharRainha(t) {
   const u = usuarioDe(); const img = coImg(u.foto); const fr = 22, fy = R.y - 8;
   if (img) { ctx.save(); ctx.beginPath(); ctx.arc(R.x, fy, fr, 0, TAU); ctx.clip(); ctx.drawImage(img, R.x - fr, fy - fr, fr * 2, fr * 2); ctx.restore(); }
   else { const gg = ctx.createRadialGradient(R.x, fy - 6, 2, R.x, fy, fr); gg.addColorStop(0, cores.ouro); gg.addColorStop(1, cores.laranja); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(R.x, fy, fr - 2, 0, TAU); ctx.fill(); ctx.fillStyle = '#1B1200'; ctx.font = `700 15px ${CO.fonte}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(iniciais(u.nome), R.x, fy + 1); }
-  // coroa: três pontinhas douradas
+  // crown: three little golden points
   ctx.fillStyle = cores.ouro; ctx.beginPath(); const cy = fy - fr - 3; ctx.moveTo(R.x - 9, cy + 4); ctx.lineTo(R.x - 9, cy - 4); ctx.lineTo(R.x - 4.5, cy); ctx.lineTo(R.x, cy - 6); ctx.lineTo(R.x + 4.5, cy); ctx.lineTo(R.x + 9, cy - 4); ctx.lineTo(R.x + 9, cy + 4); ctx.closePath(); ctx.fill();
   if (CO.cam.z > .3) { ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = cores.texto; ctx.font = `700 11px ${CO.fonte}`; ctx.fillText(coCortar(ctx, I18N.t(primeiroNome(u.nome)), r * 1.7), R.x, R.y + 30); ctx.fillStyle = cores.ambar; ctx.font = `700 7px ${CO.fonte}`; ctx.letterSpacing = '.14em'; ctx.fillText(I18N.t('RAINHA'), R.x, R.y + 41); ctx.letterSpacing = '0px'; }
   CO.hits.push({ tipo: 'rainha', x: R.x - r, y: R.y - r, w: r * 2, h: r * 2 });
@@ -582,29 +582,29 @@ function coDesenharAbelha(b, z) {
   const { ctx, cores } = CO; const c = CO.celulas.get(b.key); if (!c) return;
   const cor = c.agente.cor || cores.ambar;
   const repouso = b.modo === 'repouso';
-  const esc = Math.min(2.4, Math.max(1, .62 / z)) * (repouso || b.modo === 'bloqueado' ? .8 : 1);   // longe, a abelha cresce para continuar visível; em repouso ela encolhe
+  const esc = Math.min(2.4, Math.max(1, .62 / z)) * (repouso || b.modo === 'bloqueado' ? .8 : 1);   // far away, the bee grows to stay visible; when idle it shrinks
   ctx.save(); ctx.translate(b.x, b.y); ctx.scale(esc, esc);
   if (repouso) ctx.globalAlpha = .55;
-  // sombra de cor do agente
+  // agent color shadow
   ctx.fillStyle = coRgba(cor, repouso ? .18 : .35); ctx.beginPath(); ctx.arc(0, 0, 8.5, 0, TAU); ctx.fill();
   ctx.rotate(b.ang);
-  // asas
+  // wings
   const bat = repouso ? 0 : Math.sin(b.asa) * .55;
   ctx.fillStyle = 'rgba(243, 234, 217, .55)';
   for (const lado of [-1, 1]) { ctx.save(); ctx.translate(-1, lado * 2.2); ctx.rotate(lado * (.55 + bat) ); ctx.beginPath(); ctx.ellipse(-2, 0, 5.2, 2.4, 0, 0, TAU); ctx.fill(); ctx.restore(); }
-  // corpo listrado
+  // striped body
   ctx.fillStyle = cores.ambar; ctx.beginPath(); ctx.ellipse(0, 0, 6.2, 3.6, 0, 0, TAU); ctx.fill();
   ctx.save(); ctx.beginPath(); ctx.ellipse(0, 0, 6.2, 3.6, 0, 0, TAU); ctx.clip(); ctx.fillStyle = '#1B1200'; for (const sx of [-3.2, -.6, 2]) ctx.fillRect(sx, -4, 1.4, 8); ctx.restore();
-  ctx.fillStyle = '#1B1200'; ctx.beginPath(); ctx.arc(5.8, 0, 2.3, 0, TAU); ctx.fill();   // cabeça
-  ctx.strokeStyle = '#1B1200'; ctx.lineWidth = .7; ctx.beginPath(); ctx.moveTo(6.5, -1.5); ctx.lineTo(9, -3.5); ctx.moveTo(6.5, 1.5); ctx.lineTo(9, 3.5); ctx.stroke();   // antenas
-  // carga: pólen da cor de quem fala, ou mel para a rainha
+  ctx.fillStyle = '#1B1200'; ctx.beginPath(); ctx.arc(5.8, 0, 2.3, 0, TAU); ctx.fill();   // head
+  ctx.strokeStyle = '#1B1200'; ctx.lineWidth = .7; ctx.beginPath(); ctx.moveTo(6.5, -1.5); ctx.lineTo(9, -3.5); ctx.moveTo(6.5, 1.5); ctx.lineTo(9, 3.5); ctx.stroke();   // antennae
+  // load: pollen in the speaker's color, or honey for the queen
   if (b.modo === 'voo' && b.rota && !b.rota.volta) { if (b.rota.carga === 'mel') { ctx.fillStyle = cores.ouro; ctx.beginPath(); ctx.moveTo(-7, 0); ctx.quadraticCurveTo(-9, -4, -10.5, 0); ctx.quadraticCurveTo(-9, 4, -7, 0); ctx.fill(); } else { ctx.fillStyle = b.rota.cor; ctx.beginPath(); ctx.arc(-7.5, 0, 2.6, 0, TAU); ctx.fill(); } }
   ctx.restore();
-  // balão de conversa ao pousar
+  // speech bubble on landing
   if (b.modo === 'pouso' && coAgora() < b.balao && z > .35) { ctx.save(); ctx.translate(b.x, b.y - 13 * esc); ctx.scale(esc, esc); ctx.fillStyle = cores.texto; coRect(ctx, -9, -6, 18, 10, 5); ctx.fill(); ctx.fillStyle = cores.bg2; for (const dx of [-4.5, 0, 4.5]) { ctx.beginPath(); ctx.arc(dx, -1, 1.3 + (Math.sin(CO.t * 8 + dx) > .3 ? .5 : 0), 0, TAU); ctx.fill(); } ctx.restore(); }
 }
 
-/* ------------------------------------------------------------ câmera */
+/* ------------------------------------------------------------ camera */
 function coEnquadrar(pontos, folga = 60, anim = true) {
   if (!pontos.length) return;
   const xs = pontos.map((p) => p.x), ys = pontos.map((p) => p.y);
@@ -623,7 +623,7 @@ function coEnquadrarTudo(anim = true) {
 }
 const coZoomEm = (fator, sx, sy) => {
   const { cam } = CO; const z0 = cam.z, z1 = Math.max(.12, Math.min(3.5, z0 * fator));
-  const wx = cam.x + (sx - CO.W / 2) / z0, wy = cam.y + (sy - CO.H / 2) / z0;   // ponto do mundo sob o cursor fica parado
+  const wx = cam.x + (sx - CO.W / 2) / z0, wy = cam.y + (sy - CO.H / 2) / z0;   // the world point under the cursor stays fixed
   cam.z = z1; cam.x = wx - (sx - CO.W / 2) / z1; cam.y = wy - (sy - CO.H / 2) / z1; CO.alvoCam = null;
 };
 const coMundo = (sx, sy) => ({ x: CO.cam.x + (sx - CO.W / 2) / CO.cam.z, y: CO.cam.y + (sy - CO.H / 2) / CO.cam.z });
@@ -633,14 +633,14 @@ function coAcerto(sx, sy) {
   return null;
 }
 
-/* ------------------------------------------------------------ entrada: arrastar, zoom, pinça, clique, dica */
+/* ------------------------------------------------------------ input: drag, zoom, pinch, click, tooltip */
 function coEntrada() {
   const cv = CO.cv; const tip = CO.raiz.querySelector('.co-tip');
   const pos = (ev) => { const r = cv.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; };
-  // Três gestos: arrastar o fundo move a câmera; arrastar uma equipe, a rainha ou um quadro do canteiro reorganiza o painel (fica
-  // guardado); arrastar um agente puxa a abelha dele por um fio e, ao soltar em outro agente ou num card, abre o menu de ação.
+  // Three gestures: dragging the background moves the camera; dragging a team, the queen or a garden board rearranges the panel (it is
+  // saved); dragging an agent pulls its bee by a thread and, when dropped on another agent or a card, opens the action menu.
   cv.addEventListener('pointerdown', (ev) => {
-    if (ev.button === 2) return;   // botão direito é menu, não arrasto
+    if (ev.button === 2) return;   // right button is a menu, not a drag
     cv.setPointerCapture(ev.pointerId); const p = pos(ev); CO.ponteiros.set(ev.pointerId, p); coFecharMenu();
     if (CO.ponteiros.size === 1) {
       const h = coAcerto(p.x, p.y);
@@ -665,7 +665,7 @@ function coEntrada() {
       a.ux = p.x; a.uy = p.y; a.ut = agora;
       return;
     }
-    // só passeando: dica e cursor (a dica some ao sair de cima, com menu aberto, ou depois de 3 s parada)
+    // just hovering: tooltip and cursor (the tooltip disappears when leaving, with a menu open, or after 3 s still)
     const h = coAcerto(p.x, p.y); CO.hover = h;
     cv.style.cursor = !h ? 'grab' : h.tipo === 'cel' ? 'grab' : ['equipe', 'zona', 'rainha'].includes(h.tipo) ? 'move' : 'pointer';
     clearTimeout(CO.tipTimer);
@@ -685,7 +685,7 @@ function coEntrada() {
       if (a.modo === 'puxar') { const alvo = CO.alvoSolta; CO.alvoSolta = null; if (alvo) coMenuAcao(a.alvo.cel, alvo, p); else coSoltarAbelha(); }
       return;
     }
-    // clique simples: seleciona (destaque e dica fixa); duplo clique abre; botão direito dá o menu
+    // single click: selects (highlight and pinned tooltip); double click opens; right button gives the menu
     const h = coAcerto(p.x, p.y);
     if (!h || h.tipo === 'equipe' || h.tipo === 'zona') { CO.selecionado = null; return; }
     if (h.tipo === 'favo') return coEnquadrar(h.favo.celulas.flatMap((c) => [{ x: c.x - HEX_R - 60, y: c.y - HEX_R - 50 }, { x: c.x + HEX_R + 60, y: c.y + HEX_R + 10 }]), 30);
@@ -706,11 +706,11 @@ function coEntrada() {
   CO.tecla = (ev) => { if (U.vista !== 'colmeia' || ev.target.closest('input,textarea,[contenteditable]')) return; if (ev.key === 'Escape') { coFecharMenu(true); CO.selecionado = null; coSoltarAbelha(); tip.hidden = true; } else if (ev.key === '0') coEnquadrarTudo(); else if (ev.key === '+' || ev.key === '=') coZoomEm(1.3, CO.W / 2, CO.H / 2); else if (ev.key === '-') coZoomEm(1 / 1.3, CO.W / 2, CO.H / 2); };
   document.addEventListener('keydown', CO.tecla);
 }
-/* ------------------------------------------------------------ organização do painel: mover equipes, rainha e quadros; fica guardado por projeto */
+/* ------------------------------------------------------------ panel layout: move teams, queen and boards; saved per project */
 const coLayoutChave = () => `colmeia:layout:${projetoAtual()?.id || ''}`;
 function coLayoutCarregar() { try { return JSON.parse(localStorage.getItem(coLayoutChave()) || 'null') || { favos: {}, zonas: {}, rainha: { dx: 0, dy: 0 } }; } catch { return { favos: {}, zonas: {}, rainha: { dx: 0, dy: 0 } }; } }
-function coLayoutSalvar() { try { localStorage.setItem(coLayoutChave(), JSON.stringify(CO.layout)); } catch { /* sem armazenamento: a organização vale só nesta sessão */ } }
-/** Desloca um conjunto do painel (as abelhas vão junto). `alvo` é um acerto: equipe, favo, zona ou rainha. */
+function coLayoutSalvar() { try { localStorage.setItem(coLayoutChave(), JSON.stringify(CO.layout)); } catch { /* no storage: the layout only lasts for this session */ } }
+/** Shifts a group of the panel (bees go along). `alvo` is a hit: team, comb, zone or queen. */
 function coMoverAlvo(alvo, dx, dy) {
   if (!alvo) return;
   const leva = (c) => { c.x += dx; c.y += dy; const b = CO.abelhas.get(c.key); if (b && b.modo !== 'voo') { b.x += dx; b.y += dy; } };
@@ -725,7 +725,7 @@ function coMoverAlvo(alvo, dx, dy) {
     CO.layout.rainha.dx += dx; CO.layout.rainha.dy += dy;
   }
 }
-/** Depois de montar, reaplica a organização guardada. */
+/** After building, reapplies the saved layout. */
 function coLayoutAplicar() {
   CO.layout = coLayoutCarregar();
   const L = CO.layout;
@@ -734,23 +734,23 @@ function coLayoutAplicar() {
   if (L.rainha && (L.rainha.dx || L.rainha.dy)) { const d = { ...L.rainha }; L.rainha = { dx: 0, dy: 0 }; coMoverAlvo({ tipo: 'rainha' }, d.dx, d.dy); }
 }
 
-/* ------------------------------------------------------------ menus: soltou um agente em outro (ou num card), ou clicou com o botão direito */
+/* ------------------------------------------------------------ menus: an agent was dropped on another (or on a card), or right click */
 function coFecharMenu(forcar = false) {
-  // logo depois de abrir (soltar a abelha gera clique e pointerup em cima do menu recém-criado), nada fecha o menu por 400 ms
+  // right after opening (dropping the bee fires click and pointerup on top of the newly created menu), nothing closes the menu for 400 ms
   if (!forcar && CO.menuAberto && performance.now() - (CO.menuAbertoEm || 0) < 400) return;
   CO.raiz?.querySelector('.co-menu')?.remove(); if (CO.menuAberto) { CO.menuAberto = false; coSoltarAbelha(); }
 }
-/** Solta a abelha que estava sendo puxada: ela volta voando para a célula dela. */
+/** Releases the bee being pulled: it flies back to its cell. */
 function coSoltarAbelha() {
   const k = CO.puxando?.key; CO.puxando = null; CO.alvoSolta = null; if (!k) return;
   const b = CO.abelhas.get(k); const c = CO.celulas.get(k); if (!b || !c) return;
   if (b.modo !== 'voo') coIniciarRota(b, k, c.agente.cor, null, true);
 }
-/** Menu genérico no ponto p (coordenadas da tela do canvas). itens: [{ id, rotulo, sub, classe }]. */
+/** Generic menu at point p (canvas screen coordinates). itens: [{ id, rotulo, sub, classe }]. */
 function coMenu(titulo, itens, p, aoEscolher) {
   coFecharMenu(); CO.menuAberto = true;
   const m = document.createElement('div'); m.className = 'co-menu';
-  // data-co-acao, não data-acao: o clique global do app trata data-acao (parar, bloquear, perfil...) e faria outra coisa por cima
+  // data-co-acao, not data-acao: the app's global click handler handles data-acao (stop, block, profile...) and would do something else on top
   m.innerHTML = `<div class="co-menu-t">${titulo}</div>${itens.map((i) => `<button type="button" data-co-acao="${esc(i.id)}" class="${i.classe || ''}">${esc(i.rotulo)}${i.sub ? `<small>${esc(i.sub)}</small>` : ''}</button>`).join('')}<button type="button" data-co-acao="nada" class="mudo">Cancelar</button>`;
   const r = CO.cv.getBoundingClientRect(); const alt = 50 + itens.length * 44;
   m.style.left = `${Math.min(r.width - 250, Math.max(8, p.x - 20))}px`; m.style.top = `${Math.min(r.height - alt, Math.max(8, p.y - 10))}px`;
@@ -766,7 +766,7 @@ function coMenu(titulo, itens, p, aoEscolher) {
   CO.menuAbertoEm = performance.now();
   return m;
 }
-/** Botão direito num agente ou num card: ações básicas direto no painel. */
+/** Right click on an agent or a card: basic actions right in the panel. */
 function coMenuContexto(h, p) {
   if (h.tipo === 'cel') {
     const c = h.cel; const nome = primeiroNome(c.agente.nome); const ocupado = c.sit?.estado && c.sit.estado !== 'parado';
@@ -825,13 +825,13 @@ function coDica(h) {
   return `<b>${esc(c.agente.nome)}</b><small>${esc(c.agente.cargo || '')}, ${esc(c.equipe.nome)}</small><small>${esc(linha)}</small>${s.card ? `<small class="co-tip-card">${esc(s.card.id)} ${esc(s.card.titulo)}</small>` : ''}`;
 }
 
-/* ------------------------------------------------------------ ciclo de vida */
+/* ------------------------------------------------------------ lifecycle */
 function coLaco(ts) {
   if (U.vista !== 'colmeia' || !CO.raiz?.isConnected) { CO.raf = 0; return; }
   const dt = Math.min(.05, (ts - (CO.ultimo || ts)) / 1000); CO.ultimo = ts; CO.t += dt;
   const agora = coAgora();
   if (agora >= CO.proximoSync) { CO.proximoSync = agora + .25; try { coSincronizar(); } catch (e) { console.error(e); } }
-  // câmera: animação de enquadramento e inércia do arrasto
+  // camera: framing animation and drag inertia
   if (CO.alvoCam) { const a = CO.alvoCam, c = CO.cam, f = 1 - Math.exp(-dt * 6); c.x += (a.x - c.x) * f; c.y += (a.y - c.y) * f; c.z += (a.z - c.z) * f; if (Math.abs(a.x - c.x) < .5 && Math.abs(a.y - c.y) < .5 && Math.abs(a.z - c.z) < .002) { Object.assign(c, a); CO.alvoCam = null; } }
   else if (!CO.arrasto && (Math.abs(CO.vel.x) > .01 || Math.abs(CO.vel.y) > .01)) { CO.cam.x -= CO.vel.x * dt * 1000 / CO.cam.z; CO.cam.y -= CO.vel.y * dt * 1000 / CO.cam.z; const k = Math.exp(-dt * 4); CO.vel.x *= k; CO.vel.y *= k; }
   for (const b of CO.abelhas.values()) coMoverAbelha(b, dt);
@@ -876,15 +876,15 @@ async function renderColmeia() {
   CO.registro.forEach(() => {}); const reg = CO.raiz.querySelector('.co-registro'); reg.innerHTML = CO.registro.slice(-7).map((r) => `<div class="co-reg" style="--c:${esc(r.cor)}"><i></i>${esc(r.texto)}</div>`).join('');
   if (!CO.raf) { CO.ultimo = 0; CO.raf = requestAnimationFrame(coLaco); }
 }
-/** Eventos do app viram movimento na colmeia: fala vira voo de pólen entre quem falou e quem foi citado (ou a rainha, na DM). */
+/** App events become motion in the hive: speech becomes a pollen flight between the speaker and whoever was mentioned (or the queen, in a DM). */
 function colmeiaEvento(e) {
   if (U.vista !== 'colmeia' || !CO.raiz) return;
   if (e.tipo === 'presenca') { CO.proximoSync = 0; return; }
   if (e.tipo === 'elenco') { CO.montadoPara = ''; renderColmeia(); return; }
-  if (e.tipo === 'quadro') { CO.proximoSync = coAgora() + .8; return; }   // quadroMudou busca o quadro novo em ~300 ms; a diferença é lida depois
+  if (e.tipo === 'quadro') { CO.proximoSync = coAgora() + .8; return; }   // quadroMudou fetches the new board in ~300 ms; the difference is read afterwards
   if (e.tipo !== 'msg' && e.tipo !== 'msg.upd') return;
   const m = e.msg; if (!m || m.status === 'trabalhando' || !m.texto) return;
-  if (e.tipo === 'msg.upd' && CO.vistas?.has(m.id)) return;   // a mesma mensagem crescendo em pedaços conta uma vez
+  if (e.tipo === 'msg.upd' && CO.vistas?.has(m.id)) return;   // the same message growing in pieces counts once
   (CO.vistas ||= new Set()).add(m.id); if (CO.vistas.size > 400) CO.vistas = new Set([...CO.vistas].slice(-200));
   const cid = e.projeto; const j = PJ[cid]; if (!j) return;
   const chave = (id) => (id === 'voce' ? 'rainha' : String(id).startsWith('ext:') ? (() => { const x = /^ext:([^@]+)@(.+)$/.exec(id); return x ? `${x[2]}:${x[1]}` : null; })() : coChave(cid, id));
@@ -897,7 +897,7 @@ function colmeiaEvento(e) {
     if (['gamedirector', 'todos'].includes(k) || semAcento(primeiroNome(usuarioDe().nome)) === k) { alvos.add('rainha'); continue; }
     for (const [key, c] of CO.celulas) if (semAcento(primeiroNome(c.agente.nome)) === k || semAcento(c.agente.tokenNome || '') === k) alvos.add(key);
   }
-  if (!alvos.size && m.de !== 'voce') alvos.add(coChave(cid, j.lider || 'po'));   // falou no #equipe: vai em direção à liderança
+  if (!alvos.size && m.de !== 'voce') alvos.add(coChave(cid, j.lider || 'po'));   // spoke in #equipe: heads toward the lead
   for (const a of alvos) {
     if (a === de || (a !== 'rainha' && !CO.celulas.has(a))) continue;
     if (de === 'rainha') { coFio('rainha', a, cor, 12); const al = coPonto(a); if (al) { coOnda(al.x, al.y, cor); coParticulas(al.x, al.y - HEX_R, cor, 6, 40); } }
