@@ -118,7 +118,7 @@ function coMontar() {
     const total = 3 * w + 2 * 44;
     const defs = [['fazer', 'A fazer', 'suave'], ['andamento', 'Em andamento', 'ambar'], ['concluido', 'Concluído', 'verde']];
     CO.zonas = {};
-    defs.forEach(([id, titulo, tom], i) => { CO.zonas[id] = { id, titulo, tom, x: -total / 2 + i * (w + 44), y: baixo, w, h: h0, n: 0, extra: 0 }; });
+    defs.forEach(([id, titulo, tom], i) => { CO.zonas[id] = { id, titulo: I18N.t(titulo), tom, x: -total / 2 + i * (w + 44), y: baixo, w, h: h0, n: 0, extra: 0 }; });
   }
   // abelhas: uma por célula; quem já existia continua de onde estava
   const novas = new Map();
@@ -212,12 +212,12 @@ function coSincronizar() {
     const ant = b.estadoAnt; b.estadoAnt = s.estado;
     if (ant && ant !== s.estado) {
       if (s.estado === 'trabalhando' && ant !== 'bloqueado') { coParticulas(c.x, c.y - HEX_R, c.agente.cor, 10, 50); coOnda(c.x, c.y, c.agente.cor); if (s.pr?.atividade && !/^(na fila|abrindo)/.test(s.pr.atividade)) coRegistrar(`${primeiroNome(c.agente.nome)}: ${s.pr.atividade}`, c.agente.cor); }
-      if (s.estado === 'bloqueado') { coOnda(c.x, c.y, CO.cores.verm, HEX_R, HEX_R * 2.6, 1.2); coRegistrar(`${primeiroNome(c.agente.nome)} travou em ${s.card?.id || 'um card'}: ${String(s.card?.bloqueio || '').slice(0, 60)}`, CO.cores.verm); }
-      if (ant === 'bloqueado' && s.estado !== 'bloqueado') { coOnda(c.x, c.y, CO.cores.verde); coRegistrar(`${primeiroNome(c.agente.nome)} destravou`, CO.cores.verde); }
+      if (s.estado === 'bloqueado') { coOnda(c.x, c.y, CO.cores.verm, HEX_R, HEX_R * 2.6, 1.2); coRegistrar(I18N.t('{nome} travou em {card}: {motivo}', { nome: primeiroNome(c.agente.nome), card: s.card?.id || I18N.t('um card'), motivo: String(s.card?.bloqueio || '').slice(0, 60) }), CO.cores.verm); }
+      if (ant === 'bloqueado' && s.estado !== 'bloqueado') { coOnda(c.x, c.y, CO.cores.verde); coRegistrar(I18N.t('{nome} destravou', { nome: primeiroNome(c.agente.nome) }), CO.cores.verde); }
     }
     // modo base da abelha
     let base = s.estado === 'trabalhando' ? 'trabalho' : s.estado === 'fila' ? 'fila' : s.estado === 'bloqueado' ? 'bloqueado' : 'repouso';
-    if (s.ajudando && s.ajudando.key !== k) { base = 'ajuda'; b.alvo = s.ajudando.key; coFio(k, s.ajudando.key, c.agente.cor, 1.5, .4); if (b.base !== 'ajuda') coRegistrar(`${primeiroNome(c.agente.nome)} foi falar com ${primeiroNome(s.ajudando.agente.nome)}`, c.agente.cor); }
+    if (s.ajudando && s.ajudando.key !== k) { base = 'ajuda'; b.alvo = s.ajudando.key; coFio(k, s.ajudando.key, c.agente.cor, 1.5, .4); if (b.base !== 'ajuda') coRegistrar(I18N.t('{nome} foi falar com {outro}', { nome: primeiroNome(c.agente.nome), outro: primeiroNome(s.ajudando.agente.nome) }), c.agente.cor); }
     else if (s.respondendo && s.respondendo.key !== k) coFio(s.respondendo.key, k, s.respondendo.agente.cor, 1.5, .4);
     if (s.aguardando) coFio(k, 'rainha', CO.cores.ambar, 1.5, .3);
     // trabalhando num card que está no canteiro: a abelha vai até ele e fica lá, com um fio até a célula dela
@@ -234,11 +234,11 @@ function coSincronizar() {
     if (!ant || !CO.cardsProntos) continue;
     const dono = k.dono ? coChave(eq.cid, k.dono) : null; const cel = dono && CO.celulas.get(dono);
     if (ant.coluna !== k.coluna) {
-      if (k.coluna === 'concluido' && cel) coRegistrar(`${primeiroNome(cel.agente.nome)} entregou ${k.id}: ${k.titulo}`, CO.cores.ouro);
-      else if (k.coluna === 'andamento' && cel) { coOnda(cel.x, cel.y, cel.agente.cor); coRegistrar(`${primeiroNome(cel.agente.nome)} pegou ${k.id}: ${k.titulo}`, cel.agente.cor); }
-      else if (['revisao', 'qa'].includes(k.coluna) && cel) coRegistrar(`${k.id} foi para ${k.coluna === 'qa' ? 'QA' : 'revisão'}`, CO.cores.violeta);
+      if (k.coluna === 'concluido' && cel) coRegistrar(I18N.t('{nome} entregou {card}: {titulo}', { nome: primeiroNome(cel.agente.nome), card: k.id, titulo: k.titulo }), CO.cores.ouro);
+      else if (k.coluna === 'andamento' && cel) { coOnda(cel.x, cel.y, cel.agente.cor); coRegistrar(I18N.t('{nome} pegou {card}: {titulo}', { nome: primeiroNome(cel.agente.nome), card: k.id, titulo: k.titulo }), cel.agente.cor); }
+      else if (['revisao', 'qa'].includes(k.coluna) && cel) coRegistrar(I18N.t(k.coluna === 'qa' ? '{card} foi para QA' : '{card} foi para revisão', { card: k.id }), CO.cores.violeta);
     }
-    if (!ant.aguardando && k.aguardando && cel) { coOnda(cel.x, cel.y, CO.cores.ambar); coRegistrar(`${k.id} aguarda você`, CO.cores.ambar); }
+    if (!ant.aguardando && k.aguardando && cel) { coOnda(cel.x, cel.y, CO.cores.ambar); coRegistrar(I18N.t('{card} aguarda você', { card: k.id }), CO.cores.ambar); }
   }
   coSincronizarCanteiro();
   CO.cardsProntos = true;
@@ -247,7 +247,7 @@ function coSincronizar() {
   // HUD
   const h = CO.raiz; if (h) {
     const set = (sel, v) => { const el = h.querySelector(sel); if (el) el.lastChild.textContent = v; };
-    set('.co-stat.on', `${tot.trabalhando} trabalhando`); set('.co-stat.fila', `${tot.fila} na fila`); set('.co-stat.bloq', `${tot.bloqueado} ${tot.bloqueado === 1 ? 'bloqueada' : 'bloqueadas'}`); set('.co-stat.off', `${tot.parado} em repouso`);
+    set('.co-stat.on', I18N.t('{n} trabalhando', { n: tot.trabalhando })); set('.co-stat.fila', I18N.t('{n} na fila', { n: tot.fila })); set('.co-stat.bloq', I18N.t(tot.bloqueado === 1 ? '{n} bloqueada' : '{n} bloqueadas', { n: tot.bloqueado })); set('.co-stat.off', I18N.t('{n} em repouso', { n: tot.parado }));
     const col = h.querySelector('.co-colheita'); if (col) { col.querySelector('b').textContent = `${Math.round(CO.progresso * 100)}%`; col.querySelector('i').style.width = `${Math.round(CO.progresso * 100)}%`; }
     h.querySelector('.co-stat.bloq')?.classList.toggle('tem', tot.bloqueado > 0);
   }
@@ -387,9 +387,9 @@ function coDesenhar() {
     if (z > .22) {
       const ly = f.y - f.R + 24;
       ctx.fillStyle = cores.texto; ctx.font = `700 ${Math.max(11, Math.min(16, 12 / z))}px ${CO.fonte}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.letterSpacing = '.1em';
-      const nome = coCortar(ctx, String(f.nome).toUpperCase(), f.R * 1.5); ctx.fillText(nome, f.x, ly); ctx.letterSpacing = '0px';
+      const nome = coCortar(ctx, I18N.t(String(f.nome)).toUpperCase(), f.R * 1.5); ctx.fillText(nome, f.x, ly); ctx.letterSpacing = '0px';
       ctx.fillStyle = coRgba(tom, .9); ctx.font = `600 ${Math.max(9, Math.min(12, 9.5 / z))}px ${CO.fonte}`;
-      ctx.fillText(`${f.celulas.length} ${f.celulas.length === 1 ? 'agente' : 'agentes'}${ativos ? `, ${ativos} em ação` : ''}`, f.x, ly + 15);
+      ctx.fillText(`${I18N.t(f.celulas.length === 1 ? '{n} agente' : '{n} agentes', { n: f.celulas.length })}${ativos ? `, ${I18N.t('{n} em ação', { n: ativos })}` : ''}`, f.x, ly + 15);
       const w = ctx.measureText(nome).width; CO.hits.push({ tipo: 'favo', favo: f, x: f.x - w / 2 - 8, y: ly - 12, w: w + 16, h: 30 });
     }
   }
@@ -450,9 +450,9 @@ function coDesenhar() {
     // nome e atividade
     if (rotulos) {
       ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-      ctx.fillStyle = s.estado === 'trabalhando' ? cores.texto : cores.suave; ctx.font = `600 10.5px ${CO.fonte}`; ctx.fillText(coCortar(ctx, primeiroNome(c.agente.nome), R * 1.7), c.x, c.y + (c.lider ? 24 : 18));
+      ctx.fillStyle = s.estado === 'trabalhando' ? cores.texto : cores.suave; ctx.font = `600 10.5px ${CO.fonte}`; ctx.fillText(coCortar(ctx, I18N.t(primeiroNome(c.agente.nome)), R * 1.7), c.x, c.y + (c.lider ? 24 : 18));
       ctx.font = c.lider ? `700 7px ${CO.fonte}` : `italic 8px ${CO.fonte}`; ctx.fillStyle = c.lider ? cores.ambar : cor;
-      const sub = c.lider ? 'LEAD' : s.estado === 'trabalhando' ? coCortar(ctx, s.pr?.atividade || '', R * 1.65) : s.estado === 'fila' ? 'na fila' : '';
+      const sub = c.lider ? 'LEAD' : s.estado === 'trabalhando' ? coCortar(ctx, s.pr?.atividade || '', R * 1.65) : s.estado === 'fila' ? I18N.t('na fila') : '';
       if (sub) ctx.fillText(sub, c.x, c.y + (c.lider ? 34 : 28));
     }
     ctx.globalAlpha = 1;
@@ -507,7 +507,7 @@ function coDesenharCanteiro(t, z, dentro) {
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.letterSpacing = '.14em';
       ctx.fillStyle = cores.texto; ctx.font = `700 ${Math.max(10, Math.min(14, 11 / z))}px ${CO.fonte}`; ctx.fillText(zn.titulo.toUpperCase(), zn.x + ZONA.pad, zn.y + ZONA.cab / 2 + 1); ctx.letterSpacing = '0px';
       ctx.textAlign = 'right'; ctx.fillStyle = coRgba(tom, .95); ctx.font = `700 ${Math.max(10, Math.min(13, 11 / z))}px ${CO.fonte}`;
-      ctx.fillText(zn.extra ? `${zn.n} (${zn.extra} fora da vista)` : String(zn.n), zn.x + zn.w - ZONA.pad, zn.y + ZONA.cab / 2 + 1); ctx.textAlign = 'center';
+      ctx.fillText(zn.extra ? I18N.t('{n} ({extra} fora da vista)', { n: zn.n, extra: zn.extra }) : String(zn.n), zn.x + zn.w - ZONA.pad, zn.y + ZONA.cab / 2 + 1); ctx.textAlign = 'center';
     }
     // vagas vazias: marcação sutil de favo, para a área parecer construída
     if (z > .45) { ctx.strokeStyle = 'rgba(243, 234, 217, .05)'; ctx.lineWidth = 1 / z; const linhas = Math.round((zn.h - ZONA.cab - ZONA.pad * 2) / ZONA.sh); for (let li = 0; li < linhas; li++) for (let co = 0; co < ZONA.cols; co++) { const cx = zn.x + ZONA.pad + co * ZONA.sw + ZONA.sw / 2, cy = zn.y + ZONA.cab + ZONA.pad + li * ZONA.sh + ZONA.sh / 2; coRect(ctx, cx - ZONA.cw / 2, cy - ZONA.ch / 2, ZONA.cw, ZONA.ch, 6); ctx.stroke(); } }
@@ -575,7 +575,7 @@ function coDesenharRainha(t) {
   else { const gg = ctx.createRadialGradient(R.x, fy - 6, 2, R.x, fy, fr); gg.addColorStop(0, cores.ouro); gg.addColorStop(1, cores.laranja); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(R.x, fy, fr - 2, 0, TAU); ctx.fill(); ctx.fillStyle = '#1B1200'; ctx.font = `700 15px ${CO.fonte}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(iniciais(u.nome), R.x, fy + 1); }
   // coroa: três pontinhas douradas
   ctx.fillStyle = cores.ouro; ctx.beginPath(); const cy = fy - fr - 3; ctx.moveTo(R.x - 9, cy + 4); ctx.lineTo(R.x - 9, cy - 4); ctx.lineTo(R.x - 4.5, cy); ctx.lineTo(R.x, cy - 6); ctx.lineTo(R.x + 4.5, cy); ctx.lineTo(R.x + 9, cy - 4); ctx.lineTo(R.x + 9, cy + 4); ctx.closePath(); ctx.fill();
-  if (CO.cam.z > .3) { ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = cores.texto; ctx.font = `700 11px ${CO.fonte}`; ctx.fillText(coCortar(ctx, primeiroNome(u.nome), r * 1.7), R.x, R.y + 30); ctx.fillStyle = cores.ambar; ctx.font = `700 7px ${CO.fonte}`; ctx.letterSpacing = '.14em'; ctx.fillText('RAINHA', R.x, R.y + 41); ctx.letterSpacing = '0px'; }
+  if (CO.cam.z > .3) { ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = cores.texto; ctx.font = `700 11px ${CO.fonte}`; ctx.fillText(coCortar(ctx, I18N.t(primeiroNome(u.nome)), r * 1.7), R.x, R.y + 30); ctx.fillStyle = cores.ambar; ctx.font = `700 7px ${CO.fonte}`; ctx.letterSpacing = '.14em'; ctx.fillText(I18N.t('RAINHA'), R.x, R.y + 41); ctx.letterSpacing = '0px'; }
   CO.hits.push({ tipo: 'rainha', x: R.x - r, y: R.y - r, w: r * 2, h: r * 2 });
 }
 function coDesenharAbelha(b, z) {
@@ -771,13 +771,13 @@ function coMenuContexto(h, p) {
   if (h.tipo === 'cel') {
     const c = h.cel; const nome = primeiroNome(c.agente.nome); const ocupado = c.sit?.estado && c.sit.estado !== 'parado';
     coMenu(`${esc(nome)} <span>${esc(c.agente.cargo || '')}</span>`, [
-      { id: 'dm', rotulo: 'Abrir conversa', sub: 'DM com este agente' },
-      { id: 'perfil', rotulo: 'Ver perfil' },
-      ...(ocupado ? [{ id: 'parar', rotulo: `Parar ${nome}`, sub: 'cancela as chamadas em andamento dele', classe: 'perigo' }] : []),
+      { id: 'dm', rotulo: I18N.t('Abrir conversa'), sub: I18N.t('DM com este agente') },
+      { id: 'perfil', rotulo: I18N.t('Ver perfil') },
+      ...(ocupado ? [{ id: 'parar', rotulo: I18N.t('Parar {nome}', { nome }), sub: I18N.t('cancela as chamadas em andamento dele'), classe: 'perigo' }] : []),
     ], p, async (acao) => {
       if (acao === 'dm') { location.hash = `${c.cid}/chat/dm:${c.agente.id}`; return; }
       if (acao === 'perfil') { modalPerfil(c.agente.id); return; }
-      if (acao === 'parar') { const r = await api('POST', P(`/agente/${c.agente.id}/parar`, c.cid), {}); aviso(r._ok ? `${nome}: ${r.cancelados || 0} ${r.cancelados === 1 ? 'chamada cancelada' : 'chamadas canceladas'}.` : (r.erro || 'Não consegui parar.')); coRegistrar(`Você parou ${nome}`, CO.cores.verm); }
+      if (acao === 'parar') { const r = await api('POST', P(`/agente/${c.agente.id}/parar`, c.cid), {}); aviso(r._ok ? I18N.t(r.cancelados === 1 ? '{nome}: {n} chamada cancelada.' : '{nome}: {n} chamadas canceladas.', { nome, n: r.cancelados || 0 }) : (r.erro || I18N.t('Não consegui parar.'))); coRegistrar(I18N.t('Você parou {nome}', { nome }), CO.cores.verm); }
     });
     return;
   }
@@ -785,14 +785,14 @@ function coMenuContexto(h, p) {
     const k = h.card; const cid = h.cid; const lider = PJ[cid]?.lider || 'po';
     const emTrabalho = [...CO.celulas.values()].some((c) => c.cid === cid && c.sit?.card?.id === k.id && c.sit.estado !== 'parado');
     coMenu(`${esc(k.id)} <span>${esc(String(k.titulo).slice(0, 34))}</span>`, [
-      { id: 'abrir', rotulo: 'Abrir tarefa' },
-      k.bloqueio ? { id: 'desbloquear', rotulo: 'Desbloquear', sub: String(k.bloqueio).slice(0, 60) } : { id: 'bloquear', rotulo: 'Bloquear', sub: 'o time para de mexer nela até você liberar' },
-      ...(emTrabalho ? [{ id: 'parar', rotulo: 'Parar o trabalho nela', sub: 'cancela as chamadas em andamento neste card', classe: 'perigo' }] : []),
+      { id: 'abrir', rotulo: I18N.t('Abrir tarefa') },
+      k.bloqueio ? { id: 'desbloquear', rotulo: I18N.t('Desbloquear'), sub: String(k.bloqueio).slice(0, 60) } : { id: 'bloquear', rotulo: I18N.t('Bloquear'), sub: I18N.t('o time para de mexer nela até você liberar') },
+      ...(emTrabalho ? [{ id: 'parar', rotulo: I18N.t('Parar o trabalho nela'), sub: I18N.t('cancela as chamadas em andamento neste card'), classe: 'perigo' }] : []),
     ], p, async (acao) => {
       if (acao === 'abrir') { if (cid === U.proj) abrirIssue(k.id); else { location.hash = `${cid}/planner`; setTimeout(() => abrirIssue(k.id), 450); } return; }
-      if (acao === 'bloquear') { const motivo = await perguntarTexto('Motivo do bloqueio', 'O que está impedindo', 'Bloquear'); if (!motivo) return; const r = await api('POST', P(`/cartao/${k.id}/bloquear`, cid), { motivo }); if (!r._ok) aviso(r.erro || 'Não bloqueou.'); else coRegistrar(`Você bloqueou ${k.id}`, CO.cores.verm); return; }
-      if (acao === 'desbloquear') { const r = await api('POST', P(`/cartao/${k.id}/desbloquear`, cid), {}); if (!r._ok) aviso(r.erro || 'Não desbloqueou.'); else coRegistrar(`Você desbloqueou ${k.id}`, CO.cores.verde); return; }
-      if (acao === 'parar') { const r = await api('POST', P('/colmeia', cid), { acao: 'parar', agente: lider, card: k.id }); aviso(r._ok ? `${r.parados?.length || 0} ${r.parados?.length === 1 ? 'agente parado' : 'agentes parados'} em ${k.id}.` : (r.erro || 'Não consegui parar.')); if (r._ok) coRegistrar(`Você parou o trabalho em ${k.id}`, CO.cores.verm); }
+      if (acao === 'bloquear') { const motivo = await perguntarTexto(I18N.t('Motivo do bloqueio'), I18N.t('O que está impedindo'), I18N.t('Bloquear')); if (!motivo) return; const r = await api('POST', P(`/cartao/${k.id}/bloquear`, cid), { motivo }); if (!r._ok) aviso(r.erro || I18N.t('Não bloqueou.')); else coRegistrar(I18N.t('Você bloqueou {card}', { card: k.id }), CO.cores.verm); return; }
+      if (acao === 'desbloquear') { const r = await api('POST', P(`/cartao/${k.id}/desbloquear`, cid), {}); if (!r._ok) aviso(r.erro || I18N.t('Não desbloqueou.')); else coRegistrar(I18N.t('Você desbloqueou {card}', { card: k.id }), CO.cores.verde); return; }
+      if (acao === 'parar') { const r = await api('POST', P('/colmeia', cid), { acao: 'parar', agente: lider, card: k.id }); aviso(r._ok ? I18N.t(r.parados?.length === 1 ? '{n} agente parado em {card}.' : '{n} agentes parados em {card}.', { n: r.parados?.length || 0, card: k.id }) : (r.erro || I18N.t('Não consegui parar.'))); if (r._ok) coRegistrar(I18N.t('Você parou o trabalho em {card}', { card: k.id }), CO.cores.verm); }
     });
   }
 }
@@ -801,27 +801,27 @@ function coMenuAcao(cel, alvo, p) {
   const lider = !!cel.lider;
   const quem = alvoCel ? primeiroNome(alvoCel.agente.nome) : card.id;
   coMenu(`${esc(primeiroNome(cel.agente.nome))} <span>em</span> ${esc(quem)}`, [
-    { id: 'ajudar', rotulo: 'Ajudar', sub: 'entra no trabalho e combina com quem está nele' },
-    { id: 'monitorar', rotulo: 'Monitorar', sub: 'olha o que está acontecendo e te dá um retorno' },
-    ...(lider ? [{ id: 'parar', rotulo: 'Parar', sub: card ? 'para todo o trabalho neste card' : `para as chamadas de ${quem}`, classe: 'perigo' }] : []),
+    { id: 'ajudar', rotulo: I18N.t('Ajudar'), sub: I18N.t('entra no trabalho e combina com quem está nele') },
+    { id: 'monitorar', rotulo: I18N.t('Monitorar'), sub: I18N.t('olha o que está acontecendo e te dá um retorno') },
+    ...(lider ? [{ id: 'parar', rotulo: I18N.t('Parar'), sub: card ? I18N.t('para todo o trabalho neste card') : I18N.t('para as chamadas de {nome}', { nome: quem }), classe: 'perigo' }] : []),
   ], p, async (acao) => {
-    if (cidAlvo !== cel.cid) { aviso('Por enquanto, ajuda e monitoramento valem dentro da mesma equipe. Para outra equipe, peça pela sala dos líderes.'); return; }
+    if (cidAlvo !== cel.cid) { aviso(I18N.t('Por enquanto, ajuda e monitoramento valem dentro da mesma equipe. Para outra equipe, peça pela sala dos líderes.')); return; }
     const r2 = await api('POST', P('/colmeia', cel.cid), { acao, agente: cel.agente.id, alvoAgente: alvoCel ? alvoCel.agente.id : null, card: card ? card.id : null });
-    if (!r2._ok) return aviso(r2.erro || 'Não consegui.');
+    if (!r2._ok) return aviso(r2.erro || I18N.t('Não consegui.'));
     const corA = acao === 'parar' ? CO.cores.verm : acao === 'monitorar' ? CO.cores.violeta : cel.agente.cor;
-    if (alvoCel) { coVoar(cel.key, alvoCel.key, corA); coRegistrar(`${primeiroNome(cel.agente.nome)} vai ${acao} ${primeiroNome(alvoCel.agente.nome)}`, corA); }
-    else { const k = `${alvo.cid}:${card.id}`; coFio(cel.key, `carta:${k}`, corA, 20); const ct = CO.cartas.get(k); if (ct) coOnda(ct.x, ct.y, corA, 20, 70); coRegistrar(`${primeiroNome(cel.agente.nome)} vai ${acao} ${card.id}`, corA); }
-    if (acao === 'parar') aviso(`${r2.parados?.length ? r2.parados.length : 0} ${r2.parados?.length === 1 ? 'agente parado' : 'agentes parados'}.`);
+    if (alvoCel) { coVoar(cel.key, alvoCel.key, corA); coRegistrar(I18N.t('{nome} vai {acao} {alvo}', { nome: primeiroNome(cel.agente.nome), acao: I18N.t(acao), alvo: primeiroNome(alvoCel.agente.nome) }), corA); }
+    else { const k = `${alvo.cid}:${card.id}`; coFio(cel.key, `carta:${k}`, corA, 20); const ct = CO.cartas.get(k); if (ct) coOnda(ct.x, ct.y, corA, 20, 70); coRegistrar(I18N.t('{nome} vai {acao} {alvo}', { nome: primeiroNome(cel.agente.nome), acao: I18N.t(acao), alvo: card.id }), corA); }
+    if (acao === 'parar') aviso(I18N.t(r2.parados?.length === 1 ? '{n} agente parado.' : '{n} agentes parados.', { n: r2.parados?.length ? r2.parados.length : 0 }));
   });
 }
 
 function coDica(h) {
-  if (h.tipo === 'rainha') { const u = usuarioDe(); return `<b>${esc(u.nome)}</b><small>${u.cargo ? `${esc(u.cargo)}. ` : ''}${Math.round(CO.progresso * 100)}% do projeto colhido, ${CO.entregas} ${CO.entregas === 1 ? 'entrega' : 'entregas'} nesta sessão</small>`; }
-  if (h.tipo === 'favo') { const f = h.favo; const n = f.celulas.filter((c) => c.sit?.estado === 'trabalhando').length; return `<b>${esc(f.nome)}</b><small>${f.celulas.length} na equipe, ${n} trabalhando agora. Clique para aproximar.</small>`; }
-  if (h.tipo === 'card') { const k = h.card; const f = CO.favos.find((x) => x.cid === h.cid); const dono = h.cid && k.dono ? CO.celulas.get(`${h.cid}:${k.dono}`) : null; return `<b>${esc(k.id)} ${esc(k.titulo)}</b><small>${f ? `${esc(f.nome)}${dono ? `, com ${esc(primeiroNome(dono.agente.nome))}` : ''}. ` : ''}${esc(k.coluna)}${k.bloqueio ? `. Bloqueado: ${esc(k.bloqueio)}` : ''}${k.aguardando ? '. Aguarda a Game Director' : ''}</small>`; }
+  if (h.tipo === 'rainha') { const u = usuarioDe(); return `<b>${esc(u.nome)}</b><small>${u.cargo ? `${esc(u.cargo)}. ` : ''}${I18N.t(CO.entregas === 1 ? '{pct}% do projeto colhido, {n} entrega nesta sessão' : '{pct}% do projeto colhido, {n} entregas nesta sessão', { pct: Math.round(CO.progresso * 100), n: CO.entregas })}</small>`; }
+  if (h.tipo === 'favo') { const f = h.favo; const n = f.celulas.filter((c) => c.sit?.estado === 'trabalhando').length; return `<b>${esc(f.nome)}</b><small>${I18N.t('{total} na equipe, {n} trabalhando agora. Clique para aproximar.', { total: f.celulas.length, n })}</small>`; }
+  if (h.tipo === 'card') { const k = h.card; const f = CO.favos.find((x) => x.cid === h.cid); const dono = h.cid && k.dono ? CO.celulas.get(`${h.cid}:${k.dono}`) : null; return `<b>${esc(k.id)} ${esc(k.titulo)}</b><small>${f ? `${esc(f.nome)}${dono ? `, ${I18N.t('com {nome}', { nome: esc(primeiroNome(dono.agente.nome)) })}` : ''}. ` : ''}${esc(k.coluna)}${k.bloqueio ? `. ${I18N.t('Bloqueado: {motivo}', { motivo: esc(k.bloqueio) })}` : ''}${k.aguardando ? `. ${I18N.t('Aguarda a Game Director')}` : ''}</small>`; }
   const c = h.cel; const s = c.sit || {}; const pr = s.pr;
-  const desde = pr?.desde ? ` há ${Math.max(1, Math.round((Date.now() - pr.desde) / 60000))} min` : '';
-  const linha = s.estado === 'bloqueado' ? `Bloqueado em ${s.card?.id}: ${s.card?.bloqueio}` : pr ? `${pr.atividade || pr.estado}${desde}` : 'em repouso';
+  const desde = pr?.desde ? ` ${I18N.t('há {n} min', { n: Math.max(1, Math.round((Date.now() - pr.desde) / 60000)) })}` : '';
+  const linha = s.estado === 'bloqueado' ? I18N.t('Bloqueado em {card}: {motivo}', { card: s.card?.id, motivo: s.card?.bloqueio }) : pr ? `${pr.atividade || pr.estado}${desde}` : I18N.t('em repouso');
   return `<b>${esc(c.agente.nome)}</b><small>${esc(c.agente.cargo || '')}, ${esc(c.equipe.nome)}</small><small>${esc(linha)}</small>${s.card ? `<small class="co-tip-card">${esc(s.card.id)} ${esc(s.card.titulo)}</small>` : ''}`;
 }
 
@@ -872,7 +872,7 @@ async function renderColmeia() {
   CO.proximoSync = 0; coSincronizar();
   for (const b of CO.abelhas.values()) b.estadoAnt = CO.celulas.get(b.key)?.sit?.estado || null;
   if (primeira || CO.cam.z === 1 && CO.cam.x === 0 && CO.cam.y === 0) coEnquadrarTudo(false);
-  coRegistrar('Colmeia ao vivo', CO.cores.ambar);
+  coRegistrar(I18N.t('Colmeia ao vivo'), CO.cores.ambar);
   CO.registro.forEach(() => {}); const reg = CO.raiz.querySelector('.co-registro'); reg.innerHTML = CO.registro.slice(-7).map((r) => `<div class="co-reg" style="--c:${esc(r.cor)}"><i></i>${esc(r.texto)}</div>`).join('');
   if (!CO.raf) { CO.ultimo = 0; CO.raf = requestAnimationFrame(coLaco); }
 }
@@ -905,5 +905,5 @@ function colmeiaEvento(e) {
   }
   const nomeDe = (k) => (k === 'rainha' ? primeiroNome(usuarioDe().nome) : primeiroNome(CO.celulas.get(k)?.agente.nome || k));
   const outros = [...alvos].filter((a) => a !== de && (a === 'rainha' || CO.celulas.has(a)));
-  if (outros.length) coRegistrar(`${nomeDe(de)} falou com ${outros.map(nomeDe).join(', ')}`, cor);
+  if (outros.length) coRegistrar(I18N.t('{nome} falou com {outros}', { nome: nomeDe(de), outros: outros.map(nomeDe).join(', ') }), cor);
 }

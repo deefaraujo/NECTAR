@@ -13,6 +13,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-operacao-') as temp:
         with sync_playwright() as pw:
             browser=pw.chromium.launch(headless=True,channel='msedge')
             page=browser.new_page(viewport={'width':1366,'height':900})
+            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # os seletores destes testes estão em português
             erros=[];page.on('pageerror',lambda e:erros.append(str(e)))
             page.goto(base)
             expect(page.locator('a[href="/avaliacoes.html"]')).to_be_visible()

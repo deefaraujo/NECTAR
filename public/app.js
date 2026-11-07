@@ -50,7 +50,7 @@ const nomeColuna = (id) => (E.colunas.find((c) => c.id === id) || {}).nome || id
 const usuarioDe = () => J().usuario || { id: 'voce', nome: 'Você', foto: null, cargo: '', papel: 'Quem lidera o trabalho', cor: '#E2A226' };
 const templateId = () => (J().template && typeof J().template === 'object' ? J().template.id : J().template);   // /estado manda o template como objeto
 const nomeAgente = (id) => (id === 'voce' ? usuarioDe().nome : id === 'sistema' ? 'Sistema' : (agente(id) || { nome: id }).nome);
-const nomeCanal = (canal) => (canal === 'equipe' || canal === 'bastidores' ? canal : canal.startsWith('plan-') ? ((J().planning || []).find((p) => p.canal === canal) || {}).titulo || canal : canal.startsWith('grp-') ? ((J().grupos || []).find((g) => g.canal === canal) || {}).titulo || canal : (agente(canal.slice(3)) || {}).nome || canal);
+const nomeCanal = (canal) => (canal === 'equipe' || canal === 'bastidores' ? I18N.t(canal) : canal.startsWith('plan-') ? ((J().planning || []).find((p) => p.canal === canal) || {}).titulo || canal : canal.startsWith('grp-') ? ((J().grupos || []).find((g) => g.canal === canal) || {}).titulo || canal : (agente(canal.slice(3)) || {}).nome || canal);
 
 /* ------------------------------------------------------------ utilidades */
 async function api(metodo, url, corpo) {
@@ -63,13 +63,13 @@ async function api(metodo, url, corpo) {
   const j = await r.json().catch(() => ({}));
   return Array.isArray(j) ? Object.assign(j, { _status: r.status, _ok: r.ok }) : { ...j, _status: r.status, _ok: r.ok };
 }
-const hhmm = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+const hhmm = (iso) => new Date(iso).toLocaleTimeString(I18N.locale, { hour: '2-digit', minute: '2-digit' });
 function diaTxt(iso) {
   const d = new Date(iso); const h = new Date();
   const ontem = new Date(h); ontem.setDate(h.getDate() - 1);
   if (d.toDateString() === h.toDateString()) return 'Hoje';
   if (d.toDateString() === ontem.toDateString()) return 'Ontem';
-  return d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return d.toLocaleDateString(I18N.locale, { weekday: 'long', day: 'numeric', month: 'long' });
 }
 function idade(iso) {
   const s = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -78,7 +78,7 @@ function idade(iso) {
   if (s < 86400) return `${Math.floor(s / 3600)} h`;
   return `${Math.floor(s / 86400)} d`;
 }
-const ha = (iso) => (idade(iso) === 'agora' ? 'agora' : `há ${idade(iso)}`);
+const ha = (iso) => (idade(iso) === 'agora' ? 'agora' : I18N.t('há {tempo}', { tempo: idade(iso) }));
 const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 function aviso(texto, ms = 4500) {
   const el = document.createElement('div');
@@ -86,7 +86,7 @@ function aviso(texto, ms = 4500) {
   $('#avisos').append(el);
   setTimeout(() => el.remove(), ms);
 }
-const copiarTexto = (t) => navigator.clipboard?.writeText(t).then(() => aviso('Copiado.', 1500)).catch(() => {});
+const copiarTexto = (t) => navigator.clipboard?.writeText(t).then(() => aviso(I18N.t('Copiado.'), 1500)).catch(() => {});
 const matiz = (id) => { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
 const iniciais = (n) => String(n).split(/[\s\-_.]+/).filter(Boolean).slice(0, 2).map((s) => s[0]).join('').toUpperCase() || '?';
 
@@ -261,7 +261,7 @@ const SELETORES = {
 const nomeModo = (v) => (v === 'trabalhar' ? 'Executar' : 'Planejar');
 function seletorHtml(k) {
   const d = SELETORES[k], atual = d.opcoes.find(([v]) => v === d.atual()) || d.opcoes[0];
-  return `<button class="sel-btn ${k === 'modo' && atual[0] === 'trabalhar' ? 'exec' : ''}" data-acao="sel-abrir" data-sel="${k}" title="${d.rot}: ${esc(atual[2])}"><span class="sel-rot">${d.rot}</span><b>${atual[1]}</b>${ic('setaB')}</button>`;
+  return `<button class="sel-btn ${k === 'modo' && atual[0] === 'trabalhar' ? 'exec' : ''}" data-acao="sel-abrir" data-sel="${k}" title="${I18N.t(d.rot)}: ${esc(I18N.t(atual[2]))}"><span class="sel-rot">${d.rot}</span><b>${atual[1]}</b>${ic('setaB')}</button>`;
 }
 function fecharPops() { $('#sel-menu')?.remove(); $('#emoji-pop')?.remove(); }
 function posicionarAcima(el, ancora) {
@@ -350,7 +350,7 @@ function cartaoHtml(id, { estilo = null, nome = null, acoes = '' } = {}) {
     <div class="pcard-av">${av(id, 'x', { dot: false, estilo: e })}</div>
     <div class="pcard-corpo"><h3 class="pcard-nome">${nomeHtml(id, true, e, nome)}</h3><div class="pcard-cargo">${esc(pz.cargo || '')}</div>
       ${sobre ? `<div class="pcard-sec"><h4>Sobre mim</h4>${esc(sobre)}</div>` : ''}
-      ${acoes ? `<div class="pcard-acoes">${acoes}</div>` : ''}${acoes && id !== 'voce' ? `<label class="pcard-falar"><input data-pcard-falar="${id}" placeholder="Conversar com @${esc(nome ?? pz.nome)}" autocomplete="off"></label>` : ''}</div>${vfx}</div></div>`;
+      ${acoes ? `<div class="pcard-acoes">${acoes}</div>` : ''}${acoes && id !== 'voce' ? `<label class="pcard-falar"><input data-pcard-falar="${id}" placeholder="${I18N.t('Conversar com @{nome}', { nome: esc(nome ?? pz.nome) })}" autocomplete="off"></label>` : ''}</div>${vfx}</div></div>`;
 }
 function fecharCartao() { $('#pcard-pop')?.remove(); }
 function abrirCartao(id, ancora) {
@@ -376,7 +376,7 @@ function renderRail() {
     const eqs = equipesDoProjeto(p).map((e) => PJ[e.cid]).filter(Boolean);
     const trab = eqs.some((j) => Object.values(j.presenca || {}).some((x) => x.estado === 'trabalhando'));
     const ab = E.perguntas.filter((q) => baseDe(q.projeto) === p.id).length;
-    return `<button class="rail-btn rail-proj ${p.id === baseDe(U.proj) ? 'ativo' : ''} ${trab ? 'trabalhando' : ''} ${p.existe === false ? 'faltando' : ''}" style="--h:${matiz(p.id)}" data-projeto="${p.id}" data-tip="${esc(p.nome)}${p.existe === false ? ' (pasta não encontrada)' : ''}">${esc(iniciais(p.nome))}${ab ? `<span class="pip">${ab}</span>` : ''}</button>`;
+    return `<button class="rail-btn rail-proj ${p.id === baseDe(U.proj) ? 'ativo' : ''} ${trab ? 'trabalhando' : ''} ${p.existe === false ? 'faltando' : ''}" style="--h:${matiz(p.id)}" data-projeto="${p.id}" data-tip="${esc(p.nome)}${p.existe === false ? ` ${I18N.t('(pasta não encontrada)')}` : ''}">${esc(iniciais(p.nome))}${ab ? `<span class="pip">${ab}</span>` : ''}</button>`;
   }).join('');
   const nao = U.proj ? Object.values(J().naoLidas).reduce((a, b) => a + b, 0) : 0;
   const vistas = U.proj ? `<div class="sep"></div>
@@ -421,7 +421,7 @@ function renderLista() {
   const eqz = (id) => { const x = j.presenca[id]; return x && x.estado === 'trabalhando' ? `<span class="eq" style="--c:${agente(id).cor}"><i></i><i></i><i></i></span>` : ''; };
   const sino = (id) => (aguardandoVoce(id) ? `<span style="color:var(--ouro-1);display:inline-flex" title="Aguardando você">${ic('sino')}</span>` : '');
   const eng = E.config.engine === 'codex' ? 'Codex' : 'Claude';
-  const modo = E.config.modo === 'trabalhar' ? 'executando' : 'planejando';
+  const modo = E.config.modo === 'trabalhar' ? I18N.t('executando') : I18N.t('planejando');
   const arqSet = new Set(j.arquivadas || []);
   const naoArq = (x) => !arqSet.has(x.canal);
   const arq = [...arqSet].filter((c) => c.startsWith('dm:') ? agente(c.slice(3)) : (j.grupos || []).some((g) => g.canal === c) || (j.planning || []).some((p) => p.canal === c));
@@ -436,9 +436,9 @@ function renderLista() {
       ${(j.grupos || []).filter(naoArq).length ? `<div class="cat">${ic('setaB')}Grupos de trabalho</div>${[...j.grupos].filter(naoArq).reverse().slice(0, 8).map((g) => item(g.canal, ic('usuarios'), g.titulo, g.status === 'ativo' ? '' : `<span class="tag">${g.status === 'limite' ? 'pausado' : 'encerrado'}</span>`, g.status === 'ativo' ? '' : 'mudo')).join('')}` : ''}
       ${(j.planning || []).filter(naoArq).length ? `<div class="cat">${ic('setaB')}Planning</div>${[...j.planning].filter(naoArq).reverse().slice(0, 6).map((pl) => item(pl.canal, ic('blocos'), pl.titulo, `<span class="tag">${esc(pl.rotulo)}</span>`, ['aprovado', 'cancelado'].includes(pl.status) ? 'mudo' : '')).join('')}` : ''}
       ${gerais().length ? `<div class="cat">${ic('setaB')}Geral</div>${gerais().map((a) => (a.cid ? `<button class="canal" data-ir-canal="${esc(a.cid)}|dm:${a.agente}" title="${esc(a.nome)} atende todas as equipes">${av(`ext:${a.agente}@${a.cid}`, 'p')}<span class="nome">${esc(a.nome)}<small class="cargo-mini">${esc(a.cargo)}</small></span></button>` : item(`dm:${a.id}`, av(a.id, 'p'), a.nome, (a.id === liderAtual() ? '<span class="tag">LEAD</span>' : '') + sino(a.id) + eqz(a.id), '', a.cargo))).join('')}` : ''}
-      <div class="cat">${ic('setaB')}Agentes — ${rosterDaEquipe().filter((a) => !a.geral).length}</div>
+      <div class="cat">${ic('setaB')}${I18N.t('Agentes — {n}', { n: rosterDaEquipe().filter((a) => !a.geral).length })}</div>
       ${rosterDaEquipe().filter((a) => !a.geral && naoArq({ canal: `dm:${a.id}` })).map((a) => item(`dm:${a.id}`, av(a.id, 'p'), a.nome, (a.id === liderAtual() ? '<span class="tag">LEAD</span>' : '') + sino(a.id) + eqz(a.id), '', a.cargo)).join('')}
-      ${arq.length ? `<button class="cat cat-arq ${U.verArq ? '' : 'fechada'}" data-acao="ver-arquivadas">${ic('setaB')}Arquivadas — ${arq.length}</button>${U.verArq ? arq.map((c) => item(c, c.startsWith('dm:') ? av(c.slice(3), 'p', { dot: false }) : ic(c.startsWith('grp-') ? 'usuarios' : 'blocos'), nomeCanal(c), '', 'mudo')).join('') : ''}` : ''}
+      ${arq.length ? `<button class="cat cat-arq ${U.verArq ? '' : 'fechada'}" data-acao="ver-arquivadas">${ic('setaB')}${I18N.t('Arquivadas — {n}', { n: arq.length })}</button>${U.verArq ? arq.map((c) => item(c, c.startsWith('dm:') ? av(c.slice(3), 'p', { dot: false }) : ic(c.startsWith('grp-') ? 'usuarios' : 'blocos'), nomeCanal(c), '', 'mudo')).join('') : ''}` : ''}
     </div>
     ${CH.aberta ? chamadaPainelHtml() : ''}
     <div class="usuario"><button class="eu" data-acao="perfil" data-ag="voce" title="Seu nome e sua foto">${av('voce', 'm')}<span class="info"><b>${esc(usuarioDe().nome)}</b><small>${eng}, ${modo}</small></span></button>
@@ -473,22 +473,22 @@ function modalNovoPost() {
     for (const f of [...ev.target.files].slice(0, 8 - imgs.length)) {
       const r = await fetch(P(`/anexo?nome=${encodeURIComponent(f.name)}`), { method: 'PUT', body: f, headers: { 'x-studio-anexo': '1', 'content-type': f.type || 'application/octet-stream' } });
       const j = await r.json().catch(() => ({}));
-      if (r.ok && j.anexo) imgs.push(j.anexo); else aviso(j.erro || `Não consegui enviar ${f.name}.`);
+      if (r.ok && j.anexo) imgs.push(j.anexo); else aviso(j.erro || I18N.t('Não consegui enviar {arquivo}.', { arquivo: f.name }));
     }
     $('#np-lista').textContent = imgs.map((a) => a.nome).join(', ');
   };
   $('#m-nao').onclick = fecharModal;
   $('#m-sim').onclick = async () => {
     const r = await api('POST', P('/posts'), { titulo: $('#np-tit').value, corpo: $('#np-txt').value, imagens: imgs.map((a) => a.rel) });
-    if (!r._ok) return aviso(r.erro || 'Não consegui publicar.');
-    fecharModal(); aviso('Publicado.');
+    if (!r._ok) return aviso(r.erro || I18N.t('Não consegui publicar.'));
+    fecharModal(); aviso(I18N.t('Publicado.'));
   };
 }
 function postsHtml() {
   const lista = [...(J().posts || [])].reverse();
   if (!lista.length) return '<div class="vazio-p">Ainda não há publicações. Quando o time terminar algo, o relatório e os prints aparecem aqui.</div>';
   const nomeA = (id) => (id === 'voce' ? usuarioDe().nome : nomeAgente(id));
-  const dataP = (iso) => `${new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} ${horaCurta(Date.parse(iso))}`;
+  const dataP = (iso) => `${new Date(iso).toLocaleDateString(I18N.locale, { day: '2-digit', month: '2-digit' })} ${horaCurta(Date.parse(iso))}`;
   return lista.map((p) => {
     const longo = String(p.corpo).length > 520 || String(p.corpo).split('\n').length > 9;
     const exp = U.postsExp?.has(p.id);
@@ -497,15 +497,15 @@ function postsHtml() {
     const msgs = (J().canais[p.canal] || []).filter((m) => (m.texto || '').trim() && m.status !== 'trabalhando');
     const fio = aberto ? `<div class="post-fio">${msgs.map((m) => `<div class="post-resp-i">${av(m.de, 'p', { dot: false })}<div><b>${esc(nomeA(m.de))}</b> <span class="mudo">${esc(dataP(m.em))}</span><div class="texto corpo">${md(m.texto)}</div></div></div>`).join('') || '<p class="mudo">Ninguém respondeu ainda.</p>'}</div>` : '';
     return `<article class="post" id="post-${p.id}">
-      <header class="post-topo">${av(p.autor, 'm')}<div><b>${esc(nomeA(p.autor))}</b> <span class="mudo">${esc(dataP(p.criado))}${p.editado ? ', editada' : ''}</span></div>${p.relatorioFinal ? '<span class="etq">Relatório final</span>' : ''}</header>
+      <header class="post-topo">${av(p.autor, 'm')}<div><b>${esc(nomeA(p.autor))}</b> <span class="mudo">${esc(dataP(p.criado))}${p.editado ? `, ${I18N.t('editada')}` : ''}</span></div>${p.relatorioFinal ? '<span class="etq">Relatório final</span>' : ''}</header>
       <h3 class="post-titulo">${esc(p.titulo)}</h3>
       ${(p.mencoes || []).length || p.card || p.todos ? `<div class="post-men-l">${p.todos ? '<span class="post-men">@todos</span> ' : ''}${(p.mencoes || []).map((m) => `<span class="post-men">${esc(nomeA(m))}</span>`).join(' ')}${p.card ? ` <a class="post-card" data-issue="${esc(p.card)}">${esc(p.card)}</a>` : ''}</div>` : ''}
       <div class="post-corpo ${longo && !exp ? 'curto' : ''}"><div class="texto corpo">${md(p.corpo)}</div></div>
       ${longo ? `<button class="post-mais" data-acao="post-mais" data-post="${p.id}">${exp ? 'ver menos' : 'veja mais'}</button>` : ''}
       ${(p.anexos || []).length ? `<div class="post-imgs">${p.anexos.map((a) => `<a class="anexo-img" href="${urlAnexo(a.rel, a.pid || U.proj)}" target="_blank" rel="noopener" title="${esc(a.nome)}"><img src="${urlAnexo(a.rel, a.pid || U.proj)}" alt="${esc(a.nome)}" loading="lazy"></a>`).join('')}</div>` : ''}
-      ${p.paraTodos ? `<div class="post-visto">Aviso para todos. Visto por ${(p.visto || []).length} de ${p.totalAgentes}${(p.visto || []).length ? `: ${esc(p.visto.map(nomeA).join(', '))}` : ''}</div>` : ''}
+      ${p.paraTodos ? `<div class="post-visto">${I18N.t('Aviso para todos. Visto por {vistos} de {total}', { vistos: (p.visto || []).length, total: p.totalAgentes })}${(p.visto || []).length ? `: ${esc(p.visto.map(nomeA).join(', '))}` : ''}</div>` : ''}
       <div class="post-reacoes">${reac}</div>
-      ${p.respostas ? `<button class="post-abrir" data-acao="post-thread" data-post="${p.id}">${aberto ? 'Ocultar' : 'Abrir'} ${p.respostas} ${p.respostas === 1 ? 'resposta' : 'respostas'} de ${esc((p.quem || []).map(nomeA).join(', '))}</button>` : ''}
+      ${p.respostas ? `<button class="post-abrir" data-acao="post-thread" data-post="${p.id}">${I18N.t(aberto ? (p.respostas === 1 ? 'Ocultar {n} resposta de {quem}' : 'Ocultar {n} respostas de {quem}') : (p.respostas === 1 ? 'Abrir {n} resposta de {quem}' : 'Abrir {n} respostas de {quem}'), { n: p.respostas, quem: esc((p.quem || []).map(nomeA).join(', ')) })}</button>` : ''}
       ${fio}
       <div class="post-resp"><input class="in" data-post-resp="${p.id}" placeholder="Responder na conversa" autocomplete="off"></div>
     </article>`;
@@ -527,13 +527,13 @@ function cabecaChat() {
   const id = U.canal;
   const j = J();
   const btns = `<span class="espaco"></span>
-    ${id === 'equipe' || id === `dm:${liderAtual()}` ? `<button class="btn-ic ${CH.aberta ? 'on' : ''}" data-acao="chamar" title="Chamar ${esc(agente(liderAtual())?.nome || 'a liderança')} por voz">${ic('fone')}</button>` : ''}
+    ${id === 'equipe' || id === `dm:${liderAtual()}` ? `<button class="btn-ic ${CH.aberta ? 'on' : ''}" data-acao="chamar" title="${I18N.t('Chamar {nome} por voz', { nome: esc(agente(liderAtual())?.nome || I18N.t('a liderança')) })}">${ic('fone')}</button>` : ''}
     <button class="btn-ic ${U.membros ? 'on' : ''}" data-acao="membros" title="Andamento e membros">${ic('usuarios')}</button>
     ${id === 'bastidores' ? '' : `<button class="btn-ic" data-acao="limpar" title="Limpar conversa">${ic('lixo')}</button>`}`;
   if (id === 'posts') return `<div class="cabeca"><svg class="ic hash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${IC.hash}</svg><h2>posts</h2><span class="div"></span><span class="topico">Publicações do time: o que foi feito, com prints e relatórios finais</span><span class="espaco"></span><button class="btn-primario" data-acao="novo-post">Nova publicação</button></div>`;
   if (id.startsWith('grp-')) {
     const g = (j.grupos || []).find((x) => x.canal === id);
-    return `<div class="cabeca"><svg class="ic hash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${IC.hash}</svg><h2>${esc(g ? g.titulo : id)}</h2><span class="div"></span><span class="topico">${g ? `<span class="pilha">${g.membros.map((a) => av(a, 'p', { dot: false })).join('')}</span>${g.membros.map(nomeAgente).join(', ')}${g.status === 'ativo' ? '' : `, ${g.status === 'limite' ? 'pausado' : 'encerrado'}`}` : ''}</span><span class="espaco"></span>${g && g.status === 'ativo' ? `<button class="btn-sec" data-acao="grupo-encerrar" data-grupo="${id}">Encerrar grupo</button>` : ''}</div>`;
+    return `<div class="cabeca"><svg class="ic hash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${IC.hash}</svg><h2>${esc(g ? g.titulo : id)}</h2><span class="div"></span><span class="topico">${g ? `<span class="pilha">${g.membros.map((a) => av(a, 'p', { dot: false })).join('')}</span>${g.membros.map(nomeAgente).join(', ')}${g.status === 'ativo' ? '' : `, ${I18N.t(g.status === 'limite' ? 'pausado' : 'encerrado')}`}` : ''}</span><span class="espaco"></span>${g && g.status === 'ativo' ? `<button class="btn-sec" data-acao="grupo-encerrar" data-grupo="${id}">Encerrar grupo</button>` : ''}</div>`;
   }
   if (id.startsWith('plan-')) {
     const pl = (j.planning || []).find((x) => x.canal === id);
@@ -544,15 +544,15 @@ function cabecaChat() {
     const vivos = Object.entries(j.presenca).filter(([, p]) => p.estado === 'trabalhando').map(([a]) => a);
     const topico = id === 'bastidores'
       ? 'O que os agentes resolvem entre si, fora do chat'
-      : (vivos.length ? `<span class="pilha">${vivos.map((a) => av(a, 'p', { dot: false })).join('')}</span>${vivos.map(nomeAgente).join(' e ')} trabalhando` : 'Grupo com todos os agentes');
+      : (vivos.length ? `<span class="pilha">${vivos.map((a) => av(a, 'p', { dot: false })).join('')}</span>${I18N.t('{nomes} trabalhando', { nomes: vivos.map(nomeAgente).join(` ${I18N.t('e')} `) })}` : 'Grupo com todos os agentes');
     return `<div class="cabeca"><svg class="ic hash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${id === 'bastidores' ? IC.cadeado : IC.hash}</svg><h2>${id}</h2><span class="div"></span><span class="topico">${topico}</span>${btns}</div>`;
   }
   const a = agente(id.slice(3)); const p = j.presenca[a.id];
   const tag = a.id === liderAtual() ? ' <span class="tag-lead">LEAD</span>' : '';
   const sub = aguardandoVoce(a.id) ? '<span class="viva" style="--c:var(--ouro-1)">aguardando você</span>'
-    : p ? `<span class="viva" style="--c:${a.cor}">${p.estado === 'fila' ? 'na fila' : esc(p.atividade)}</span> <span data-desde="${p.desde}"></span>${p.canal && p.canal !== id ? ` <a class="ref" data-canal="${esc(p.canal)}">ver em #${esc(p.canal)}</a>` : ''}` : esc(a.papel);
-  const parar = p ? `<button class="btn-ic" data-acao="parar-agente" data-ag="${a.id}" title="Parar ${esc(a.nome)}">${ic('parar')}</button>` : '';
-  const perfil = `<button class="btn-ic" data-acao="perfil" data-ag="${a.id}" title="Regras e contexto de ${esc(a.nome)}">${ic('engrenagem')}</button>`;
+    : p ? `<span class="viva" style="--c:${a.cor}">${p.estado === 'fila' ? 'na fila' : esc(p.atividade)}</span> <span data-desde="${p.desde}"></span>${p.canal && p.canal !== id ? ` <a class="ref" data-canal="${esc(p.canal)}">${I18N.t('ver em #{canal}', { canal: esc(p.canal) })}</a>` : ''}` : esc(a.papel);
+  const parar = p ? `<button class="btn-ic" data-acao="parar-agente" data-ag="${a.id}" title="${I18N.t('Parar {nome}', { nome: esc(a.nome) })}">${ic('parar')}</button>` : '';
+  const perfil = `<button class="btn-ic" data-acao="perfil" data-ag="${a.id}" title="${I18N.t('Regras e contexto de {nome}', { nome: esc(a.nome) })}">${ic('engrenagem')}</button>`;
   return `<div class="cabeca">${av(a.id, 'm')}<h2>${nomeHtml(a.id, true)}${tag}<span class="cargo-h">${esc(a.cargo)}</span></h2><span class="div"></span><span class="topico">${sub}</span>${btns.replace('<span class="espaco"></span>', `<span class="espaco"></span>${parar}${perfil}`)}</div>`;
 }
 
@@ -582,7 +582,7 @@ function renderChat() {
       <div class="caixa">
         ${respostaHtml()}
         <div class="anexos-pend" id="anexos-pend" hidden></div>
-        <textarea id="texto" rows="1" placeholder="${U.canal === 'equipe' ? 'Enviar mensagem para #equipe' : `Enviar mensagem para ${esc(nomeCanal(U.canal))}`}">${esc(U.rascunhos[`${U.proj}/${U.canal}`] || '')}</textarea>
+        <textarea id="texto" rows="1" placeholder="${I18N.t('Enviar mensagem para {canal}', { canal: esc((U.canal === 'equipe' ? '#' : '') + nomeCanal(U.canal)) })}">${esc(U.rascunhos[`${U.proj}/${U.canal}`] || '')}</textarea>
         <div class="barra">
           ${seletorHtml('motor')}${seletorHtml('modo')}
           <button class="btn-ic" data-acao="anexar" title="Anexar arquivos (ou arraste e cole aqui)">${ic('clipe')}</button>
@@ -615,13 +615,13 @@ function renderDigitando() {
   if (!el) return;
   const ps = Object.entries(J().presenca).filter(([, p]) => p.canal === U.canal || (U.canal !== 'bastidores' && p.canal === 'bastidores'));
   if (!ps.length) { el.innerHTML = ''; return; }
-  const nomes = ps.map(([id]) => `<b>${esc(nomeAgente(id))}</b>`).join(' e ');
+  const nomes = ps.map(([id]) => `<b>${esc(nomeAgente(id))}</b>`).join(` ${I18N.t('e')} `);
   const [id, p] = ps[0];
   const cor = (agente(id) || {}).cor || '#aaa';
   const generica = ['escrevendo', 'começando', 'trabalhando', 'na fila', ''];
   const extra = ps.length === 1 && p.estado === 'trabalhando' && !generica.includes(p.atividade || '') ? p.atividade : '';
   el.innerHTML = `<span class="pontos" style="--c:${cor}"><i></i><i></i><i></i></span>
-    <span>${nomes} ${ps.length > 1 ? 'estão trabalhando' : (p.estado === 'fila' ? 'está na fila' : 'está escrevendo')}</span>
+    <span>${I18N.t(ps.length > 1 ? '{nomes} estão trabalhando' : (p.estado === 'fila' ? '{nomes} está na fila' : '{nomes} está escrevendo'), { nomes })}</span>
     ${extra ? `<span class="t">${esc(extra)}</span>` : ''}${ps.length === 1 && p.estado === 'trabalhando' ? `<span class="t" data-desde="${p.desde}"></span>` : ''}`;
 }
 
@@ -645,9 +645,9 @@ function perguntaHtml(m) {
   const c = q.card ? cartao(q.card) : null;
   const podeDelegar = !q.planning && !q.decisao && q.de !== liderAtual();
   return `<div class="embed pergunta ${aberta ? '' : 'fechada'}" data-q="${q.id}">
-    <div class="linha1">${ic(aberta ? 'sino' : 'check')}${aberta ? 'Precisa de você' : comLider ? `Com ${esc(nomeAgente(liderAtual()))} para decidir` : 'Respondida'}</div>
+    <div class="linha1">${ic(aberta ? 'sino' : 'check')}${aberta ? 'Precisa de você' : comLider ? I18N.t('Com {nome} para decidir', { nome: esc(nomeAgente(liderAtual())) }) : 'Respondida'}</div>
     ${c ? `<div class="tit">${esc(c.id)}  ${esc(c.titulo)}</div>` : ''}
-    ${aberta ? `<div class="opcoes">${q.opcoes.map((o) => `<button data-responder="${q.id}" data-resp="${esc(o)}">${esc(o)}</button>`).join('')}<button class="sec" data-acao="responder-livre" data-q="${q.id}" data-de="${esc(q.de)}">Responder…</button>${podeDelegar ? `<button class="sec" data-acao="delegar-pergunta" data-q="${q.id}" title="Passa a pergunta para a liderança decidir por você">${esc(nomeAgente(liderAtual()))} decide</button>` : ''}</div>` : ''}</div>`;
+    ${aberta ? `<div class="opcoes">${q.opcoes.map((o) => `<button data-responder="${q.id}" data-resp="${esc(o)}">${esc(o)}</button>`).join('')}<button class="sec" data-acao="responder-livre" data-q="${q.id}" data-de="${esc(q.de)}">Responder…</button>${podeDelegar ? `<button class="sec" data-acao="delegar-pergunta" data-q="${q.id}" title="Passa a pergunta para a liderança decidir por você">${I18N.t('{nome} decide', { nome: esc(nomeAgente(liderAtual())) })}</button>` : ''}</div>` : ''}</div>`;
 }
 
 function relatorioHtml(d) {
@@ -658,14 +658,14 @@ function relatorioHtml(d) {
   const pg = d.progresso || { pct: 0, pontosFeitos: 0, pontosTotal: 0 };
   return `<div class="embed relatorio">
     <div class="linha1">${ic('relogio')}${esc(d.titulo || (d.manual ? 'Relatório de hoje' : 'Relatório do dia'))}<span class="rel-hora">${esc(d.hora || '')}</span></div>
-    ${pg.pontosTotal ? `<div class="rel-prog"><i class="uso-b"><b class="ok" style="width:${pg.pct}%"></b></i><span>${pg.pontosFeitos} de ${pg.pontosTotal} pontos, ${pg.pct}%</span></div>` : ''}
-    ${bloco(`${d.titulo ? 'Concluído' : 'Concluído hoje'}${d.pontosHoje ? `, ${d.pontosHoje} pontos` : ''}`, lista(d.concluidos || [], 'Nada concluído ainda.'))}
+    ${pg.pontosTotal ? `<div class="rel-prog"><i class="uso-b"><b class="ok" style="width:${pg.pct}%"></b></i><span>${I18N.t('{feitos} de {total} pontos, {pct}%', { feitos: pg.pontosFeitos, total: pg.pontosTotal, pct: pg.pct })}</span></div>` : ''}
+    ${bloco(`${I18N.t(d.titulo ? 'Concluído' : 'Concluído hoje')}${d.pontosHoje ? `, ${I18N.t('{n} pontos', { n: d.pontosHoje })}` : ''}`, lista(d.concluidos || [], 'Nada concluído ainda.'))}
     ${(d.andamento || []).length ? bloco('Em andamento', lista(d.andamento)) : ''}
     ${(d.emRevisao || []).length ? bloco('Esperando revisão ou QA', lista(d.emRevisao)) : ''}
     ${(d.bloqueados || []).length ? bloco('Bloqueado', lista(d.bloqueados, '', (c) => `<small class="rel-motivo">${esc(c.motivo)}</small>`)) : ''}
-    ${d.perguntas ? bloco('Precisa de você', `<div class="rel-vazio">${d.perguntas} ${d.perguntas === 1 ? 'pergunta em aberto' : 'perguntas em aberto'}.</div>`) : ''}
+    ${d.perguntas ? bloco('Precisa de você', `<div class="rel-vazio">${I18N.t(d.perguntas === 1 ? '{n} pergunta em aberto.' : '{n} perguntas em aberto.', { n: d.perguntas })}</div>`) : ''}
     ${(d.proximos || []).length ? bloco('Próximos', lista(d.proximos)) : ''}
-    ${d.uso ? `<div class="rel-rodape">Créditos: sessão ${d.uso.cinco ?? '?'}%, semana ${d.uso.sete ?? '?'}%</div>` : ''}
+    ${d.uso ? `<div class="rel-rodape">${I18N.t('Créditos: sessão {sessao}%, semana {semana}%', { sessao: d.uso.cinco ?? '?', semana: d.uso.sete ?? '?' })}</div>` : ''}
   </div>`;
 }
 
@@ -718,7 +718,7 @@ function renderAnexosPend() {
 async function anexarArquivos(arquivos) {
   const l = anexosAtuais();
   for (const f of [...arquivos]) {
-    if (l.length >= 8) { aviso('No máximo 8 arquivos por mensagem.'); break; }
+    if (l.length >= 8) { aviso(I18N.t('No máximo 8 arquivos por mensagem.')); break; }
     const item = { nome: f.name || 'colado.png', tamanho: f.size, estado: 'enviando', imagem: /^image\/(png|jpe?g|gif|webp)$/.test(f.type), previa: /^image\//.test(f.type) ? URL.createObjectURL(f) : null };
     if (f.size > 25 * 1048576) { item.estado = 'erro'; item.erro = 'passa de 25 MB'; l.push(item); continue; }
     l.push(item);
@@ -746,7 +746,7 @@ function msgHtml(m, ant) {
   const cor = minha ? '#F6C75B' : ext ? (ext.cor || '#8fa3bf') : (a ? a.cor : '#fff');
   const p = J().presenca[m.de];
   const camChips = (m.caminhos || []).length
-    ? `<div class="chips-cam">${m.caminhos.map((c) => `<span class="chip-cam ${c.dentro ? '' : 'fora'}" title="${esc(c.caminho)}${c.dentro ? '' : ' (fora do projeto: só leitura)'}">${ic(c.tipo === 'pasta' ? 'pasta' : 'copiar')}${esc(c.caminho.split(/[\\/]/).filter(Boolean).pop())}</span>`).join('')}</div>` : '';
+    ? `<div class="chips-cam">${m.caminhos.map((c) => `<span class="chip-cam ${c.dentro ? '' : 'fora'}" title="${esc(c.caminho)}${c.dentro ? '' : ` ${I18N.t('(fora do projeto: só leitura)')}`}">${ic(c.tipo === 'pasta' ? 'pasta' : 'copiar')}${esc(c.caminho.split(/[\\/]/).filter(Boolean).pop())}</span>`).join('')}</div>` : '';
   let corpo = '';
   if (minha) corpo = `<div class="texto corpo">${md(m.texto)}</div>${camChips}${anexosHtml(m.anexos)}`;
   else if (m.status === 'trabalhando') {
@@ -758,7 +758,7 @@ function msgHtml(m, ant) {
   else corpo = (m.texto ? `<div class="texto corpo">${md(m.texto)}</div>` : '') + (m.pergunta ? perguntaHtml(m) : '') + embedsHtml(m.resumo);
   if (m.relatorioTarefa) {
     const r=m.relatorioTarefa;
-    corpo += `<div class="anexos-msg"><a class="anexo-arq relatorio-download" href="${P(`/cartao/${encodeURIComponent(r.card)}/relatorio?tipo=${encodeURIComponent(r.tipo)}&revisao=${r.revisao}&arquivo=${encodeURIComponent(r.nome)}`)}" download="${esc(r.nome)}">${ic('copiar')}<span>Baixar ${esc(r.nome)}</span></a></div>`;
+    corpo += `<div class="anexos-msg"><a class="anexo-arq relatorio-download" href="${P(`/cartao/${encodeURIComponent(r.card)}/relatorio?tipo=${encodeURIComponent(r.tipo)}&revisao=${r.revisao}&arquivo=${encodeURIComponent(r.nome)}`)}" download="${esc(r.nome)}">${ic('copiar')}<span>${I18N.t('Baixar {arquivo}', { arquivo: esc(r.nome) })}</span></a></div>`;
   }
   if (!minha && m.anexos?.length) corpo += anexosHtml(m.anexos);
   const dur = m.duracaoMs > 5000 ? `<span class="dur">${Math.round(m.duracaoMs / 1000)} s</span>` : '';
@@ -766,7 +766,7 @@ function msgHtml(m, ant) {
   return `<div class="msg ${novo ? 'topo' : ''} ${paraVoce ? 'para-voce' : ''}" id="msg-${m.id}" data-de="${esc(m.de)}" data-status="${esc(m.status || '')}" style="--c:${cor}">
     <div class="lado ${novo ? '' : 'hora'}">${novo ? (ext ? `<span class="av g" style="--c:${cor}" title="${esc(ext.nome)}, ${esc(ext.equipe)}">${ic('usuarios')}</span>` : av(m.de, 'g', { dot: false })) : hhmm(m.em)}</div>
     <div>
-      ${novo ? `<div class="cab"><b>${ext ? esc(ext.nome) : nomeHtml(m.de, U.canal.startsWith('dm:') || !!a?.externo)}</b>${ext ? `<span class="cargo-m">${esc(ext.cargo || '')}${ext.cargo ? ', ' : ''}equipe ${esc(ext.equipe)}</span>` : a?.cargo ? `<span class="cargo-m">${esc(a.cargo)}</span>` : ''}${m.de === liderAtual() ? '<span class="tag">LEAD</span>' : ''}<time>${hhmm(m.em)}</time>${dur}</div>` : ''}
+      ${novo ? `<div class="cab"><b>${ext ? esc(ext.nome) : nomeHtml(m.de, U.canal.startsWith('dm:') || !!a?.externo)}</b>${ext ? `<span class="cargo-m">${esc(ext.cargo || '')}${ext.cargo ? ', ' : ''}${I18N.t('equipe {equipe}', { equipe: esc(ext.equipe) })}</span>` : a?.cargo ? `<span class="cargo-m">${esc(a.cargo)}</span>` : ''}${m.de === liderAtual() ? '<span class="tag">LEAD</span>' : ''}<time>${hhmm(m.em)}</time>${dur}</div>` : ''}
       ${corpo}
     </div>
     ${m.status !== 'trabalhando' && (m.texto || m.anexos?.length) ? `<div class="copiar"><button class="btn-ic" data-acao="responder-msg" data-msg="${m.id}" title="Responder">${ic('setaE')}</button><button class="btn-ic" data-acao="encaminhar-msg" data-msg="${m.id}" title="Encaminhar para outro chat">${ic('setaD')}</button>${m.texto ? `<button class="btn-ic" data-copiar="${m.id}" title="Copiar">${ic('copiar')}</button>` : ''}</div>` : ''}
@@ -844,7 +844,7 @@ const autorMarca = (de) => (de === 'voce' ? usuarioDe().nome : String(de).starts
 const msgDe = (id) => (J().canais[U.canal] || []).find((x) => x.id === id);
 function respostaHtml() {
   const r = U.resposta?.[`${U.proj}/${U.canal}`];
-  return r ? `<div class="respondendo">${ic('setaE')}<span>Respondendo a <b>${esc(nomeAgente(r.de))}</b>: ${esc(r.trecho)}</span><button class="btn-ic" data-acao="cancelar-resposta" title="Cancelar">${ic('fechar')}</button></div>` : '';
+  return r ? `<div class="respondendo">${ic('setaE')}<span>${I18N.t('Respondendo a <b>{nome}</b>: {trecho}', { nome: esc(nomeAgente(r.de)), trecho: esc(r.trecho) })}</span><button class="btn-ic" data-acao="cancelar-resposta" title="Cancelar">${ic('fechar')}</button></div>` : '';
 }
 function responderMsg(id) {
   const m = msgDe(id); if (!m) return;
@@ -877,17 +877,17 @@ async function encaminharPara(cid, canal) {
   // os anexos só acompanham dentro da mesma equipe (cada equipe guarda os seus na própria pasta)
   const anexos = cid === x.de ? (x.m.anexos || []).map((a) => ({ rel: a.rel })) : [];
   const r = await api('POST', P('/mensagem', cid), { canal, texto, engine: E.config.engine, modo: E.config.modo, anexos });
-  if (!r._ok) return aviso(r.erro || 'Não consegui encaminhar.');
+  if (!r._ok) return aviso(r.erro || I18N.t('Não consegui encaminhar.'));
   fecharModal(); U.encaminhar = null;
   if (cid === U.proj) addMsg(cid, r);
-  aviso(`Encaminhada para ${canal === 'equipe' ? '#equipe' : (PJ[cid]?.roster || []).find((a) => `dm:${a.id}` === canal)?.nome || nomeCanal(canal)}${cid !== x.de ? ` (${equipeDe(cid)?.nome})` : ''}.`);
+  aviso(I18N.t('Encaminhada para {destino}{equipe}.', { destino: canal === 'equipe' ? '#equipe' : (PJ[cid]?.roster || []).find((a) => `dm:${a.id}` === canal)?.nome || nomeCanal(canal), equipe: cid !== x.de ? ` (${equipeDe(cid)?.nome})` : '' }));
 }
 
 async function enviar() {
   const ta = $('#texto');
   const texto = ta.value.trim();
   const pend = anexosAtuais();
-  if (pend.some((a) => a.estado === 'enviando')) return aviso('Espere o envio dos anexos terminar.');
+  if (pend.some((a) => a.estado === 'enviando')) return aviso(I18N.t('Espere o envio dos anexos terminar.'));
   const prontos = pend.filter((a) => a.estado === 'ok');
   if (!texto && !prontos.length) return;
   const chaveR = `${U.proj}/${U.canal}`; const resp = U.resposta?.[chaveR];
@@ -904,7 +904,7 @@ async function enviar() {
   ta.value = ''; U.rascunhos[`${U.proj}/${U.canal}`] = ''; autoAltura(ta);
   if (resp) { delete U.resposta[chaveR]; $('.respondendo')?.remove(); }
   const r = await api('POST', P('/mensagem'), { canal: U.canal, texto: textoFinal, engine: E.config.engine, modo: E.config.modo, anexos: prontos.map((a) => ({ rel: a.rel })) });
-  if (!r._ok) { aviso(r.erro || 'Não consegui enviar.'); ta.value = texto; if (resp) U.resposta[chaveR] = resp; return; }
+  if (!r._ok) { aviso(r.erro || I18N.t('Não consegui enviar.')); ta.value = texto; if (resp) U.resposta[chaveR] = resp; return; }
   pend.splice(0).forEach((a) => a.previa && URL.revokeObjectURL(a.previa));
   renderAnexosPend();
   addMsg(U.proj, r);
@@ -920,7 +920,7 @@ function sugestoes() {
   // os nomes são os que você deu a cada um (perfil); gente das outras equipes entra em seções separadas, por equipe
   const locais = [...(!q || 'todos'.startsWith(semAcento(q)) ? [{ id: '__todos', nome: 'todos', cargo: 'avisa o time inteiro' }] : []), ...(!q || 'image'.startsWith(semAcento(q)) || 'imagem'.startsWith(semAcento(q)) ? [{ id: '__image', nome: 'Image', cargo: 'gera uma imagem com o Codex' }] : []), ...rosterAtual().filter(bate)];
   const externos = (J().externos || []).filter((x) => !rosterAtual().some((a) => semAcento(primeiroNome(a.nome)) === semAcento(x.token))).filter(bate).map((x) => ({ id: `ext:${x.agente}@${x.cid}`, nome: x.nome, cargo: x.cargo, token: x.token, equipe: x.equipe, cor: x.cor, lider: x.lider }));
-  const secoes = [[J().equipeNome ? `Esta equipe (${J().equipeNome})` : 'Esta equipe', locais], ...Object.entries(externos.reduce((acc, x) => { (acc[x.equipe] ||= []).push(x); return acc; }, {}))].filter(([, l]) => l.length);
+  const secoes = [[J().equipeNome ? I18N.t('Esta equipe ({equipe})', { equipe: J().equipeNome }) : I18N.t('Esta equipe'), locais], ...Object.entries(externos.reduce((acc, x) => { (acc[x.equipe] ||= []).push(x); return acc; }, {}))].filter(([, l]) => l.length);
   const lista = secoes.flatMap(([, l]) => l);
   if (!lista.length) { box.hidden = true; return; }
   sugSel = Math.min(sugSel, lista.length - 1);
@@ -939,18 +939,18 @@ function inserirMencao(id) {
 }
 async function responderPergunta(pid, qid, texto) {
   const r = await api('POST', P(`/perguntas/${qid}/responder`, pid), { texto });
-  if (!r._ok) aviso(r.erro || 'Não consegui responder.');
+  if (!r._ok) aviso(r.erro || I18N.t('Não consegui responder.'));
   return r._ok;
 }
 
 /* ------------------------------------------------------------ painel da direita */
 function usoHtml() {
   const u = E.uso?.motores?.[U.usoMotor] || (U.usoMotor === 'claude' ? E.uso : null);
-  const pz = Object.entries(E.pausas || {}).filter(([, p]) => p.ate * 1000 > Date.now()).map(([eng, p]) => `<div class="uso-pausa">${ic('relogio')}<span>${eng === 'codex' ? 'Codex' : 'Claude'} parado, volta ${diaCurto(p.ate * 1000) === 'hoje' ? '' : `${diaCurto(p.ate * 1000)} `}${horaCurta(p.ate * 1000)}</span></div>`).join('');   // com a data quando a volta não é hoje (limite semanal)
+  const pz = Object.entries(E.pausas || {}).filter(([, p]) => p.ate * 1000 > Date.now()).map(([eng, p]) => `<div class="uso-pausa">${ic('relogio')}<span>${I18N.t('{motor} parado, volta {quando}', { motor: eng === 'codex' ? 'Codex' : 'Claude', quando: `${diaCurto(p.ate * 1000) === 'hoje' ? '' : `${I18N.t(diaCurto(p.ate * 1000))} `}${horaCurta(p.ate * 1000)}` })}</span></div>`).join('');   // com a data quando a volta não é hoje (limite semanal)
   const cs = J().cartoes;
   const tot = cs.reduce((s, c) => s + (c.pontos || 0), 0);
   const feito = cs.filter((c) => c.coluna === 'concluido').reduce((s, c) => s + (c.pontos || 0), 0);
-  const prog = tot ? `<div class="uso-l" title="Pontos concluídos: ${feito} de ${tot}"><span>Feito</span><i class="uso-b"><b class="ok" style="width:${Math.round(100 * feito / tot)}%"></b></i><em>${Math.round(100 * feito / tot)}%</em></div>` : '';
+  const prog = tot ? `<div class="uso-l" title="${I18N.t('Pontos concluídos: {feitos} de {total}', { feitos: feito, total: tot })}"><span>Feito</span><i class="uso-b"><b class="ok" style="width:${Math.round(100 * feito / tot)}%"></b></i><em>${Math.round(100 * feito / tot)}%</em></div>` : '';
   // o painel sempre mostra o piloto, mesmo sem leitura de uso ainda
   const faixa = (p) => (p >= 90 ? 'crit' : p >= 75 ? 'alto' : p >= 50 ? 'med' : '');
   const lin = (rot, dica, w) => (w ? `<div class="uso-l" title="${dica}: ${w.pct}%"><span>${rot}</span><i class="uso-b"><b class="${faixa(w.pct)}" style="width:${Math.min(100, w.pct)}%"></b></i><em>${w.pct}%</em></div>` : '');
@@ -959,23 +959,23 @@ function usoHtml() {
   const piloto = `<button class="piloto ${pil.ativo ? 'on' : ''}" data-acao="piloto" title="${pil.ativo ? 'O time segue sozinho enquanto o app estiver aberto' : 'Liga para o time seguir sozinho enquanto você estiver fora'}"><i class="chave-p"></i><span>Piloto automático</span><em>${pil.ativo ? 'ligado' : 'desligado'}</em></button>`
     + (templateId() === 'professional-operations' ? `<button class="piloto assessor ${assessorAuto ? 'on' : ''}" data-acao="assessor-auto" title="${assessorAuto ? 'O assessor procura o que adiantar para você quando aparece sinal novo (agenda, Jira, outras equipes). Sem sinal novo, fica quieto.' : 'Ligue para o assessor tomar a iniciativa; desligado, ele só faz o que você pedir.'}"><i class="chave-p"></i><span>Assessor por conta própria</span><em>${assessorAuto ? 'ligado' : 'desligado'}</em></button><div class="linha-in assessor-botoes"><button class="btn-sec ronda" data-acao="ronda-assessor" title="Uma ronda agora: ele olha agenda, Jira, equipes e quadro e te diz o que adiantou ou propõe">Olhar agora</button><button class="btn-sec ronda" data-acao="iniciativas" title="O que o assessor decidiu fazer, em que pé está e o que depende de você">Iniciativas${(J().iniciativasResumo?.aguardandoVoce || 0) ? ` <b class="pip-ini">${J().iniciativasResumo.aguardandoVoce}</b>` : ''}</button><button class="btn-sec ronda" data-acao="desde" title="O que aconteceu desde a última vez que você esteve aqui, calculado pelo app">O que aconteceu</button></div>` : '');
   const tabs = `<div class="seg uso-tabs" role="tablist" aria-label="Uso da assinatura">${['claude', 'codex'].map(e => `<button role="tab" aria-selected="${U.usoMotor === e}" class="${U.usoMotor === e ? 'on' : ''}" data-uso-motor="${e}">${e === 'codex' ? 'Codex' : 'Claude'}</button>`).join('')}</div>`;
-  const janela = (key, fallback) => { const w = u?.[key]; return w ? lin(w.minutos ? (w.minutos >= 1440 ? `${Math.round(w.minutos / 1440)} d` : `${Math.round(w.minutos / 60)} h`) : fallback, `${U.usoMotor}: uso da janela${w.resetsAt ? ', renova ' + new Date(w.resetsAt * 1000).toLocaleString('pt-BR') : ''}`, w) : ''; };
+  const janela = (key, fallback) => { const w = u?.[key]; return w ? lin(w.minutos ? (w.minutos >= 1440 ? `${Math.round(w.minutos / 1440)} d` : `${Math.round(w.minutos / 60)} h`) : fallback, `${U.usoMotor}: ${I18N.t('uso da janela')}${w.resetsAt ? ', ' + I18N.t('renova {data}', { data: new Date(w.resetsAt * 1000).toLocaleString(I18N.locale) }) : ''}`, w) : ''; };
   const mot = J().motores?.[U.usoMotor];
   const nomeM = U.usoMotor === 'codex' ? 'Codex' : 'Claude';
   const MODELOS_TETO = U.usoMotor === 'codex' ? { low: 'Luna', medium: 'Terra', high: 'Sol' } : { low: 'Haiku 4.5 e Sonnet 4.6', medium: 'até Sonnet 5.5', high: 'libera Opus 5 e Opus 5.5' };
   const controle = mot ? `<div class="motor-ctl">
-      <button class="motor-liga ${mot.ativo ? 'on' : ''}" data-acao="motor-ativo" data-eng="${U.usoMotor}" title="${mot.ativo ? `Desligar o ${nomeM} neste projeto` : `Ligar o ${nomeM} neste projeto`}"><i class="chave-p"></i><span>Usar o ${nomeM} neste projeto</span><em>${mot.ativo ? 'ligado' : 'desligado'}</em></button>
+      <button class="motor-liga ${mot.ativo ? 'on' : ''}" data-acao="motor-ativo" data-eng="${U.usoMotor}" title="${mot.ativo ? I18N.t('Desligar o {motor} neste projeto', { motor: nomeM }) : I18N.t('Ligar o {motor} neste projeto', { motor: nomeM })}"><i class="chave-p"></i><span>${I18N.t('Usar o {motor} neste projeto', { motor: nomeM })}</span><em>${mot.ativo ? 'ligado' : 'desligado'}</em></button>
       ${mot.ativo ? `<div class="motor-esforco"><span class="rot">Limite de esforço</span>
-        <div class="seg motor-teto" role="radiogroup" aria-label="Limite de esforço do ${nomeM}">${[['auto', 'Auto'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']].map(([v, n]) => `<button role="radio" aria-checked="${mot.teto === v}" class="${mot.teto === v ? 'on' : ''}" data-acao="motor-teto" data-eng="${U.usoMotor}" data-teto="${v}" title="${v === 'auto' ? 'A Cris decide pelo uso da conta' : `Teto ${v}: ${MODELOS_TETO[v]}`}">${n}</button>`).join('')}</div>
-        <small class="uso-data" title="Low usa só os modelos mais baratos. Medium chega ao Sonnet 5.5. High libera o Opus.">Agora: <b>${mot.efetivo.teto}</b> (${MODELOS_TETO[mot.efetivo.teto]})${mot.efetivo.auto ? (mot.efetivo.motivo ? `, ${esc(mot.efetivo.motivo)}` : '') : ', fixado por você'}</small></div>` : ''}
-      <small class="uso-data">${mot.chamadas24h} de ${mot.total24h} chamadas nas últimas 24 h</small>
-      ${(() => { const pisos = { ...(E.config.creditos?.pisos || {}) }; const ld = liderAtual(); if (ld && !pisos[ld]) pisos[ld] = 'medio'; const pi = Object.entries(pisos).filter(([id, v]) => v && rosterAtual().some((a) => a.id === id)); return pi.length ? `<small class="uso-data" title="O menor modelo de cada cargo. Vale mesmo com o uso alto. Quem lidera a equipe tem Sonnet 5.5 no mínimo.">Piso de modelo: ${esc(pi.map(([id, v]) => `${nomeAgente(id)} ${v === 'forte' ? 'Opus' : 'Sonnet 5.5'}`).join(', '))}</small>` : ''; })()}
+        <div class="seg motor-teto" role="radiogroup" aria-label="${I18N.t('Limite de esforço do {motor}', { motor: nomeM })}">${[['auto', 'Auto'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High']].map(([v, n]) => `<button role="radio" aria-checked="${mot.teto === v}" class="${mot.teto === v ? 'on' : ''}" data-acao="motor-teto" data-eng="${U.usoMotor}" data-teto="${v}" title="${v === 'auto' ? 'A Cris decide pelo uso da conta' : I18N.t('Teto {nivel}: {modelos}', { nivel: v, modelos: I18N.t(MODELOS_TETO[v]) })}">${n}</button>`).join('')}</div>
+        <small class="uso-data" title="Low usa só os modelos mais baratos. Medium chega ao Sonnet 5.5. High libera o Opus.">Agora: <b>${mot.efetivo.teto}</b> (${I18N.t(MODELOS_TETO[mot.efetivo.teto])})${mot.efetivo.auto ? (mot.efetivo.motivo ? `, ${esc(mot.efetivo.motivo)}` : '') : `, ${I18N.t('fixado por você')}`}</small></div>` : ''}
+      <small class="uso-data">${I18N.t('{feitas} de {total} chamadas nas últimas 24 h', { feitas: mot.chamadas24h, total: mot.total24h })}</small>
+      ${(() => { const pisos = { ...(E.config.creditos?.pisos || {}) }; const ld = liderAtual(); if (ld && !pisos[ld]) pisos[ld] = 'medio'; const pi = Object.entries(pisos).filter(([id, v]) => v && rosterAtual().some((a) => a.id === id)); return pi.length ? `<small class="uso-data" title="O menor modelo de cada cargo. Vale mesmo com o uso alto. Quem lidera a equipe tem Sonnet 5.5 no mínimo.">${I18N.t('Piso de modelo: {lista}', { lista: esc(pi.map(([id, v]) => `${nomeAgente(id)} ${v === 'forte' ? 'Opus' : 'Sonnet 5.5'}`).join(', ')) })}</small>` : ''; })()}
     </div>` : '';
-  return `<div class="uso">${piloto}${tabs}${controle}${pz}${u?.cinco || u?.sete || u?.extra ? janela('cinco', '5 h') + janela('sete', '7 d') + (u.extra ? lin('Extra', `Créditos extras${u.extra.emUso ? ' (em uso)' : ' (ainda não usados; o plano cobre)'}${u.extra.resetsAt ? `, renovam ${new Date(u.extra.resetsAt * 1000).toLocaleDateString('pt-BR')}` : ''}`, u.extra) : '') + (() => { const velho = [u.cinco, u.sete].filter((w) => w && !w.estimado).some((w) => w.lido ? Date.now() - Date.parse(w.lido) > 45 * 60_000 : true); return `<small class="uso-data">${u.extra && (velho || !u.cinco || u.cinco.estimado) ? `Créditos extras lidos às ${esc(hhmm(u.extra.lido || u.em))}. O Claude Code agora informa só o limite dos extras: 5 h e semana podem estar defasados.` : `Atualizado ${esc(hhmm(u.em))}`}</small>`; })() : '<small class="uso-data">Aguardando leitura desta conta</small>'}<button class="btn-sec uso-relatorio" data-acao="relatorio-creditos">Relatório de consumo</button>${prog}</div>`;
+  return `<div class="uso">${piloto}${tabs}${controle}${pz}${u?.cinco || u?.sete || u?.extra ? janela('cinco', '5 h') + janela('sete', '7 d') + (u.extra ? lin('Extra', `${I18N.t('Créditos extras')} ${u.extra.emUso ? I18N.t('(em uso)') : I18N.t('(ainda não usados; o plano cobre)')}${u.extra.resetsAt ? `, ${I18N.t('renovam {data}', { data: new Date(u.extra.resetsAt * 1000).toLocaleDateString(I18N.locale) })}` : ''}`, u.extra) : '') + (() => { const velho = [u.cinco, u.sete].filter((w) => w && !w.estimado).some((w) => w.lido ? Date.now() - Date.parse(w.lido) > 45 * 60_000 : true); return `<small class="uso-data">${u.extra && (velho || !u.cinco || u.cinco.estimado) ? I18N.t('Créditos extras lidos às {hora}. O Claude Code agora informa só o limite dos extras: 5 h e semana podem estar defasados.', { hora: esc(hhmm(u.extra.lido || u.em)) }) : I18N.t('Atualizado {hora}', { hora: esc(hhmm(u.em)) })}</small>`; })() : '<small class="uso-data">Aguardando leitura desta conta</small>'}<button class="btn-sec uso-relatorio" data-acao="relatorio-creditos">Relatório de consumo</button>${prog}</div>`;
 }
 
-const horaCurta = (ts) => new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-const diaCurto = (ts) => (new Date(ts).toDateString() === new Date().toDateString() ? 'hoje' : new Date(ts).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }));
+const horaCurta = (ts) => new Date(ts).toLocaleTimeString(I18N.locale, { hour: '2-digit', minute: '2-digit' });
+const diaCurto = (ts) => (new Date(ts).toDateString() === new Date().toDateString() ? 'hoje' : new Date(ts).toLocaleDateString(I18N.locale, { weekday: 'short', day: '2-digit', month: '2-digit' }));
 
 function agendaMini() {
   const ig = J().integ;
@@ -986,7 +986,7 @@ function agendaMini() {
   const outros = ev.filter((e) => !prox.includes(e)).slice(0, Math.max(0, 3 - prox.length));
   const lista = [...prox, ...outros].sort((a, b) => a.ts - b.ts);
   if (!lista.length) return '';
-  return `<div class="cat">Agenda</div>${lista.map((e) => `<button class="ag-i ${e.tipo}" data-acao="demandas" title="${esc(e.titulo)}"><span class="ag-h">${diaCurto(e.ts)}<b>${horaCurta(e.ts)}</b></span><span class="ag-t">${esc(e.titulo)}</span></button>`).join('')}`;
+  return `<div class="cat">Agenda</div>${lista.map((e) => `<button class="ag-i ${e.tipo}" data-acao="demandas" title="${esc(e.titulo)}"><span class="ag-h">${I18N.t(diaCurto(e.ts))}<b>${horaCurta(e.ts)}</b></span><span class="ag-t">${esc(e.titulo)}</span></button>`).join('')}`;
 }
 
 function renderMembros() {
@@ -1009,7 +1009,7 @@ function renderMembros() {
   };
   const membro = (a) => {
     const p = j.presenca[a.id];
-    const sub = aguardandoVoce(a.id) ? 'Aguardando você' : p ? `${p.estado === 'fila' ? 'Na fila' : esc(p.atividade || 'Trabalhando')}${p.card ? ` em ${esc(p.card)}` : ''}` : esc(a.cargo);
+    const sub = aguardandoVoce(a.id) ? 'Aguardando você' : p ? `${p.estado === 'fila' ? I18N.t('Na fila') : esc(p.atividade || I18N.t('Trabalhando'))}${p.card ? ` ${I18N.t('em {card}', { card: esc(p.card) })}` : ''}` : esc(a.cargo);
     return `<button class="membro ${placaCls(a.id)}" data-canal="dm:${a.id}" style="--c:${a.cor}">${av(a.id, 'm')}<span class="info"><span class="nm">${nomeHtml(a.id)}${a.id === liderAtual() ? '<span class="tag">LEAD</span>' : ''}</span><small class="${p || aguardandoVoce(a.id) ? 'viva' : ''}">${sub}${p && p.estado === 'trabalhando' ? ` <span data-desde="${p.desde}"></span>` : ''}</small></span></button>`;
   };
   el.innerHTML = `
@@ -1017,13 +1017,13 @@ function renderMembros() {
     <div class="rolagem">
       ${usoHtml()}
       ${agendaMini()}
-      <div class="cat">Em andamento — ${em.length}</div>
+      <div class="cat">${I18N.t('Em andamento — {n}', { n: em.length })}</div>
       ${em.length ? em.map(mini).join('') : '<div class="vazio-p">Nada em andamento.</div>'}
-      ${rev.length ? `<div class="cat">Revisão e QA — ${rev.length}</div>${rev.map(mini).join('')}` : ''}
-      ${bloq.length ? `<div class="cat">Parados — ${bloq.length}</div>${bloq.map(mini).join('')}` : ''}
+      ${rev.length ? `<div class="cat">${I18N.t('Revisão e QA — {n}', { n: rev.length })}</div>${rev.map(mini).join('')}` : ''}
+      ${bloq.length ? `<div class="cat">${I18N.t('Parados — {n}', { n: bloq.length })}</div>${bloq.map(mini).join('')}` : ''}
       <div class="cat">Lead — 1</div>
       ${agente(liderAtual()) ? membro(agente(liderAtual())) : ''}
-      <div class="cat">Especialistas — ${rosterDaEquipe().filter((a) => a.id !== liderAtual() && !a.sistema).length}</div>
+      <div class="cat">${I18N.t('Especialistas — {n}', { n: rosterDaEquipe().filter((a) => a.id !== liderAtual() && !a.sistema).length })}</div>
       ${rosterDaEquipe().filter((a) => a.id !== liderAtual() && !a.sistema).map(membro).join('')}
     </div>`;
 }
@@ -1040,7 +1040,7 @@ function trilhaHtml(c) {
   const p = c.prontidao;
   if (!p || ['backlog', 'pronto', 'concluido'].includes(c.coluna)) return '';
   const prox = p.etapas.findIndex((e) => !e.ok);
-  const segs = p.etapas.map((e, i) => `<i class="${e.ok ? 'ok' : e.falhou ? 'falhou' : i === prox ? 'agora' : ''}" title="${esc(e.nome)}${e.ok ? ': pronto' : e.falhou ? ': não passou' : i === prox ? ': em andamento' : ''}"></i>`).join('');
+  const segs = p.etapas.map((e, i) => `<i class="${e.ok ? 'ok' : e.falhou ? 'falhou' : i === prox ? 'agora' : ''}" title="${esc(e.nome)}${e.ok ? `: ${I18N.t('pronto')}` : e.falhou ? `: ${I18N.t('não passou')}` : i === prox ? `: ${I18N.t('em andamento')}` : ''}"></i>`).join('');
   const falta = c.coluna !== 'impedimento' && p.falta?.length ? `<div class="trilha-falta" title="${esc(p.falta.join('\n'))}">${esc(p.falta[0])}</div>` : '';
   return `<div class="trilha">${segs}</div>${falta}`;
 }
@@ -1052,15 +1052,15 @@ function cardHtml(c, vivos) {
   return `<article class="card ${c.coluna === 'concluido' ? 'feito' : ''}" draggable="true" data-id="${c.id}" ${trab ? `style="--c:${agente(trab).cor}"` : ''}>
     ${trab ? '<i class="vivo-bar"></i>' : ''}
     <div class="titulo">${esc(c.titulo)}</div>
-    ${dono || c.bloqueio || c.aguardando || c.modelo || c.motor || c.jira ? `<div class="etiquetas">${c.jira ? `<span class="etq jira" title="Demanda no Jira">${esc(c.jira)}</span>` : ''}${c.modelo || c.motor ? `<span class="etq modelo ${c.motor === 'codex' ? 'codex' : ''}">${c.motor === 'codex' ? 'Codex' : esc(NOME_MODELO[c.modelo] || c.modelo)}${c.esforco ? ` ${esc(c.esforco)}` : ''}</span>` : ''}${dono ? `<span class="etq" style="--c:${dono.cor}">${esc(dono.nome)}</span>` : ''}${c.aguardando ? `<span class="etq aguarda">${ic('sino')}Aguardando você</span>` : ''}${c.bloqueio ? `<span class="etq bloq" title="${c.bloqueioPor === 'voce' ? 'Parado por você: só você libera' : 'A P.O. analisa e tenta desimpedir'}">${ic('bandeira')}${c.bloqueioPor === 'voce' ? 'Parado por você' : `Bloqueado${c.bloqueioPor && c.bloqueioPor !== 'sistema' ? ` por ${esc(nomeAgente(c.bloqueioPor))}` : ''}`}</span>` : ''}</div>` : ''}
-    ${(() => { const n = (c.ressalvas || []).filter((r) => r.status === 'aberta').length; return n ? `<div class="etiquetas"><span class="etq bloq" title="Aviso aberto: a P.O. direciona quem resolve. Nada avança com ressalva aberta.">${ic('alerta')}${n} ${n === 1 ? 'ressalva' : 'ressalvas'}</span></div>` : ''; })()}${c.coluna === 'concluido' && c.validacao?.status === 'pendente' ? `<div class="etiquetas"><span class="etq aguarda">${ic('sino')}Aguardando sua validação</span></div>` : ''}
+    ${dono || c.bloqueio || c.aguardando || c.modelo || c.motor || c.jira ? `<div class="etiquetas">${c.jira ? `<span class="etq jira" title="Demanda no Jira">${esc(c.jira)}</span>` : ''}${c.modelo || c.motor ? `<span class="etq modelo ${c.motor === 'codex' ? 'codex' : ''}">${c.motor === 'codex' ? 'Codex' : esc(NOME_MODELO[c.modelo] || c.modelo)}${c.esforco ? ` ${esc(c.esforco)}` : ''}</span>` : ''}${dono ? `<span class="etq" style="--c:${dono.cor}">${esc(dono.nome)}</span>` : ''}${c.aguardando ? `<span class="etq aguarda">${ic('sino')}Aguardando você</span>` : ''}${c.bloqueio ? `<span class="etq bloq" title="${c.bloqueioPor === 'voce' ? 'Parado por você: só você libera' : 'A P.O. analisa e tenta desimpedir'}">${ic('bandeira')}${c.bloqueioPor === 'voce' ? 'Parado por você' : `${I18N.t('Bloqueado')}${c.bloqueioPor && c.bloqueioPor !== 'sistema' ? ` ${I18N.t('por {nome}', { nome: esc(nomeAgente(c.bloqueioPor)) })}` : ''}`}</span>` : ''}</div>` : ''}
+    ${(() => { const n = (c.ressalvas || []).filter((r) => r.status === 'aberta').length; return n ? `<div class="etiquetas"><span class="etq bloq" title="Aviso aberto: a P.O. direciona quem resolve. Nada avança com ressalva aberta.">${ic('alerta')}${I18N.t(n === 1 ? '{n} ressalva' : '{n} ressalvas', { n })}</span></div>` : ''; })()}${c.coluna === 'concluido' && c.validacao?.status === 'pendente' ? `<div class="etiquetas"><span class="etq aguarda">${ic('sino')}Aguardando sua validação</span></div>` : ''}
     ${trilhaHtml(c)}
-    ${trab ? `<div class="quem-vivo"><span class="pontos"><i></i><i></i><i></i></span>${esc(nomeAgente(trab))} ${esc(J().presenca[trab].atividade || 'trabalhando')}</div>` : ''}
+    ${trab ? `<div class="quem-vivo"><span class="pontos"><i></i><i></i><i></i></span>${esc(nomeAgente(trab))} ${esc(J().presenca[trab].atividade || I18N.t('trabalhando'))}</div>` : ''}
     <div class="rodape"><span class="tipo ${tipo}">${ic('check')}</span><span class="chave">${esc(c.id)}</span><span class="esp"></span>
       ${c.aceite.length ? `<span class="sub">${ic('checkq')}${ok}/${c.aceite.length}</span>` : ''}
       ${c.pontos ? `<span class="pts" title="Esforço em pontos">${c.pontos}</span>` : ''}
-      <span class="prio ${c.prioridade}" title="Prioridade ${nomePrio[c.prioridade]}">${ic(iconePrio[c.prioridade])}</span>
-      ${(c.participantes || []).slice(0, 3).map((p) => `<span class="part ${p.papel}" title="${esc(nomeAgente(p.agente))}, ${p.papel === 'monitora' ? 'monitora' : 'colabora'}">${av(p.agente, 'p', { dot: false })}</span>`).join('')}
+      <span class="prio ${c.prioridade}" title="${I18N.t('Prioridade {nivel}', { nivel: I18N.t(nomePrio[c.prioridade]) })}">${ic(iconePrio[c.prioridade])}</span>
+      ${(c.participantes || []).slice(0, 3).map((p) => `<span class="part ${p.papel}" title="${esc(nomeAgente(p.agente))}, ${I18N.t(p.papel === 'monitora' ? 'monitora' : 'colabora')}">${av(p.agente, 'p', { dot: false })}</span>`).join('')}
       ${dono ? av(dono.id, 'p', { dot: false }) : `<span class="av p"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">${IC.usuario}</svg></span>`}</div>
     <div class="card-acoes"><button data-card-comentar="${c.id}" title="Comentar">${ic('chat')}</button><button data-card-remover="${c.id}" title="Cancelar tarefa (exclui o card)">${ic('lixo')}</button></div>
   </article>`;
@@ -1082,9 +1082,9 @@ function quadroHtml() {
     const real = j.cartoes.filter((c) => c.coluna === col.id).length;
     const estouro = w.limite && real > w.limite;
     return `<section class="coluna" data-col="${col.id}">
-      <div class="col-topo"><h3>${esc(col.nome)}</h3><span class="n">${total}</span>${cs.some((c) => c.pontos) ? `<span class="max">${cs.reduce((s, c) => s + (c.pontos || 0), 0)} pt</span>` : ''}${w.limite ? `<span class="max ${estouro ? 'estouro' : ''}">MÁX ${w.limite}</span>` : ''}</div>
+      <div class="col-topo"><h3>${esc(col.nome)}</h3><span class="n">${total}</span>${cs.some((c) => c.pontos) ? `<span class="max">${cs.reduce((s, c) => s + (c.pontos || 0), 0)} pt</span>` : ''}${w.limite ? `<span class="max ${estouro ? 'estouro' : ''}">${I18N.t('MÁX {n}', { n: w.limite })}</span>` : ''}</div>
       <div class="pilha-cards">${cs.map((c) => cardHtml(c, vivos)).join('')}</div>
-      ${corte ? `<button class="mostrar-mais" data-acao="todos-concluidos">Mostrar todos (${total})</button>` : ''}
+      ${corte ? `<button class="mostrar-mais" data-acao="todos-concluidos">${I18N.t('Mostrar todos ({n})', { n: total })}</button>` : ''}
       ${['backlog', 'pronto'].includes(col.id) ? `<button class="add-card" data-acao="criar" data-col="${col.id}">${ic('mais')}Criar tarefa</button>` : ''}
     </section>`;
   }).join('')}</div>`;
@@ -1153,15 +1153,15 @@ function renderAgenda(buscar = true) {
   const dias = Array.from({ length: 7 }, (_, i) => new Date(AG.semana.getTime() + i * DIA_MS));
   const hoje = agKey(new Date());
   const H0 = 7, H1 = 21, ALT = 52;   // px por hora
-  const fmtDia = (d) => d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
-  const rotulo = `${dias[0].toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')} a ${dias[6].toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '')}`;
+  const fmtDia = (d) => d.toLocaleDateString(I18N.locale, { weekday: 'short' }).replace('.', '');
+  const rotulo = I18N.t('{inicio} a {fim}', { inicio: dias[0].toLocaleDateString(I18N.locale, { day: '2-digit', month: 'short' }).replace('.', ''), fim: dias[6].toLocaleDateString(I18N.locale, { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '') });
   const doDia = (d) => AG.eventos.filter((e) => { const a = new Date(e.inicio), b = new Date(e.fim); return a < new Date(d.getTime() + DIA_MS) && b > d; });
   const bloco = (e, d) => {
     const a = new Date(e.inicio), b = new Date(e.fim);
     const ini = Math.max(a, d), fim = Math.min(b, new Date(d.getTime() + DIA_MS));
     const top = Math.max(0, ((ini - d) / 3600_000 - H0) * ALT), alt = Math.max(22, ((fim - ini) / 3600_000) * ALT - 2);
     const cor = CORES_AG[e.tipo] || CORES_AG.reuniao;
-    return `<button class="ag-ev ${e.cancelado ? 'cancelado' : ''}" data-acao="ag-ver" data-ev="${e.id}" style="top:${top}px;height:${alt}px;--c:${cor}" title="${esc(e.titulo)}"><b>${esc(e.titulo)}</b><small>${a.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}${e.local ? ` ${esc(e.local)}` : ''}</small></button>`;
+    return `<button class="ag-ev ${e.cancelado ? 'cancelado' : ''}" data-acao="ag-ver" data-ev="${e.id}" style="top:${top}px;height:${alt}px;--c:${cor}" title="${esc(e.titulo)}"><b>${esc(e.titulo)}</b><small>${a.toLocaleTimeString(I18N.locale, { hour: '2-digit', minute: '2-digit' })}${e.local ? ` ${esc(e.local)}` : ''}</small></button>`;
   };
   const horas = Array.from({ length: H1 - H0 }, (_, i) => `<div class="ag-hora" style="top:${i * ALT}px">${String(H0 + i).padStart(2, '0')}:00</div>`).join('');
   const agora = new Date(); const linhaAgora = agora >= dias[0] && agora < new Date(dias[6].getTime() + DIA_MS) ? `<div class="ag-agora" style="top:${(agora.getHours() + agora.getMinutes() / 60 - H0) * ALT}px"></div>` : '';
@@ -1181,7 +1181,7 @@ function renderAgenda(buscar = true) {
           ${dias.map((d) => `<div class="ag-col ${agKey(d) === hoje ? 'hoje' : ''}" data-ag-dia="${d.toISOString()}">${Array.from({ length: H1 - H0 }, (_, i) => `<div class="ag-slot" data-ag-slot="${new Date(d.getTime() + (H0 + i) * 3600_000).toISOString()}" style="top:${i * ALT}px;height:${ALT}px"></div>`).join('')}${doDia(d).filter((e) => !e.diaInteiro).map((e) => bloco(e, d)).join('')}${agKey(d) === hoje ? linhaAgora : ''}</div>`).join('')}
         </div>
       </div>
-      <aside class="ag-lado"><h3>Próximos</h3>${proximos.length ? proximos.map((e) => `<button class="ag-prox-i" data-acao="ag-ver" data-ev="${e.id}" style="--c:${CORES_AG[e.tipo] || CORES_AG.reuniao}"><span class="ag-q">${esc(new Date(e.inicio).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', ''))}${e.diaInteiro ? '' : ` ${new Date(e.inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`}</span><b>${esc(e.titulo)}</b>${e.origem?.quem && e.origem.quem !== 'voce' ? `<small>marcado por ${esc(nomeAgente(e.origem.quem))}${e.origem.equipe ? ` (${esc(e.origem.equipe)})` : ''}</small>` : ''}</button>`).join('') : '<div class="dica-v" style="color:var(--mudo)">Nada marcado. Clique num horário, ou conte um compromisso ao seu assessor que ele marca.</div>'}</aside>
+      <aside class="ag-lado"><h3>Próximos</h3>${proximos.length ? proximos.map((e) => `<button class="ag-prox-i" data-acao="ag-ver" data-ev="${e.id}" style="--c:${CORES_AG[e.tipo] || CORES_AG.reuniao}"><span class="ag-q">${esc(new Date(e.inicio).toLocaleDateString(I18N.locale, { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', ''))}${e.diaInteiro ? '' : ` ${new Date(e.inicio).toLocaleTimeString(I18N.locale, { hour: '2-digit', minute: '2-digit' })}`}</span><b>${esc(e.titulo)}</b>${e.origem?.quem && e.origem.quem !== 'voce' ? `<small>${I18N.t('marcado por {nome}', { nome: esc(nomeAgente(e.origem.quem)) })}${e.origem.equipe ? ` (${esc(e.origem.equipe)})` : ''}</small>` : ''}</button>`).join('') : '<div class="dica-v" style="color:var(--mudo)">Nada marcado. Clique num horário, ou conte um compromisso ao seu assessor que ele marca.</div>'}</aside>
     </div></div>`;
   const g = $('.ag-grade'); if (g) g.scrollTop = Math.max(0, (Math.min(Math.max(agora.getHours(), H0), H1) - H0 - 1) * ALT);
 }
@@ -1196,15 +1196,15 @@ function modalEvento(ev = null, inicioSugerido = null) {
     <label class="campo" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="ev-inteiro" ${e.diaInteiro ? 'checked' : ''}> Dia inteiro</label>
     <div class="dois campo"><div><label class="rot">Local ou link</label><input class="in" id="ev-local" value="${esc(e.local || '')}" maxlength="200" autocomplete="off"></div><div><label class="rot">Participantes</label><input class="in" id="ev-part" value="${esc((e.participantes || []).join(', '))}" placeholder="nomes separados por vírgula" autocomplete="off"></div></div>
     <div class="campo"><label class="rot">Descrição</label><textarea class="in" id="ev-desc" rows="3" maxlength="1500">${esc(e.descricao || '')}</textarea></div>
-    ${ev ? `<div class="dica-v" style="color:var(--mudo);margin:-6px 0 10px">${ev.origem?.quem && ev.origem.quem !== 'voce' ? `Marcado por ${esc(nomeAgente(ev.origem.quem))}${ev.origem.equipe ? ` (${esc(ev.origem.equipe)})` : ''}. ` : ''}${ev.cancelado ? 'Este evento está cancelado. ' : ''}${ev.card ? `Card ${esc(ev.card)}.` : ''}</div>` : ''}
+    ${ev ? `<div class="dica-v" style="color:var(--mudo);margin:-6px 0 10px">${ev.origem?.quem && ev.origem.quem !== 'voce' ? `${I18N.t('Marcado por {nome}', { nome: esc(nomeAgente(ev.origem.quem)) })}${ev.origem.equipe ? ` (${esc(ev.origem.equipe)})` : ''}. ` : ''}${ev.cancelado ? `${I18N.t('Este evento está cancelado.')} ` : ''}${ev.card ? I18N.t('Card {card}.', { card: esc(ev.card) }) : ''}</div>` : ''}
     <div class="acoes">${ev ? `<button class="btn-sec btn-perigo" data-acao="ag-excluir" data-ev="${ev.id}">Excluir</button>${ev.cancelado ? '' : `<button class="btn-sec" data-acao="ag-cancelar-ev" data-ev="${ev.id}">Cancelar evento</button>`}` : ''}<span class="espaco"></span><button class="btn-sec" data-acao="fechar">Fechar</button><button class="btn-primario" data-acao="ag-salvar" data-ev="${ev ? ev.id : ''}">Salvar</button></div>`, 'evento');
 }
 async function salvarEvento(id) {
   const corpo = { titulo: $('#ev-titulo').value, tipo: $('#ev-tipo').value, lembreteMin: Number($('#ev-lembrete').value), inicio: new Date($('#ev-inicio').value).toISOString(), fim: new Date($('#ev-fim').value).toISOString(), diaInteiro: $('#ev-inteiro').checked, local: $('#ev-local').value, participantes: $('#ev-part').value, descricao: $('#ev-desc').value };
-  if (!$('#ev-inicio').value || !$('#ev-fim').value) return aviso('Informe início e fim.');
+  if (!$('#ev-inicio').value || !$('#ev-fim').value) return aviso(I18N.t('Informe início e fim.'));
   const r = id ? await api('PUT', P(`/agenda/${id}`), corpo) : await api('POST', P('/agenda'), corpo);
-  if (!r._ok) return aviso(r.erro || 'Não consegui salvar o evento.');
-  fecharModal(); aviso(id ? 'Evento atualizado.' : 'Evento marcado.'); carregarAgenda();
+  if (!r._ok) return aviso(r.erro || I18N.t('Não consegui salvar o evento.'));
+  fecharModal(); aviso(id ? I18N.t('Evento atualizado.') : I18N.t('Evento marcado.')); carregarAgenda();
 }
 
 function renderPlanner() {
@@ -1235,14 +1235,14 @@ function renderPlanner() {
 async function moverCard(id, col, forcar = false) {
   const r = await api('POST', P(`/cartao/${id}/mover`), { coluna: col, forcar });
   if (r._status === 409 && !forcar) {
-    if (await perguntar(`${nomeColuna(col)} está no limite de trabalho em andamento. Mover mesmo assim?`, 'Mover mesmo assim')) return moverCard(id, col, true);
+    if (await perguntar(I18N.t('{coluna} está no limite de trabalho em andamento. Mover mesmo assim?', { coluna: nomeColuna(col) }), I18N.t('Mover mesmo assim'))) return moverCard(id, col, true);
     return;
   }
   if (!r._ok && !forcar && /evid|bloqueado/i.test(r.erro || '')) {
-    if (await perguntar(`${r.erro}. Concluir mesmo assim?`, 'Concluir mesmo assim')) return moverCard(id, col, true);
+    if (await perguntar(I18N.t('{erro}. Concluir mesmo assim?', { erro: r.erro }), I18N.t('Concluir mesmo assim'))) return moverCard(id, col, true);
     return;
   }
-  if (!r._ok) aviso(r.erro || 'Não consegui mover.');
+  if (!r._ok) aviso(r.erro || I18N.t('Não consegui mover.'));
 }
 
 /* ------------------------------------------------------------ memória */
@@ -1278,7 +1278,7 @@ function desenharMemoria() {
         ${window.studioApp ? `<button class="btn-sec" data-acao="abrir-memoria">Abrir pasta</button>` : ''}
         <button class="btn-primario" data-acao="curar">Curar agora</button></div>
     </div>
-    <div class="mem-barra"><div class="info"><b>${e.total ?? notas.length} notas</b>${e.novasDesde ? `, ${e.novasDesde} nova${e.novasDesde > 1 ? 's' : ''} desde a última curadoria` : ''}${e.ultimaCuradoria ? `. Curada ${ha(e.ultimaCuradoria)}.` : '. Ainda não foi curada.'}</div></div>
+    <div class="mem-barra"><div class="info"><b>${I18N.t('{n} notas', { n: e.total ?? notas.length })}</b>${e.novasDesde ? `, ${I18N.t(e.novasDesde > 1 ? '{n} novas desde a última curadoria' : '{n} nova desde a última curadoria', { n: e.novasDesde })}` : ''}${e.ultimaCuradoria ? `. ${I18N.t('Curada {quando}.', { quando: ha(e.ultimaCuradoria) })}` : `. ${I18N.t('Ainda não foi curada.')}`}</div></div>
     <div class="memoria-v">
       <div class="mem-arvore"><div class="busca">${ic('busca')}<input id="mem-busca" class="in" placeholder="Buscar nas notas" value="${esc(U.memBusca)}" autocomplete="off"></div><div class="mem-lista" id="mem-lista">${grupos}</div></div>
       <div class="mem-leitor" id="mem-leitor"><div class="mem-vazio">Escolha uma nota para ler.</div></div>
@@ -1344,13 +1344,13 @@ function modalDemandas() {
   const noQuadro = new Set(J().cartoes.map((c) => c.jira).filter(Boolean));
   const lead = agente(liderAtual());
   const linhaEv = (e) => `<div class="ev-i ${e.tipo}"><span class="ev-q">${diaCurto(e.ts)}${e.dia ? '' : `<b>${horaCurta(e.ts)}</b>`}</span><span class="ev-t">${esc(e.titulo)}</span>${e.teams ? `<a class="ref" href="${esc(e.teams)}" target="_blank" rel="noopener">Teams</a>` : ''}</div>`;
-  const dem = (i) => `<div class="dem-i"><div class="dem-topo"><a class="ref" href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.key)}</a><span class="dem-st">${esc(i.status)}</span>${i.prioridade ? `<span class="dem-pr">${esc(i.prioridade)}</span>` : ''}${i.vencimento ? `<span class="dem-venc">vence ${esc(i.vencimento)}</span>` : ''}</div>
+  const dem = (i) => `<div class="dem-i"><div class="dem-topo"><a class="ref" href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.key)}</a><span class="dem-st">${esc(i.status)}</span>${i.prioridade ? `<span class="dem-pr">${esc(i.prioridade)}</span>` : ''}${i.vencimento ? `<span class="dem-venc">${I18N.t('vence {data}', { data: esc(i.vencimento) })}</span>` : ''}</div>
       <div class="dem-res">${esc(i.resumo)}</div>${i.descricao ? `<div class="dem-desc">${esc(i.descricao.replace(/\s+/g, ' ').slice(0, 200))}</div>` : ''}
-      <div class="dem-acoes"><button class="btn-sec" data-acao="discutir-demanda" data-key="${esc(i.key)}">Discutir com ${esc(primeiroNome(lead?.nome || 'a P.O.'))}</button>${noQuadro.has(i.key) ? '<span class="dem-ok">no quadro</span>' : `<button class="btn-sec" data-acao="trazer-demanda" data-key="${esc(i.key)}">Trazer ao quadro</button>`}</div></div>`;
+      <div class="dem-acoes"><button class="btn-sec" data-acao="discutir-demanda" data-key="${esc(i.key)}">${I18N.t('Discutir com {nome}', { nome: esc(primeiroNome(lead?.nome || I18N.t('a P.O.'))) })}</button>${noQuadro.has(i.key) ? '<span class="dem-ok">no quadro</span>' : `<button class="btn-sec" data-acao="trazer-demanda" data-key="${esc(i.key)}">Trazer ao quadro</button>`}</div></div>`;
   abrirModal(`<div class="inbox-topo">${ic('quadro')}<h2>Demandas e agenda</h2><span class="espaco"></span><button class="btn-sec" data-acao="sincronizar-integ">Atualizar agora</button><button class="btn-ic" data-acao="fechar">${ic('fechar')}</button></div>
     <div class="inbox-lista">
-      ${ig.agenda?.ativo ? `<div class="dem-bloco"><h4>Agenda</h4>${ag.erro && !ag.em ? `<div class="vazio-p">${esc(ag.erro)}</div>` : (eventos.length ? eventos.map(linhaEv).join('') : '<div class="vazio-p">Sem compromissos nos próximos dias.</div>')}${ag.em ? `<div class="dem-lido">Lida ${ha(ag.em)}</div>` : ''}</div>` : ''}
-      ${ig.jira?.ativo ? `<div class="dem-bloco"><h4>Demandas no Jira${jira.total ? `, ${jira.total}` : ''}</h4>${jira.erro && !jira.em ? `<div class="vazio-p">${esc(jira.erro)}</div>` : (jira.itens.length ? jira.itens.map(dem).join('') : '<div class="vazio-p">Nenhuma demanda aberta.</div>')}${jira.em ? `<div class="dem-lido">Lido ${ha(jira.em)}${jira.erro ? `. Última tentativa falhou: ${esc(jira.erro)}` : ''}</div>` : ''}</div>` : ''}
+      ${ig.agenda?.ativo ? `<div class="dem-bloco"><h4>Agenda</h4>${ag.erro && !ag.em ? `<div class="vazio-p">${esc(ag.erro)}</div>` : (eventos.length ? eventos.map(linhaEv).join('') : '<div class="vazio-p">Sem compromissos nos próximos dias.</div>')}${ag.em ? `<div class="dem-lido">${I18N.t('Lida {quando}', { quando: ha(ag.em) })}</div>` : ''}</div>` : ''}
+      ${ig.jira?.ativo ? `<div class="dem-bloco"><h4>${jira.total ? I18N.t('Demandas no Jira, {n}', { n: jira.total }) : 'Demandas no Jira'}</h4>${jira.erro && !jira.em ? `<div class="vazio-p">${esc(jira.erro)}</div>` : (jira.itens.length ? jira.itens.map(dem).join('') : '<div class="vazio-p">Nenhuma demanda aberta.</div>')}${jira.em ? `<div class="dem-lido">${I18N.t('Lido {quando}', { quando: ha(jira.em) })}${jira.erro ? `. ${I18N.t('Última tentativa falhou: {erro}', { erro: esc(jira.erro) })}` : ''}</div>` : ''}</div>` : ''}
       ${!ig.agenda?.ativo && !ig.jira?.ativo ? '<div class="vazio-inbox">Ligue o Jira e a agenda em Ajustes, na aba Integrações.</div>' : ''}
     </div>`, 'inbox demandas');
 }
@@ -1478,10 +1478,10 @@ async function modalPerfil(id, { manter = false, aba = null } = {}) {
   if (!ehEu) U.vozes = await fetch('/api/voz').then((x) => x.json()).then((x) => ({ lista: x.vozes || [], padrao: x.voz })).catch(() => ({ lista: [], padrao: null }));
   const trabalho = ehEu ? '' : `<div id="ped-trabalho" ${U.ped.aba === 'trabalho' ? '' : 'hidden'}>
       ${(a.skills || []).length ? `<div class="campo"><label class="rot">Skills do cargo</label><div class="skills-lista">${a.skills.map((x) => `<span class="skill-chip">${esc(x)}</span>`).join('')}</div></div>` : ''}
-      ${blocoRegras(id, r, `Regras de ${esc(a.nome)} neste projeto`)}
+      ${blocoRegras(id, r, I18N.t('Regras de {nome} neste projeto', { nome: esc(a.nome) }))}
       ${blocoReferencias(id, r)}
       <div class="campo"><label class="rot">Adicionar contexto</label>
-        <textarea class="in" id="cx-texto" rows="3" placeholder="Algo que ${esc(a.nome)} precisa saber e o time ainda não registrou."></textarea>
+        <textarea class="in" id="cx-texto" rows="3" placeholder="${I18N.t('Algo que {nome} precisa saber e o time ainda não registrou.', { nome: esc(a.nome) })}"></textarea>
         <div style="margin-top:8px;display:flex;gap:8px"><button class="btn-sec" data-acao="add-contexto" data-escopo="${id}">Anotar na memória dele</button><button class="btn-sec" data-acao="nota-agente" data-ag="${id}">Ver a memória dele</button></div></div>
     </div>`;
   abrirModal(`<div class="perfil-topo"><div><h2>${ehEu ? 'Meu perfil' : esc(a.nome)}</h2><div class="perfil-papel">${esc(a.cargo)}${a.papel ? `, ${esc(a.papel)}` : ''}</div></div><span class="espaco"></span><button class="btn-ic" data-acao="fechar">${ic('fechar')}</button></div>
@@ -1514,7 +1514,7 @@ function pedPerfilHtml(id) {
       <div class="ped-galeria">${Array.from({ length: AVATARES }, (_, i) => i + 1).map((n) => `<button type="button" class="ped-av ${!a.foto && id !== 'voce' && avatarPadrao(id) === avatarUrl(n) ? 'on' : ''}" data-avatar="${n}" title="Usar este avatar"><img src="${avatarUrl(n)}" alt="" draggable="false"></button>`).join('')}</div>
       <div class="linha-in"><label class="btn-sec arquivo">${a.foto ? 'Trocar por uma foto do PC' : 'Subir foto do PC'}<input type="file" accept="${tipos}" hidden data-recorte="foto"></label>${a.foto ? `<button class="btn-sec" data-acao="ajustar-img" data-ag="${id}" data-tipo="foto">Ajustar</button><button class="btn-sec" data-acao="tirar-foto" data-ag="${id}">Remover</button>` : ''}</div></div>
     <div class="ped-sec"><label class="rot">Capa</label><div class="linha-in"><label class="btn-sec arquivo">${a.capa ? 'Trocar capa' : 'Escolher capa'}<input type="file" accept="${tipos}" hidden data-recorte="capa"></label>${a.capa ? `<button class="btn-sec" data-acao="ajustar-img" data-ag="${id}" data-tipo="capa">Ajustar</button><button class="btn-sec" data-acao="tirar-capa" data-ag="${id}">Remover</button>` : ''}<span class="ped-cores">Cor <input type="color" id="ped-corcapa" value="${e.corCapa || a.cor || '#5865f2'}"></span></div></div>
-    <div class="ped-sec"><label class="rot">Tema do perfil</label><div class="ped-cores"><input type="color" id="ped-t1" value="${t1}"><input type="color" id="ped-t2" value="${t2}">${TEMAS.map(([c1, c2]) => `<button class="ped-cor" style="background:linear-gradient(135deg,${c1},${c2})" data-acao="ped-tema" data-c1="${c1}" data-c2="${c2}" title="${c1} e ${c2}"></button>`).join('')}<button class="btn-sec" data-acao="ped-tema">Sem tema</button></div></div>
+    <div class="ped-sec"><label class="rot">Tema do perfil</label><div class="ped-cores"><input type="color" id="ped-t1" value="${t1}"><input type="color" id="ped-t2" value="${t2}">${TEMAS.map(([c1, c2]) => `<button class="ped-cor" style="background:linear-gradient(135deg,${c1},${c2})" data-acao="ped-tema" data-c1="${c1}" data-c2="${c2}" title="${I18N.t('{c1} e {c2}', { c1, c2 })}"></button>`).join('')}<button class="btn-sec" data-acao="ped-tema">Sem tema</button></div></div>
     <div class="ped-sec"><label class="rot">Decoração do avatar</label><div class="ped-tiles" data-grupo="decoracao">${decos}</div></div>
     <div class="ped-sec"><label class="rot">Efeito do perfil</label><div class="ped-tiles" data-grupo="efeito">${efeitos}</div></div>
     <div class="ped-sec"><label class="rot">Estilo do nome</label><div class="ped-tiles" data-grupo="fonte">${fontes}</div></div>
@@ -1524,9 +1524,9 @@ function pedPerfilHtml(id) {
     <div class="ped-sec"><label class="rot">Sobre mim</label><textarea class="in" id="ped-bio" rows="3" maxlength="190" placeholder="${id === 'voce' ? '' : esc(a.papel || '')}">${esc(e.bio || '')}</textarea></div>
     ${id === 'voce' ? '' : (() => { const vz = U.vozes || { lista: [], padrao: null }; const v = e.voz || null; const pad = vz.padrao || { nome: 'leni', ritmo: 0.4, expressividade: 0.45 }; const ritmo = v?.ritmo ?? pad.ritmo, exp = v?.expressividade ?? pad.expressividade; const padNome = vz.lista.find((x) => x.id === pad.nome)?.nome || pad.nome;
       return `<div class="ped-sec"><label class="rot">Voz na chamada</label>
-      <select class="in" id="ped-voz-nome"><option value="">Padrão dos Ajustes (${esc(padNome)})</option>${vz.lista.map((x) => `<option value="${esc(x.id)}" ${v?.nome === x.id ? 'selected' : ''}>${esc(x.nome)}${x.genero ? ` (${esc(x.genero)})` : ''}</option>`).join('')}</select>
+      <select class="in" id="ped-voz-nome"><option value="">${I18N.t('Padrão dos Ajustes ({voz})', { voz: esc(padNome) })}</option>${vz.lista.map((x) => `<option value="${esc(x.id)}" ${v?.nome === x.id ? 'selected' : ''}>${esc(x.nome)}${x.genero ? ` (${esc(x.genero)})` : ''}</option>`).join('')}</select>
       <div class="dois" style="margin-top:10px"><div><label class="rot">Ritmo <em id="ped-voz-ritmo-v">${Math.round(ritmo * 100)}</em></label><input type="range" class="faixa" id="ped-voz-ritmo" min="15" max="80" step="5" value="${Math.round(ritmo * 100)}" ${v ? '' : 'disabled'}></div><div><label class="rot">Expressividade <em id="ped-voz-exp-v">${Math.round(exp * 100)}</em></label><input type="range" class="faixa" id="ped-voz-exp" min="20" max="90" step="5" value="${Math.round(exp * 100)}" ${v ? '' : 'disabled'}></div></div>
-      <div class="linha-in" style="margin-top:6px"><button class="btn-sec" data-acao="ped-voz-ouvir" data-ag="${id}">Ouvir ${esc(a.nome.split(' ')[0])}</button><small class="dica-v" id="ped-voz-st" style="color:var(--mudo)">Ritmo para a esquerda é mais pausado.</small></div></div>`; })()}
+      <div class="linha-in" style="margin-top:6px"><button class="btn-sec" data-acao="ped-voz-ouvir" data-ag="${id}">${I18N.t('Ouvir {nome}', { nome: esc(a.nome.split(' ')[0]) })}</button><small class="dica-v" id="ped-voz-st" style="color:var(--mudo)">Ritmo para a esquerda é mais pausado.</small></div></div>`; })()}
     <div class="ped-rodape"><button class="btn-sec" data-acao="fechar">Cancelar</button><button class="btn-primario" data-acao="ped-salvar">Salvar perfil</button></div>
   </div><div class="ped-prev" id="ped-prev"></div></div>`;
 }
@@ -1541,13 +1541,13 @@ function pedLigarVoz() {
 }
 async function pedOuvirVoz(id) {
   const st = $('#ped-voz-st'); const v = U.ped.estilo.voz || U.vozes?.padrao || {};
-  if (st) st.textContent = 'Gerando a prévia…';
+  if (st) st.textContent = I18N.t('Gerando a prévia…');
   const nome = pessoaDe(id)?.nome?.split(' ')[0] || 'eu';
   const r = await api('POST', '/api/voz/previa', { ...v, texto: `Oi, Déborah! Aqui é ${nome}. Dei uma olhada no quadro agora há pouco e tem duas coisas esperando a sua decisão. Quer que eu conte o resumo?` });
-  if (!r._ok) { if (st) st.textContent = r.erro || 'Não consegui gerar a prévia.'; return; }
-  if (st) st.textContent = `Pronto em ${((r.ms || 0) / 1000).toFixed(1)} s.`;
+  if (!r._ok) { if (st) st.textContent = r.erro || I18N.t('Não consegui gerar a prévia.'); return; }
+  if (st) st.textContent = I18N.t('Pronto em {s} s.', { s: ((r.ms || 0) / 1000).toFixed(1) });
   const d = lerDisp(); const a = new Audio(`/api/voz/previa/audio?t=${Date.now()}`); a.volume = d.volume; if (d.saida && a.setSinkId) await a.setSinkId(d.saida).catch(() => {});
-  a.play().catch(() => { if (st) st.textContent = 'O navegador bloqueou o áudio; clique de novo.'; });
+  a.play().catch(() => { if (st) st.textContent = I18N.t('O navegador bloqueou o áudio; clique de novo.'); });
 }
 function pedRedesenharNomes() { const { fontes, efeitos } = pedNomeTiles(); const f = $('[data-grupo=fonte]'), e = $('[data-grupo=efeitoNome]'); if (f) f.innerHTML = fontes; if (e) e.innerHTML = efeitos; }
 function pedRedesenhar() { const el = $('#ped-perfil'); const y = el.closest('.modal')?.scrollTop; el.innerHTML = pedPerfilHtml(U.ped.id); pedPrev(); VFX.ligar(el); if (y != null) el.closest('.modal').scrollTop = y; }
@@ -1562,12 +1562,12 @@ function pedEscolher(campo, valor) {
 async function pedSalvar() {
   const { id, estilo: e, nome } = U.ped;
   const r = await api('PUT', P(`/agente/${id}/estilo`), { decoracao: e.decoracao || null, efeito: e.efeito || null, placa: e.placa || null, tema: e.tema || null, nome: e.nome || null, bio: e.bio || '', corCapa: e.corCapa || null, ...(id === 'voce' ? {} : { voz: e.voz || null }) });
-  if (!r._ok) return aviso(r.erro || 'Não salvou o perfil.');
+  if (!r._ok) return aviso(r.erro || I18N.t('Não salvou o perfil.'));
   if (nome.trim() !== pessoaDe(id).nome) {
     const rn = await api('PUT', P(`/agente/${id}/perfil`), { nome });
-    if (!rn._ok) { $('#pf-dica').className = 'dica-v erro'; $('#pf-dica').textContent = rn.erro || 'Não salvou o nome.'; return; }
+    if (!rn._ok) { $('#pf-dica').className = 'dica-v erro'; $('#pf-dica').textContent = rn.erro || I18N.t('Não salvou o nome.'); return; }
   }
-  aviso('Perfil salvo.');
+  aviso(I18N.t('Perfil salvo.'));
 }
 
 async function pedConversaHtml(id) {
@@ -1593,12 +1593,12 @@ async function pedConversaHtml(id) {
 
 /* ---- recorte da foto e da capa: zoom e posição sobre a imagem carregada (o GIF fica animado) ---- */
 const LIMITE_IMG = { foto: 8 * 1024 * 1024, capa: 10 * 1024 * 1024 };
-function lerDataUrl(arquivo) { return new Promise((ok, falha) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = () => falha(new Error('Não consegui ler o arquivo.')); fr.readAsDataURL(arquivo); }); }
-function carregarImg(src) { return new Promise((ok, falha) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => falha(new Error('Não consegui abrir essa imagem.')); i.src = src; }); }
+function lerDataUrl(arquivo) { return new Promise((ok, falha) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = () => falha(new Error(I18N.t('Não consegui ler o arquivo.'))); fr.readAsDataURL(arquivo); }); }
+function carregarImg(src) { return new Promise((ok, falha) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => falha(new Error(I18N.t('Não consegui abrir essa imagem.'))); i.src = src; }); }
 async function prepararImagem(arquivo, tipo) {
-  if (!/^image\/(png|jpeg|webp|gif)$/.test(arquivo.type)) throw new Error('Use PNG, JPG, WEBP ou GIF.');
+  if (!/^image\/(png|jpeg|webp|gif)$/.test(arquivo.type)) throw new Error(I18N.t('Use PNG, JPG, WEBP ou GIF.'));
   if (arquivo.type === 'image/gif') {   // GIF vai como veio, para continuar animado
-    if (arquivo.size > LIMITE_IMG[tipo]) throw new Error(`O GIF passou de ${LIMITE_IMG[tipo] / 1024 / 1024} MB.`);
+    if (arquivo.size > LIMITE_IMG[tipo]) throw new Error(I18N.t('O GIF passou de {mb} MB.', { mb: LIMITE_IMG[tipo] / 1024 / 1024 }));
     return lerDataUrl(arquivo);
   }
   const img = await carregarImg(URL.createObjectURL(arquivo));
@@ -1645,7 +1645,7 @@ async function aplicarRecorte() {
   const { id, tipo, dataUrl, zoom, x, y } = U.rec;
   const recorte = { zoom: +zoom.toFixed(3), x: +x.toFixed(2), y: +y.toFixed(2) };
   const r = dataUrl ? await api('POST', P(`/agente/${id}/${tipo}`), { dataUrl, recorte }) : await api('PUT', P(`/agente/${id}/estilo`), { [tipo === 'capa' ? 'recorteCapa' : 'recorteFoto']: recorte });
-  if (!r._ok) return aviso(r.erro || 'Não salvou a imagem.');
+  if (!r._ok) return aviso(r.erro || I18N.t('Não salvou a imagem.'));
   $('#recorte')?.remove();
   setTimeout(() => { if (U.ped?.id === id && !$('#modal').hidden) modalPerfil(id, { manter: true }); }, 200);
 }
@@ -1653,31 +1653,31 @@ async function aplicarRecorte() {
 /* ---- caixa de iniciativas do assessor e "o que aconteceu enquanto estive fora" ---- */
 const ESTADO_INI = { detected: ['detectada', 'off'], evaluating: ['avaliando', 'fila'], proposed: ['aguarda você', 'voce'], approved: ['aprovada', 'on'], planning: ['planejando', 'on'], queued: ['na fila', 'fila'], running: ['em andamento', 'on'], waiting_dependency: ['esperando dependência', 'fila'], waiting_approval: ['aguarda você', 'voce'], reviewing: ['em revisão', 'on'], completed: ['concluída', 'ok'], blocked: ['bloqueada', 'erro'], failed: ['falhou', 'erro'], cancelled: ['cancelada', 'off'], expired: ['expirou', 'off'] };
 async function modalIniciativas() {
-  const r = await fetch(P('/iniciativas')).then((x) => x.json()).catch(() => null); if (!r) return aviso('Não consegui ler as iniciativas.');
+  const r = await fetch(P('/iniciativas')).then((x) => x.json()).catch(() => null); if (!r) return aviso(I18N.t('Não consegui ler as iniciativas.'));
   U.iniAberto = true;
   const lista = r.iniciativas.slice(0, 60);
   const item = (i) => { const [rot, cls] = ESTADO_INI[i.estado] || [i.estado, 'off']; const decide = ['proposed', 'waiting_approval'].includes(i.estado); const ativa = !['completed', 'cancelled', 'expired', 'failed'].includes(i.estado);
     return `<div class="ini ${cls}"><div class="ini-cab"><span class="loz ${cls}">${esc(rot)}</span><b>${esc(i.titulo)}</b><small>${esc(i.id)}</small></div>
       ${i.motivo && i.motivo !== i.titulo ? `<div class="ini-motivo">${esc(i.motivo)}</div>` : ''}
-      <div class="ini-meta">${i.categoria ? `<span>${esc(i.categoria)}</span>` : ''}${i.agentes.length ? `<span>com ${i.agentes.map(nomeAgente).join(', ')}</span>` : ''}${i.cards.length ? `<span>${i.cards.map((c) => `<a class="ref" data-issue="${esc(c)}">${esc(c)}</a>`).join(' ')}</span>` : ''}${i.entregaveis.length ? `<span>${i.entregaveis.length} ${i.entregaveis.length === 1 ? 'entregável' : 'entregáveis'}</span>` : ''}<span>${i.chamadas} ${i.chamadas === 1 ? 'chamada' : 'chamadas'}</span><span>${diaTxt(i.atualizado)} ${hhmm(i.atualizado)}</span></div>
-      ${i.proximaAcao ? `<div class="ini-prox">Próximo: ${esc(i.proximaAcao)}</div>` : ''}
+      <div class="ini-meta">${i.categoria ? `<span>${esc(i.categoria)}</span>` : ''}${i.agentes.length ? `<span>${I18N.t('com {nomes}', { nomes: i.agentes.map(nomeAgente).join(', ') })}</span>` : ''}${i.cards.length ? `<span>${i.cards.map((c) => `<a class="ref" data-issue="${esc(c)}">${esc(c)}</a>`).join(' ')}</span>` : ''}${i.entregaveis.length ? `<span>${I18N.t(i.entregaveis.length === 1 ? '{n} entregável' : '{n} entregáveis', { n: i.entregaveis.length })}</span>` : ''}<span>${I18N.t(i.chamadas === 1 ? '{n} chamada' : '{n} chamadas', { n: i.chamadas })}</span><span>${diaTxt(i.atualizado)} ${hhmm(i.atualizado)}</span></div>
+      ${i.proximaAcao ? `<div class="ini-prox">${I18N.t('Próximo: {acao}', { acao: esc(i.proximaAcao) })}</div>` : ''}
       <div class="ini-acoes">${decide ? `<button class="btn-primario" data-acao="ini-decidir" data-ini="${i.id}" data-dec="aprovar">Aprovar</button>` : ''}${ativa ? `<button class="btn-sec" data-acao="ini-decidir" data-ini="${i.id}" data-dec="cancelar">Cancelar</button>` : ''}${['failed', 'cancelled', 'expired', 'blocked'].includes(i.estado) ? `<button class="btn-sec" data-acao="ini-decidir" data-ini="${i.id}" data-dec="reabrir">Reabrir</button>` : ''}</div></div>`; };
-  abrirModal(`<div class="inbox-topo"><h2>Iniciativas do assessor</h2><span class="espaco"></span><span class="mudo">${r.resumo.ativas} ${r.resumo.ativas === 1 ? 'ativa' : 'ativas'}${r.resumo.aguardandoVoce ? `, ${r.resumo.aguardandoVoce} aguardando você` : ''}</span><button class="btn-ic" data-acao="fechar" title="Fechar">${ic('fechar')}</button></div>
+  abrirModal(`<div class="inbox-topo"><h2>Iniciativas do assessor</h2><span class="espaco"></span><span class="mudo">${I18N.t(r.resumo.ativas === 1 ? '{n} ativa' : '{n} ativas', { n: r.resumo.ativas })}${r.resumo.aguardandoVoce ? `, ${I18N.t('{n} aguardando você', { n: r.resumo.aguardandoVoce })}` : ''}</span><button class="btn-ic" data-acao="fechar" title="Fechar">${ic('fechar')}</button></div>
     <div class="inbox-lista">${lista.length ? lista.map(item).join('') : '<div class="vazio-inbox">Nenhuma iniciativa ainda. Com o modo automático ligado, cada sinal novo (reunião, Jira, outra equipe, quadro) vira uma iniciativa aqui.</div>'}</div>`, 'inbox');
 }
 async function modalDesde() {
   const chave = `ultimaAtividade:${U.proj}`; let desde = null; try { desde = localStorage.getItem(chave); } catch { /* sem armazenamento */ }
-  const r = await fetch(P(`/desde${desde ? `?desde=${encodeURIComponent(desde)}` : ''}`)).then((x) => x.json()).catch(() => null); if (!r) return aviso('Não consegui montar o resumo.');
+  const r = await fetch(P(`/desde${desde ? `?desde=${encodeURIComponent(desde)}` : ''}`)).then((x) => x.json()).catch(() => null); if (!r) return aviso(I18N.t('Não consegui montar o resumo.'));
   const sec = (tit, itens, f) => (itens.length ? `<div class="sec"><h4>${tit} <span class="mudo">${itens.length}</span></h4>${itens.map(f).join('')}</div>` : '');
-  abrirModal(`<div class="inbox-topo"><h2>O que aconteceu</h2><span class="espaco"></span><span class="mudo">desde ${diaTxt(r.desde)} ${hhmm(r.desde)}</span><button class="btn-ic" data-acao="fechar" title="Fechar">${ic('fechar')}</button></div>
+  abrirModal(`<div class="inbox-topo"><h2>O que aconteceu</h2><span class="espaco"></span><span class="mudo">${I18N.t('desde {dia} {hora}', { dia: diaTxt(r.desde), hora: hhmm(r.desde) })}</span><button class="btn-ic" data-acao="fechar" title="Fechar">${ic('fechar')}</button></div>
     <div class="inbox-lista">
-      ${sec('Precisa de você', [...r.aguardandoVoce.map((c) => ({ t: `${c.id} ${c.titulo} aguarda sua decisão`, c: c.id })), ...r.perguntasAbertas.map((p) => ({ t: `${p.de}: ${p.texto}` })), ...r.iniciativas.filter((i) => ['proposed', 'waiting_approval'].includes(i.estado)).map((i) => ({ t: `Proposta do assessor: ${i.titulo}` }))], (x) => `<div class="desde-l voce">${x.c ? `<a class="ref" data-issue="${esc(x.c)}">${esc(x.c)}</a> ` : ''}${esc(x.t)}</div>`)}
+      ${sec('Precisa de você', [...r.aguardandoVoce.map((c) => ({ t: I18N.t('{id} {titulo} aguarda sua decisão', { id: c.id, titulo: c.titulo }), c: c.id })), ...r.perguntasAbertas.map((p) => ({ t: `${p.de}: ${p.texto}` })), ...r.iniciativas.filter((i) => ['proposed', 'waiting_approval'].includes(i.estado)).map((i) => ({ t: I18N.t('Proposta do assessor: {titulo}', { titulo: i.titulo }) }))], (x) => `<div class="desde-l voce">${x.c ? `<a class="ref" data-issue="${esc(x.c)}">${esc(x.c)}</a> ` : ''}${esc(x.t)}</div>`)}
       ${sec('Concluído', r.concluidos, (c) => `<div class="desde-l ok"><a class="ref" data-issue="${esc(c.id)}">${esc(c.id)}</a> ${esc(c.titulo)}${c.dono ? ` <small>${esc(c.dono)}</small>` : ''}</div>`)}
       ${sec('Bloqueado', r.bloqueados, (c) => `<div class="desde-l erro"><a class="ref" data-issue="${esc(c.id)}">${esc(c.id)}</a> ${esc(c.motivo)}</div>`)}
       ${sec('Falaram com você', r.paraVoce, (m) => `<div class="desde-l"><b>${esc(m.de)}</b> ${esc(m.texto)} <small>${hhmm(m.em)}</small></div>`)}
       ${sec('Cards que andaram', r.cards.filter((c) => c.mudancas.length), (c) => `<div class="desde-l"><a class="ref" data-issue="${esc(c.id)}">${esc(c.id)}</a> ${esc(c.titulo)} <span class="loz ${esc(c.coluna)}">${esc(c.coluna)}</span><div class="mudo" style="font-size:12px;margin-top:2px">${c.mudancas.map(esc).join('<br>')}</div></div>`)}
       ${sec('Entregas na pasta', r.entregas, (e) => `<div class="desde-l">${esc(e.pasta)} <small>${e.arquivos.map(esc).join(', ')}</small></div>`)}
-      ${sec('Quem trabalhou', r.quemTrabalhou, (q) => `<div class="desde-l">${esc(q.agente)} <small>${q.falas} ${q.falas === 1 ? 'mensagem' : 'mensagens'}</small></div>`)}
+      ${sec('Quem trabalhou', r.quemTrabalhou, (q) => `<div class="desde-l">${esc(q.agente)} <small>${I18N.t(q.falas === 1 ? '{n} mensagem' : '{n} mensagens', { n: q.falas })}</small></div>`)}
       ${sec('Iniciativas do assessor', r.iniciativas, (i) => `<div class="desde-l">${esc(i.titulo)} <span class="loz">${esc((ESTADO_INI[i.estado] || [i.estado])[0])}</span></div>`)}
       ${!(r.aguardandoVoce.length || r.concluidos.length || r.bloqueados.length || r.paraVoce.length || r.cards.length || r.entregas.length) ? '<div class="vazio-inbox">Nada aconteceu nesse período.</div>' : ''}
     </div>`, 'inbox');
@@ -1691,9 +1691,9 @@ async function carregarArquivos() {
   const el = $('#aj-arquivos'); if (!el) return;
   const r = await fetch(P('/arquivos')).then((x) => x.json()).catch(() => null);
   if (!r || !$('#aj-arquivos')) return;
-  $('#aj-arquivos').innerHTML = `<div class="arq-total"><b>${esc(r.totalTexto)}</b> na pasta desta equipe${r.ultima ? ` <span class="mudo">faxina ${diaTxt(new Date(r.ultima).toISOString())} às ${hhmm(new Date(r.ultima).toISOString())}</span>` : ''}</div>
+  $('#aj-arquivos').innerHTML = `<div class="arq-total"><b>${esc(r.totalTexto)}</b> na pasta desta equipe${r.ultima ? ` <span class="mudo">${I18N.t('faxina {dia} às {hora}', { dia: diaTxt(new Date(r.ultima).toISOString()), hora: hhmm(new Date(r.ultima).toISOString()) })}</span>` : ''}</div>
     <div class="arq-lista">${r.itens.filter((i) => i.bytes > 0 || ['estado', 'relatorios', 'entregas'].includes(i.id)).map((i) => `<div class="arq-linha"><span class="arq-tam">${esc(i.tamanho)}</span><span class="arq-txt">${esc(i.texto)}</span></div>`).join('')}</div>
-    <div class="linha-in" style="margin-top:8px;align-items:center"><button class="btn-sec" data-acao="faxina">Faxina agora</button><span class="mudo">${r.previa.n ? `${r.previa.n} ${r.previa.n === 1 ? 'item sairia' : 'itens sairiam'} (${esc(r.previa.liberadoTexto)})` : 'nada para tirar no momento'}; o app faz isso sozinho a cada 12 h</span></div>`;
+    <div class="linha-in" style="margin-top:8px;align-items:center"><button class="btn-sec" data-acao="faxina">Faxina agora</button><span class="mudo">${r.previa.n ? I18N.t(r.previa.n === 1 ? '{n} item sairia ({tamanho})' : '{n} itens sairiam ({tamanho})', { n: r.previa.n, tamanho: esc(r.previa.liberadoTexto) }) : I18N.t('nada para tirar no momento')}; ${I18N.t('o app faz isso sozinho a cada 12 h')}</span></div>`;
 }
 
 /** Um avatar da galeria da ferramenta vira a foto do perfil (passa pelo mesmo caminho do upload, sem recorte). */
@@ -1701,9 +1701,9 @@ async function escolherAvatar(id, n) {
   if (!id) return;
   try {
     const blob = await (await fetch(avatarUrl(n))).blob();
-    const dataUrl = await new Promise((ok, erro) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = () => erro(new Error('Não li a imagem.')); fr.readAsDataURL(blob); });
+    const dataUrl = await new Promise((ok, erro) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = () => erro(new Error(I18N.t('Não li a imagem.'))); fr.readAsDataURL(blob); });
     const r = await api('POST', P(`/agente/${id}/foto`), { dataUrl, recorte: { zoom: 1, x: 0, y: 0 } });
-    if (!r._ok) return aviso(r.erro || 'Não salvou a foto.');
+    if (!r._ok) return aviso(r.erro || I18N.t('Não salvou a foto.'));
     setTimeout(() => { if (U.ped?.id === id && !$('#modal').hidden) modalPerfil(id, { manter: true }); }, 200);
   } catch (e) { aviso(e.message); }
 }
@@ -1732,7 +1732,7 @@ async function adicionarRegra(escopo) {
   const campo = document.getElementById(`rg-novo-${escopo}`); const t = campo?.value.trim(); if (!t) return;
   const atual = (await (await fetch(P(`${rotaEscopo(escopo)}/regras`))).json().catch(() => ({}))).itens || [];
   const r = await api('PUT', P(`${rotaEscopo(escopo)}/regras`), { itens: [...atual, t] });
-  if (!r._ok) return aviso(r.erro || 'Não salvou.');
+  if (!r._ok) return aviso(r.erro || I18N.t('Não salvou.'));
   await redesenharRegras(escopo); document.getElementById(`rg-novo-${escopo}`)?.focus();
 }
 
@@ -1749,7 +1749,7 @@ function prepararFoto(arquivo) {
       URL.revokeObjectURL(url);
       ok(cv.toDataURL('image/jpeg', 0.88));
     };
-    img.onerror = () => { URL.revokeObjectURL(url); falha(new Error('Não consegui abrir essa imagem.')); };
+    img.onerror = () => { URL.revokeObjectURL(url); falha(new Error(I18N.t('Não consegui abrir essa imagem.'))); };
     img.src = url;
   });
 }
@@ -1759,7 +1759,7 @@ function prepararFoto(arquivo) {
 function modalNovaEquipe() {
   const p = projetoAtual();
   if (!p) return;
-  abrirModal(`<h2>Adicionar equipe a ${esc(p.nome)}</h2>
+  abrirModal(`<h2>${I18N.t('Adicionar equipe a {nome}', { nome: esc(p.nome) })}</h2>
     <div class="dica-v" style="color:var(--mudo);margin:-6px 0 12px">Cada equipe tem as próprias conversas, contatos e planner. As lideranças, e principalmente o seu assessor, enxergam as outras equipes do projeto para trazer resumos e montar apresentações.</div>
     <div class="eq-escolha" id="ne-tipos">${E.templates.filter((t) => !t.rascunho).map((t, k) => `<label class="eq-opcao"><input type="radio" name="ne-tipo" value="${esc(t.id)}" ${k === 0 ? 'checked' : ''}><span><b>${esc(t.nome)}</b><small>${esc(t.descricao || '')}</small></span></label>`).join('')}</div>
     <div class="campo" style="margin-top:12px"><label class="rot">Nome da equipe (opcional)</label><input class="in" id="ne-nome" placeholder="Se deixar em branco, usa o nome do tipo" autocomplete="off"></div>
@@ -1768,7 +1768,7 @@ function modalNovaEquipe() {
   $('#m-sim').onclick = async () => {
     const tipo = $('input[name="ne-tipo"]:checked')?.value;
     const r = await api('POST', P('/equipes'), { template: tipo, nome: $('#ne-nome').value.trim() || undefined });
-    if (!r._ok) return aviso(r.erro || 'Não consegui adicionar a equipe.');
+    if (!r._ok) return aviso(r.erro || I18N.t('Não consegui adicionar a equipe.'));
     fecharModal();
     await recarregarApp();
     await carregarProjeto(r.equipe.cid);
@@ -1794,7 +1794,7 @@ function modalNovoProjeto({ template = '', nome = '' } = {}) {
     const r = await api('POST', '/api/pasta/validar', { caminho: v });
     valido = !!r.ok;
     dica.className = `dica-v ${r.ok ? 'ok' : 'erro'}`;
-    dica.textContent = r.ok ? `Pasta encontrada: ${r.nome}` : r.erro;
+    dica.textContent = r.ok ? I18N.t('Pasta encontrada: {nome}', { nome: r.nome }) : r.erro;
     if (r.ok && !$('#np-nome').value) $('#np-nome').value = r.nome;
   };
   caminho.oninput = () => { clearTimeout(t); t = setTimeout(validar, 250); };
@@ -1804,9 +1804,9 @@ function modalNovoProjeto({ template = '', nome = '' } = {}) {
     await validar();
     if (!valido) { caminho.focus(); return; }
     const escolhidas = $('#np-equipes input:checked').map((x) => x.value);
-    if (!escolhidas.length) { aviso('Escolha ao menos uma equipe.'); return; }
+    if (!escolhidas.length) { aviso(I18N.t('Escolha ao menos uma equipe.')); return; }
     const r = await api('POST', '/api/projetos', { nome: $('#np-nome').value.trim(), caminho: caminho.value.trim(), template: escolhidas[0], conhecer: $('#np-conhecer').checked, engine: E.config.engine, modo: E.config.modo });
-    if (!r._ok) { aviso(r.erro || 'Não consegui adicionar.'); return; }
+    if (!r._ok) { aviso(r.erro || I18N.t('Não consegui adicionar.')); return; }
     for (const tpl of escolhidas.slice(1)) await api('POST', `/api/p/${r.projeto.id}/equipes`, { template: tpl });   // a primeira é a principal
     fecharModal();
     await recarregarApp();
@@ -1833,7 +1833,7 @@ function modalCriar(col = 'backlog', { contexto = [], titulo = '' } = {}) {
     const titulo = $('#n-tit').value.trim();
     if (!titulo) { $('#n-tit').focus(); return; }
     const r = await api('POST', P('/cartao'), { titulo, descricao: $('#n-desc').value, dono: $('#n-dono').value || null, prioridade: $('#n-prio').value, coluna: $('#n-col').value });
-    if (!r._ok) { aviso(r.erro || 'Não criei.'); return; }
+    if (!r._ok) { aviso(r.erro || I18N.t('Não criei.')); return; }
     if (contexto.length && r.card?.id) await api('PATCH', P(`/cartao/${r.card.id}`), { campos: { contexto } });
     fecharModal();
   };
@@ -1846,14 +1846,14 @@ function ressalvasHtml(c) {
   const l = c.ressalvas || [];
   if (!l.length) return '';
   const rot = { aberta: 'aberta', resolvida: 'resolvida', aceita: 'aceita pela P.O.' };
-  return `<h4>Ressalvas</h4>${l.map((r) => `<div class="ressalva ${r.status}"><b>${esc(rot[r.status] || r.status)}</b>, ${esc(r.tipo)}, ${esc(r.severidade)}${r.origem ? `, de ${esc(nomeAgente(r.origem))}` : ''}<p>${esc(r.texto)}</p>${r.resolucao?.texto ? `<p class="mudo">${r.status === 'aceita' ? 'Motivo da aceitação' : 'Resolução'}: ${esc(r.resolucao.texto)}${r.resolucao.evidencia ? ` Evidência: ${esc(r.resolucao.evidencia)}` : ''}</p>` : ''}</div>`).join('')}`;
+  return `<h4>Ressalvas</h4>${l.map((r) => `<div class="ressalva ${r.status}"><b>${esc(rot[r.status] || r.status)}</b>, ${esc(r.tipo)}, ${esc(r.severidade)}${r.origem ? `, ${I18N.t('de {nome}', { nome: esc(nomeAgente(r.origem)) })}` : ''}<p>${esc(r.texto)}</p>${r.resolucao?.texto ? `<p class="mudo">${I18N.t(r.status === 'aceita' ? 'Motivo da aceitação: {texto}' : 'Resolução: {texto}', { texto: esc(r.resolucao.texto) })}${r.resolucao.evidencia ? ` ${I18N.t('Evidência: {evidencia}', { evidencia: esc(r.resolucao.evidencia) })}` : ''}</p>` : ''}</div>`).join('')}`;
 }
 // A Game Director é a última QA: depois de concluído, ela testa e aprova ou reprova.
 function validacaoHtml(c) {
   if (c.coluna !== 'concluido' || !c.validacao) return '';
   const v = c.validacao;
   const aceitas = (c.ressalvas || []).filter((r) => r.status === 'aceita');
-  if (v.status === 'pendente') return `<section class="sec valida"><h4>Sua validação final</h4><p>O time entregou e deu por concluído. Você é a última QA: teste e diga se está tudo certo.</p>${aceitas.length ? `<p class="erro">A P.O. aceitou ${aceitas.length} ${aceitas.length === 1 ? 'ressalva' : 'ressalvas'} para conferir (veja abaixo).</p>` : ''}<div class="side-acoes"><button class="btn-primario" data-acao="validar-ok">Está tudo certo</button><button class="btn-sec" data-acao="validar-nok">Tem problema</button></div></section>`;
+  if (v.status === 'pendente') return `<section class="sec valida"><h4>Sua validação final</h4><p>O time entregou e deu por concluído. Você é a última QA: teste e diga se está tudo certo.</p>${aceitas.length ? `<p class="erro">${I18N.t(aceitas.length === 1 ? 'A P.O. aceitou {n} ressalva para conferir (veja abaixo).' : 'A P.O. aceitou {n} ressalvas para conferir (veja abaixo).', { n: aceitas.length })}</p>` : ''}<div class="side-acoes"><button class="btn-primario" data-acao="validar-ok">Está tudo certo</button><button class="btn-sec" data-acao="validar-nok">Tem problema</button></div></section>`;
   if (v.status === 'aprovada') return `<section class="sec valida ok"><h4>Validado por você</h4><p class="mudo">${ha(v.em)}${v.motivo ? `, ${esc(v.motivo)}` : ''}</p></section>`;
   return `<section class="sec valida"><h4>Reprovado por você</h4><p class="mudo">${ha(v.em)}: ${esc(v.motivo || '')}</p></section>`;
 }
@@ -1862,30 +1862,30 @@ function workflowHtml(c) {
   const f = c.workflow;
   if (!f) return `<div class="sec"><h4>Dependências</h4>${deps}</div>`;
   const pendentes = (c.dependeDe || []).filter(id => cartao(id)?.coluna !== 'concluido');
-  return `<section class="sec workflow-card"><h4>Fluxo técnico, entrega r${f.revisao}</h4>${deps}
+  return `<section class="sec workflow-card"><h4>${I18N.t('Fluxo técnico, entrega r{n}', { n: f.revisao })}</h4>${deps}
     <div class="workflow-estados"><span>Revisão: <b>${esc(f.revisaoCodigo.status)}</b></span><span>Documentação: <b>${esc(f.documentacao.status)}</b></span><span>QA: <b>${esc(f.qa.status)}</b></span><span>Retrabalhos: <b>${f.retrabalhos}</b></span></div>
-    ${c.prontidao ? `<div class="trilha-det">${c.prontidao.etapas.map((e) => `<div class="${e.ok ? 'ok' : e.falhou ? 'falhou' : ''}"><i></i>${esc(e.nome)}</div>`).join('')}</div>${c.prontidao.falta?.length ? `<p class="erro">Para avançar falta: ${c.prontidao.falta.map(esc).join('; ')}</p>` : ''}` : ''}
+    ${c.prontidao ? `<div class="trilha-det">${c.prontidao.etapas.map((e) => `<div class="${e.ok ? 'ok' : e.falhou ? 'falhou' : ''}"><i></i>${esc(e.nome)}</div>`).join('')}</div>${c.prontidao.falta?.length ? `<p class="erro">${I18N.t('Para avançar falta: {itens}', { itens: c.prontidao.falta.map(esc).join('; ') })}</p>` : ''}` : ''}
     ${ressalvasHtml(c)}
-    ${pendentes.length ? `<p class="erro">Aguardando ${pendentes.map(esc).join(', ')}</p>` : ''}
+    ${pendentes.length ? `<p class="erro">${I18N.t('Aguardando {cards}', { cards: pendentes.map(esc).join(', ') })}</p>` : ''}
     <div class="dois"><div><label class="rot">Tipo de tarefa</label><select class="in" data-campo="tipoTarefa">${['feature','bug','refatoracao','teste','infra','documentacao'].map(t=>`<option ${c.tipoTarefa===t?'selected':''}>${t}</option>`).join('')}</select></div><div><label class="rot">Risco</label><select class="in" data-campo="risco">${['baixo','medio','alto'].map(t=>`<option ${c.risco===t?'selected':''}>${t}</option>`).join('')}</select></div></div>
-    <h4>Retomada</h4><p>${esc(f.checkpoint.resumo || 'Sem checkpoint registrado.')}</p><p>Próximo passo: ${esc(f.checkpoint.proximoPasso || 'Planejar e executar a tarefa.')}</p>
+    <h4>Retomada</h4><p>${esc(f.checkpoint.resumo || 'Sem checkpoint registrado.')}</p><p>${I18N.t('Próximo passo: {passo}', { passo: esc(f.checkpoint.proximoPasso || I18N.t('Planejar e executar a tarefa.')) })}</p>
     ${f.checkpoint.branch || f.checkpoint.worktree ? `<p class="caminho">${esc(f.checkpoint.branch)}, ${esc(f.checkpoint.worktree)}</p>` : ''}
-    <h4>Verificações da entrega atual</h4>${f.verificacoes.length ? f.verificacoes.map(v=>`<div class="workflow-check"><b>${esc(v.status)}</b>, ${esc(v.comando)}${v.obrigatoria?', obrigatória':''}<p>${esc(v.evidencia)}</p></div>`).join('') : '<p class="mudo">Nenhuma verificação registrada.</p>'}
+    <h4>Verificações da entrega atual</h4>${f.verificacoes.length ? f.verificacoes.map(v=>`<div class="workflow-check"><b>${esc(v.status)}</b>, ${esc(v.comando)}${v.obrigatoria?`, ${I18N.t('obrigatória')}`:''}<p>${esc(v.evidencia)}</p></div>`).join('') : '<p class="mudo">Nenhuma verificação registrada.</p>'}
     <div class="campo"><label class="rot">Verificações planejadas (um comando por linha)</label><textarea class="in" data-validacoes rows="2">${esc((c.validacoesObrigatorias || []).join('\n'))}</textarea></div>
-    ${f.achados.length ? `<h4>Achados</h4>${f.achados.map(a=>`<div class="workflow-check"><b>${esc(a.severidade)} · ${esc(a.status)} · r${a.revisao}</b><p>${esc(a.arquivo)}:${a.linha} · ${esc(a.evidencia)}</p><p>Impacto: ${esc(a.impacto)}. Correção: ${esc(a.correcao)}</p>${a.verificacao ? `<p>Verificação: ${esc(a.verificacao.evidencia)}</p>` : ''}</div>`).join('')}` : ''}
-    ${(c.relatorios || []).length?`<h4>Relatórios e handoffs</h4>${c.relatorios.map(r=>`<a class="anexo-arq" href="${P(`/cartao/${encodeURIComponent(c.id)}/relatorio?tipo=${r.tipo}&revisao=${r.revisao}&arquivo=${encodeURIComponent(r.nome)}`)}" download="${esc(r.nome)}">Baixar ${esc(r.nome)}${r.autoral ? ` (escrito por ${esc(r.autor)})` : ''}</a>`).join('')}`:''}
+    ${f.achados.length ? `<h4>Achados</h4>${f.achados.map(a=>`<div class="workflow-check"><b>${esc(a.severidade)} · ${esc(a.status)} · r${a.revisao}</b><p>${esc(a.arquivo)}:${a.linha} · ${esc(a.evidencia)}</p><p>${I18N.t('Impacto: {impacto}. Correção: {correcao}', { impacto: esc(a.impacto), correcao: esc(a.correcao) })}</p>${a.verificacao ? `<p>${I18N.t('Verificação: {evidencia}', { evidencia: esc(a.verificacao.evidencia) })}</p>` : ''}</div>`).join('')}` : ''}
+    ${(c.relatorios || []).length?`<h4>Relatórios e handoffs</h4>${c.relatorios.map(r=>`<a class="anexo-arq" href="${P(`/cartao/${encodeURIComponent(c.id)}/relatorio?tipo=${r.tipo}&revisao=${r.revisao}&arquivo=${encodeURIComponent(r.nome)}`)}" download="${esc(r.nome)}">${I18N.t('Baixar {arquivo}', { arquivo: esc(r.nome) })}${r.autoral ? ` ${I18N.t('(escrito por {autor})', { autor: esc(r.autor) })}` : ''}</a>`).join('')}`:''}
     <button class="btn-sec" data-acao="decisoes">Decisões do projeto</button></section>`;
 }
 async function modalDecisoes() {
   const r = await api('GET', P('/decisoes'));
-  abrirModal(`<h2>Decisões do projeto</h2><p>Decisões aceitas orientam todos os agentes envolvidos. Mudanças preservam o histórico.</p>${(r.decisoes || []).map(d=>`<section class="campo decisao"><b>${esc(d.id)} · r${d.revisao} · ${esc(d.status)} · ${esc(d.proposta.tipo)}</b><p>${esc(d.proposta.contexto)}</p>${d.proposta.opcoes.map(o=>`<div class="workflow-check"><b>${esc(o.texto)}${d.escolha===o.id?' · escolhida':''}</b><p>${esc(o.consequencia)}</p>${d.status==='proposta'?`<button class="btn-sec" data-acao="aceitar-decisao" data-decisao="${esc(d.id)}" data-revisao="${d.revisao}" data-opcao="${esc(o.id)}">Escolher esta opção</button>`:''}</div>`).join('')}<button class="btn-sec" data-acao="editar-decisao" data-decisao="${esc(d.id)}">Revisar ${d.status==='aceita'?'decisão':'proposta'}</button></section>`).join('') || '<p>Nenhuma decisão registrada.</p>'}<div class="acoes"><button class="btn-sec" data-acao="fechar">Fechar</button><button class="btn-primario" data-acao="editar-decisao">Nova decisão</button></div>`, 'perfil');
+  abrirModal(`<h2>Decisões do projeto</h2><p>Decisões aceitas orientam todos os agentes envolvidos. Mudanças preservam o histórico.</p>${(r.decisoes || []).map(d=>`<section class="campo decisao"><b>${esc(d.id)} · r${d.revisao} · ${esc(d.status)} · ${esc(d.proposta.tipo)}</b><p>${esc(d.proposta.contexto)}</p>${d.proposta.opcoes.map(o=>`<div class="workflow-check"><b>${esc(o.texto)}${d.escolha===o.id?` · ${I18N.t('escolhida')}`:''}</b><p>${esc(o.consequencia)}</p>${d.status==='proposta'?`<button class="btn-sec" data-acao="aceitar-decisao" data-decisao="${esc(d.id)}" data-revisao="${d.revisao}" data-opcao="${esc(o.id)}">Escolher esta opção</button>`:''}</div>`).join('')}<button class="btn-sec" data-acao="editar-decisao" data-decisao="${esc(d.id)}">${I18N.t(d.status==='aceita'?'Revisar decisão':'Revisar proposta')}</button></section>`).join('') || '<p>Nenhuma decisão registrada.</p>'}<div class="acoes"><button class="btn-sec" data-acao="fechar">Fechar</button><button class="btn-primario" data-acao="editar-decisao">Nova decisão</button></div>`, 'perfil');
 }
 async function editarDecisao(id) {
   const r = await api('GET', P('/decisoes'));
   const d = r.decisoes?.find(d=>d.id===id);
   U.decisaoEdit = d || null;
   const opcoes = d?.proposta.opcoes || [{id:'opcao-1',texto:'',consequencia:''},{id:'opcao-2',texto:'',consequencia:''}];
-  abrirModal(`<h2>${d?'Revisar decisão':'Nova decisão'}</h2>${d?.status==='aceita'?'<p>A versão aceita fica no histórico. A nova proposta precisará ser escolhida novamente.</p>':''}<div class="campo"><label class="rot">Quem decide</label><select class="in" id="dc-tipo"><option value="humana" ${d?.proposta.tipo==='humana'?'selected':''}>Pessoa responsável</option><option value="tecnica" ${d?.proposta.tipo==='tecnica'?'selected':''}>P.O. · decisão técnica</option></select></div><div class="campo"><label class="rot">Contexto e decisão necessária</label><textarea class="in" id="dc-contexto">${esc(d?.proposta.contexto || '')}</textarea></div><div class="campo"><label class="rot">Cards afetados (vazio = todo o projeto)</label><input class="in" id="dc-cards" value="${esc((d?.proposta.cards || []).join(', '))}"></div>${opcoes.map((o,i)=>`<div class="campo" data-decisao-opcao="${esc(o.id)}"><label class="rot">Opção ${i+1}</label><input class="in" data-dc-texto value="${esc(o.texto)}" placeholder="Escolha possível"><textarea class="in" data-dc-consequencia placeholder="Consequências e desvantagens">${esc(o.consequencia)}</textarea></div>`).join('')}<div class="acoes"><button class="btn-sec" data-acao="decisoes">Voltar</button><button class="btn-primario" data-acao="salvar-decisao">Registrar proposta</button></div>`, 'perfil');
+  abrirModal(`<h2>${d?'Revisar decisão':'Nova decisão'}</h2>${d?.status==='aceita'?'<p>A versão aceita fica no histórico. A nova proposta precisará ser escolhida novamente.</p>':''}<div class="campo"><label class="rot">Quem decide</label><select class="in" id="dc-tipo"><option value="humana" ${d?.proposta.tipo==='humana'?'selected':''}>Pessoa responsável</option><option value="tecnica" ${d?.proposta.tipo==='tecnica'?'selected':''}>P.O. · decisão técnica</option></select></div><div class="campo"><label class="rot">Contexto e decisão necessária</label><textarea class="in" id="dc-contexto">${esc(d?.proposta.contexto || '')}</textarea></div><div class="campo"><label class="rot">Cards afetados (vazio = todo o projeto)</label><input class="in" id="dc-cards" value="${esc((d?.proposta.cards || []).join(', '))}"></div>${opcoes.map((o,i)=>`<div class="campo" data-decisao-opcao="${esc(o.id)}"><label class="rot">${I18N.t('Opção {n}', { n: i+1 })}</label><input class="in" data-dc-texto value="${esc(o.texto)}" placeholder="Escolha possível"><textarea class="in" data-dc-consequencia placeholder="Consequências e desvantagens">${esc(o.consequencia)}</textarea></div>`).join('')}<div class="acoes"><button class="btn-sec" data-acao="decisoes">Voltar</button><button class="btn-primario" data-acao="salvar-decisao">Registrar proposta</button></div>`, 'perfil');
 }
 function abrirIssue(id) { if (!cartao(id)) return; U.issue = id; renderIssue(true); }
 function renderIssue(forcar = false) {
@@ -1900,7 +1900,7 @@ function renderIssue(forcar = false) {
     if (!c.bloqueio) chip?.remove();
     else if (!chip) $('.issue-topo .chave',m)?.insertAdjacentHTML('afterend','<span class="loz bloq">Bloqueado</span>');
     const botao=$('[data-acao="bloquear"],[data-acao="desbloquear"]',m);
-    if (botao) { botao.dataset.acao=c.bloqueio?'desbloquear':'bloquear'; botao.textContent=c.bloqueio?'Liberar bloqueio':'Bloquear'; }
+    if (botao) { botao.dataset.acao=c.bloqueio?'desbloquear':'bloquear'; botao.textContent=c.bloqueio?I18N.t('Liberar bloqueio'):I18N.t('Bloquear'); }
   }
   // não reabre o card por cima de outra janela (ex.: "Arquivar?"), nem enquanto se digita nele
   if (!forcar && (m.hidden || !m.querySelector('.issue'))) return;
@@ -1917,11 +1917,11 @@ function renderIssue(forcar = false) {
         <textarea class="issue-titulo" id="i-titulo" data-campo="titulo" rows="1">${esc(c.titulo)}</textarea>
         <div id="i-bloqueio" class="bloq-aviso" style="${c.bloqueio?'':'display:none'}">${ic('bandeira')}<div><b>Bloqueado.</b> <span class="txt-bloqueio">${esc(c.bloqueio || '')}</span></div></div>
         <div class="sec"><h4>Descrição</h4><textarea class="in" data-campo="descricao" rows="4" placeholder="Adicionar descrição">${esc(c.descricao)}</textarea></div>
-        <div class="sec"><h4>Critérios de aceite ${c.aceite.length ? `<span class="mudo">${ok} de ${c.aceite.length}</span>` : ''}</h4>
+        <div class="sec"><h4>Critérios de aceite ${c.aceite.length ? `<span class="mudo">${I18N.t('{feito} de {total}', { feito: ok, total: c.aceite.length })}</span>` : ''}</h4>
           ${c.aceite.length ? `<div class="barra-prog"><i style="width:${Math.round(100 * ok / c.aceite.length)}%"></i></div>` : ''}
           ${c.aceite.map((a, i) => `<label class="check ${a.ok ? 'ok' : ''}"><input type="checkbox" data-aceite="${i}" ${a.ok ? 'checked' : ''}><span>${esc(a.t)}</span></label>`).join('')}
           <input class="in" data-novo-aceite placeholder="Adicionar critério" style="margin-top:8px"></div>
-        ${(c.plano || []).length ? `<div class="sec"><h4>Plano de execução <span class="mudo">${c.plano.filter((p) => p.status === 'feito').length} de ${c.plano.length}</span></h4>${c.plano.map((p) => `<div class="passo ${p.status}" title="${esc(p.evidencia || '')}"><span class="n">${p.n}</span><span class="t">${esc(p.titulo)}${p.saida ? `<small>${esc(p.saida)}</small>` : ''}</span>${p.dono ? av(p.dono, 'p', { dot: false }) : ''}<span class="st">${{ feito: 'feito', pulado: 'pulado', pendente: 'pendente' }[p.status] || p.status}</span></div>`).join('')}</div>` : ''}
+        ${(c.plano || []).length ? `<div class="sec"><h4>Plano de execução <span class="mudo">${I18N.t('{feito} de {total}', { feito: c.plano.filter((p) => p.status === 'feito').length, total: c.plano.length })}</span></h4>${c.plano.map((p) => `<div class="passo ${p.status}" title="${esc(p.evidencia || '')}"><span class="n">${p.n}</span><span class="t">${esc(p.titulo)}${p.saida ? `<small>${esc(p.saida)}</small>` : ''}</span>${p.dono ? av(p.dono, 'p', { dot: false }) : ''}<span class="st">${{ feito: 'feito', pulado: 'pulado', pendente: 'pendente' }[p.status] || p.status}</span></div>`).join('')}</div>` : ''}
         ${c.evidencias.length ? `<div class="sec"><h4>Evidências</h4>${c.evidencias.map((e) => `<div class="evid">${esc(e)}</div>`).join('')}</div>` : ''}
         ${fatosHtml(c.id)}
         ${c.arquivos.length ? `<div class="sec"><h4>Arquivos</h4>${c.arquivos.map((e) => `<span class="arq">${esc(e)}</span>`).join('')}</div>` : ''}
@@ -1938,7 +1938,7 @@ function renderIssue(forcar = false) {
         <div class="side-linha"><span>Responsável</span><span class="val">${dono ? av(dono.id, 'p', { dot: false }) : ''}<select class="in" data-campo="dono"><option value="">Sem dono</option>${rosterAtual().filter((a) => !a.sistema).map((a) => `<option value="${a.id}" ${a.id === c.dono ? 'selected' : ''}>${esc(a.nome)}</option>`).join('')}</select></span></div>
         <div class="side-linha"><span>Prioridade</span><span class="val"><span class="prio ${c.prioridade}">${ic(iconePrio[c.prioridade])}</span><select class="in" data-campo="prioridade">${['alta', 'normal', 'baixa'].map((p) => `<option value="${p}" ${p === c.prioridade ? 'selected' : ''}>${nomePrio[p]}</option>`).join('')}</select></span></div>
         <div class="side-linha"><span>Jira</span><span class="val"><input class="in" data-campo="jira" value="${esc(c.jira || '')}" placeholder="ABC-123" maxlength="30">${c.jira && J().integ?.jira?.url ? `<a class="ref" href="${esc(J().integ.jira.url)}/browse/${esc(c.jira)}" target="_blank" rel="noopener">abrir</a>` : ''}</span></div>
-        <div class="side-linha"><span>Esforço</span><span class="val"><select class="in" data-campo="pontos"><option value="">Sem estimativa</option>${PONTOS.map((p) => `<option value="${p}" ${p === c.pontos ? 'selected' : ''}>${p} ${p === 1 ? 'ponto' : 'pontos'}</option>`).join('')}</select></span></div>
+        <div class="side-linha"><span>Esforço</span><span class="val"><select class="in" data-campo="pontos"><option value="">Sem estimativa</option>${PONTOS.map((p) => `<option value="${p}" ${p === c.pontos ? 'selected' : ''}>${I18N.t(p === 1 ? '{n} ponto' : '{n} pontos', { n: p })}</option>`).join('')}</select></span></div>
         ${(() => { const g = (J().custos?.cards || {})[c.id]; return g ? `<div class="side-linha"><span>Custo</span><span class="val" title="Valor de tabela dos tokens gastos neste card; a assinatura não cobra por chamada, é a régua do orçamento">${g.toFixed(2)}</span></div>` : ''; })()}
         <div class="side-linha"><span>Motor</span><span class="val"><select class="in" data-campo="motor"><option value="" ${!c.motor ? 'selected' : ''}>Padrão dos Ajustes</option><option value="claude" ${c.motor === 'claude' ? 'selected' : ''}>Claude</option><option value="codex" ${c.motor === 'codex' ? 'selected' : ''}>Codex</option></select></span></div>
         ${E.config.creditos?.automatico ? `<div class="side-linha"><span>Teto de esforço</span><span class="val"><select class="in" data-campo="teto" title="A P.O. define o nível máximo de modelo e raciocínio deste card. Os agentes escolhem o nível dentro dele.">${[['', 'Só o teto da conta'], ['low', 'Low (modelos baixos)'], ['medium', 'Medium (até Sonnet 5.5)'], ['high', 'High (libera Opus)']].map(([v, n]) => `<option value="${v}" ${v === (c.teto || '') ? 'selected' : ''}>${n}</option>`).join('')}</select></span></div>` : `<div class="side-linha"><span>Modelo</span><span class="val"><select class="in" data-campo="modelo">${MODELOS_CLAUDE.map(([v, n]) => `<option value="${v}" ${v === (c.modelo || '') ? 'selected' : ''}>${v ? n : 'Padrão dos Ajustes'}</option>`).join('')}</select></span></div>
@@ -1952,7 +1952,7 @@ function renderIssue(forcar = false) {
         <div class="side-linha"><span>Atualizado</span><span class="val">${ha(c.atualizado)}</span></div>
         <div class="side-acoes">
           ${c.bloqueio ? '<button class="btn-sec" data-acao="desbloquear">Liberar bloqueio</button>' : '<button class="btn-sec" data-acao="bloquear">Bloquear</button>'}
-          ${c.dono ? `<button class="btn-sec" data-acao="pedir-status">Pedir andamento a ${esc(primeiroNome(nomeAgente(c.dono)))}</button>` : ''}
+          ${c.dono ? `<button class="btn-sec" data-acao="pedir-status">${I18N.t('Pedir andamento a {nome}', { nome: esc(primeiroNome(nomeAgente(c.dono))) })}</button>` : ''}
           <button class="btn-sec btn-perigo" data-acao="arquivar">Remover tarefa</button></div>
       </div>
     </div>`, 'issue');
@@ -1965,7 +1965,7 @@ function contextoCardHtml(c) {
   const atual = c.contexto || [];
   if (!fichas.length && !atual.length && !(J().registro?.total)) return '';
   const nomeFicha = (k) => fichas.find((f) => f.chave === k)?.nome || k;
-  return `<div class="rot" style="margin-top:10px" title="Fichas do ${esc(J().registro?.vista || 'registro')} que chegam inteiras a quem pega o card">Fichas do ${esc(J().registro?.vista || 'registro')}</div>
+  return `<div class="rot" style="margin-top:10px" title="${I18N.t('Fichas do {registro} que chegam inteiras a quem pega o card', { registro: esc(J().registro?.vista || I18N.t('registro')) })}">${I18N.t('Fichas do {registro}', { registro: esc(J().registro?.vista || I18N.t('registro')) })}</div>
     <div class="reg-ctx">${atual.map((k) => `<span class="chip-cam" title="${esc(k)}">${ic('ficha')}${esc(nomeFicha(k))}<button class="btn-ic" data-ctx-rem="${esc(k)}" title="Tirar do card">${ic('fechar')}</button></span>`).join('') || '<div class="vazio-p" style="padding:2px 0 6px">Nenhuma. O agente recebe o que a tarefa citar pelo nome.</div>'}</div>
     ${fichas.length ? `<select class="in" data-ctx-add><option value="">Apontar ficha</option>${fichas.filter((f) => !atual.includes(f.chave)).map((f) => `<option value="${esc(f.chave)}">${esc(f.nome)} (${esc((REG.dados.tipos[f.tipo] || {}).titulo || f.tipo)})</option>`).join('')}</select>` : ''}`;
 }
@@ -1973,12 +1973,12 @@ function contextoCardHtml(c) {
 function fatosHtml(cardId) {
   const f = J().fatos || {}; const doCard = Object.entries(f.cards?.[cardId] || {}); const doProj = Object.entries(f.projeto || {});
   if (!doCard.length && !doProj.length) return '';
-  const linha = ([k, x]) => `<div class="fato ${x.origem === 'app' ? 'medido' : ''}" title="${esc(x.evidencia || '')}"><b>${esc(k)}</b><span class="val">${esc(x.valor)}</span><small>${x.origem === 'app' ? 'medido pelo app' : `por ${esc(x.por)}`} ${hhmm(x.em)}</small></div>`;
-  return `<div class="sec"><h4>Fatos ${doCard.length ? `<span class="mudo">${doCard.length} do card</span>` : ''}</h4>${doCard.map(linha).join('')}${doProj.length ? `<details class="fatos-proj"><summary>Do projeto (${doProj.length})</summary>${doProj.map(linha).join('')}</details>` : ''}</div>`;
+  const linha = ([k, x]) => `<div class="fato ${x.origem === 'app' ? 'medido' : ''}" title="${esc(x.evidencia || '')}"><b>${esc(k)}</b><span class="val">${esc(x.valor)}</span><small>${x.origem === 'app' ? I18N.t('medido pelo app') : I18N.t('por {nome}', { nome: esc(x.por) })} ${hhmm(x.em)}</small></div>`;
+  return `<div class="sec"><h4>Fatos ${doCard.length ? `<span class="mudo">${I18N.t('{n} do card', { n: doCard.length })}</span>` : ''}</h4>${doCard.map(linha).join('')}${doProj.length ? `<details class="fatos-proj"><summary>${I18N.t('Do projeto ({n})', { n: doProj.length })}</summary>${doProj.map(linha).join('')}</details>` : ''}</div>`;
 }
 async function patchCard(campos) {
   const r = await api('PATCH', P(`/cartao/${U.issue}`), { campos });
-  if (!r._ok) aviso(r.erro || 'Não salvou.');
+  if (!r._ok) aviso(r.erro || I18N.t('Não salvou.'));
 }
 
 /* ---- ajustes ---- */
@@ -1995,16 +1995,16 @@ function conexaoCard(app, c = {}) {
   const ok = c.conectado; const venceu = ['authentication_expired', 'permission_denied', 'sync_error'].includes(c.estado);
   let linha, botao;
   if (c.entrando) {
-    linha = (app === 'teams' || app === 'github') && c.codigo ? `Na página ${app === 'github' ? 'do GitHub' : 'da Microsoft'} que abriu, digite o código <b>${esc(c.codigo.usuario)}</b> e entre com a ${app === 'github' ? 'sua conta' : 'conta da empresa'}. <a href="${esc(c.codigo.url)}" target="_blank" rel="noopener">Abrir de novo</a>` : `Termine o login no navegador que abriu. Esta tela atualiza sozinha.`;
+    linha = (app === 'teams' || app === 'github') && c.codigo ? `${I18N.t(app === 'github' ? 'Na página do GitHub que abriu, digite o código <b>{codigo}</b> e entre com a sua conta.' : 'Na página da Microsoft que abriu, digite o código <b>{codigo}</b> e entre com a conta da empresa.', { codigo: esc(c.codigo.usuario) })} <a href="${esc(c.codigo.url)}" target="_blank" rel="noopener">Abrir de novo</a>` : `Termine o login no navegador que abriu. Esta tela atualiza sozinha.`;
     botao = `<button class="btn-sec" data-acao="cx-cancelar" data-app="${app}">Cancelar</button>`;
   } else if (ok) {
-    linha = `${CX_ESTADO[c.estado] || 'Conectado'}${c.conta ? ` como ${esc(c.conta)}` : ''}. ${c.detalhe ? esc(c.detalhe) : ''}`;
+    linha = `${I18N.t(CX_ESTADO[c.estado] || 'Conectado')}${c.conta ? ` ${I18N.t('como {conta}', { conta: esc(c.conta) })}` : ''}. ${c.detalhe ? esc(c.detalhe) : ''}`;
     botao = `<button class="btn-sec" data-acao="cx-verificar" data-app="${app}">Testar</button><button class="btn-sec btn-perigo" data-acao="cx-desconectar" data-app="${app}">Desconectar</button>`;
   } else if (venceu) {
-    linha = `${CX_ESTADO[c.estado]}. ${esc(c.detalhe || '')}`;
+    linha = `${I18N.t(CX_ESTADO[c.estado])}. ${esc(c.detalhe || '')}`;
     botao = `<button class="btn-primario" data-acao="cx-conectar" data-app="${app}">Reconectar</button><button class="btn-sec btn-perigo" data-acao="cx-desconectar" data-app="${app}">Desconectar</button>`;
   } else {
-    linha = c.precisaConfig ? (app === 'github' ? `Falta o Client ID do aplicativo (Configuração da TI, abaixo). Enquanto isso, um token pessoal no Modo manual também conecta.` : `Precisa de uma liberação única da TI (veja Configuração da TI, abaixo). Depois é só clicar em Conectar.`) : `Entre com a sua conta${app === 'teams' ? ' Microsoft da empresa' : ''}. Serve para ${esc(c.uso || '')}.`;
+    linha = c.precisaConfig ? (app === 'github' ? `Falta o Client ID do aplicativo (Configuração da TI, abaixo). Enquanto isso, um token pessoal no Modo manual também conecta.` : `Precisa de uma liberação única da TI (veja Configuração da TI, abaixo). Depois é só clicar em Conectar.`) : I18N.t(app === 'teams' ? 'Entre com a sua conta Microsoft da empresa. Serve para {uso}.' : 'Entre com a sua conta. Serve para {uso}.', { uso: esc(c.uso || '') });
     botao = `<button class="btn-primario" data-acao="cx-conectar" data-app="${app}">Conectar</button>`;
   }
   const erro = c.erro && !ok && !c.entrando ? `<div class="cx-erro">${esc(c.erro.texto)}</div>` : '';
@@ -2040,16 +2040,16 @@ function contaCard(eng, contasM) {
   const win = contasM.plataforma === 'win32';
   let estado, botao;
   if (!c.instalado) {
-    estado = `<b>${nome} não está instalado neste computador.</b><small>Instale e clique em Verificar de novo.</small><code class="conta-cmd">${esc((win ? inst.win : inst.unix) || inst.npm || '')}</code>${inst.npm && (win ? inst.win : inst.unix) ? `<code class="conta-cmd">${esc(inst.npm)}</code>` : ''}`;
+    estado = `<b>${I18N.t('{motor} não está instalado neste computador.', { motor: nome })}</b><small>Instale e clique em Verificar de novo.</small><code class="conta-cmd">${esc((win ? inst.win : inst.unix) || inst.npm || '')}</code>${inst.npm && (win ? inst.win : inst.unix) ? `<code class="conta-cmd">${esc(inst.npm)}</code>` : ''}`;
     botao = `<button class="btn-sec" data-acao="conta-verificar">Verificar de novo</button>`;
   } else if (c.entrando) {
-    estado = `<b>Esperando você entrar no ${site}…</b><small>${c.url ? `Se o navegador não abriu, <a href="${esc(c.url)}" target="_blank" rel="noopener">abra o login aqui</a>.` : 'O navegador vai abrir a página de login.'}</small>`;
+    estado = `<b>${I18N.t('Esperando você entrar no {site}…', { site })}</b><small>${c.url ? I18N.t('Se o navegador não abriu, <a href="{url}" target="_blank" rel="noopener">abra o login aqui</a>.', { url: esc(c.url) }) : 'O navegador vai abrir a página de login.'}</small>`;
     botao = `<button class="btn-sec" data-acao="conta-cancelar" data-eng="${eng}">Cancelar</button>`;
   } else if (c.conectado) {
-    estado = `<b>Conectado${c.email ? ` como ${esc(c.email)}` : ''}</b><small>${[c.plano && `Plano ${esc(c.plano)}`, c.metodo && esc(c.metodo), c.versao && `versão ${esc(c.versao)}`].filter(Boolean).join(', ')}</small>`;
+    estado = `<b>${c.email ? I18N.t('Conectado como {email}', { email: esc(c.email) }) : I18N.t('Conectado')}</b><small>${[c.plano && I18N.t('Plano {plano}', { plano: esc(c.plano) }), c.metodo && esc(c.metodo), c.versao && I18N.t('versão {versao}', { versao: esc(c.versao) })].filter(Boolean).join(', ')}</small>`;
     botao = `<button class="btn-sec btn-perigo" data-acao="conta-desconectar" data-eng="${eng}">Desconectar</button>`;
   } else {
-    estado = `<b>Não conectado</b><small>Entre com a sua conta ${eng === 'claude' ? 'do Claude' : 'do ChatGPT'} para usar o ${nome}.</small>`;
+    estado = `<b>Não conectado</b><small>${I18N.t(eng === 'claude' ? 'Entre com a sua conta do Claude para usar o {motor}.' : 'Entre com a sua conta do ChatGPT para usar o {motor}.', { motor: nome })}</small>`;
     botao = `<button class="btn-primario" data-acao="conta-conectar" data-eng="${eng}">Conectar</button>`;
   }
   return `<div class="conta ${c.conectado ? 'on' : ''}" data-conta="${eng}"><span class="conta-ic ${eng}">${eng === 'claude' ? 'C' : 'O'}</span><div class="conta-info">${estado}</div>${botao}</div>`;
@@ -2091,11 +2091,11 @@ async function modalAjustes() {
       ${contaCard('claude', contasM)}
       ${(() => { const vz = contasM.voz || {}; const sv = vz.servico || {}; return `<div class="campo" style="margin:14px 0 18px"><label class="rot">Voz da chamada (tudo roda neste computador)</label>
         <div class="dica-v" style="color:var(--mudo)">Voz natural em português (Chatterbox) e reconhecimento de fala (Whisper), os dois rodando neste computador: nada da conversa sai daqui. Precisa de placa de vídeo com 4 GB livres; na primeira chamada os modelos são carregados e pode levar um minuto.</div>
-        <div class="dica-v" style="color:var(--mudo);margin-top:6px">${sv.disponivel ? `Serviço carregado: reconhecimento ${esc(sv.stt || '')}, voz ${esc(sv.tts || '')}.` : 'O serviço de voz carrega quando você abre uma chamada.'}</div>
-        <div class="dica-v" style="color:var(--mudo);margin-top:6px">Microfone, alto-falante, volume e sensibilidade ficam na aba <b>Dispositivos</b>.</div>
+        <div class="dica-v" style="color:var(--mudo);margin-top:6px">${sv.disponivel ? I18N.t('Serviço carregado: reconhecimento {stt}, voz {tts}.', { stt: esc(sv.stt || ''), tts: esc(sv.tts || '') }) : 'O serviço de voz carrega quando você abre uma chamada.'}</div>
+        <div class="dica-v" style="color:var(--mudo);margin-top:6px">${I18N.t('Microfone, alto-falante, volume e sensibilidade ficam na aba <b>Dispositivos</b>.')}</div>
         ${(() => { const v = vz.voz || { nome: 'leni', ritmo: 0.4, expressividade: 0.45 }; const vozes = vz.vozes || []; const atual = vozes.find((x) => x.id === v.nome);
           return `<div style="margin-top:14px"><label class="rot">Voz</label><select class="in" id="voz-nome">${vozes.map((x) => `<option value="${esc(x.id)}" ${x.id === v.nome ? 'selected' : ''}>${esc(x.nome)}${x.genero ? ` (${esc(x.genero)})` : ''}</option>`).join('')}</select>
-            <div class="dica-v" id="voz-origem" style="color:var(--mudo);margin-top:6px">${atual ? `Timbre e sotaque: ${esc(atual.origem)}.` : ''} A voz é gerada pelo modelo a partir de uma amostra curta; as amostras do app são leituras brasileiras de domínio público.</div>
+            <div class="dica-v" id="voz-origem" style="color:var(--mudo);margin-top:6px">${atual ? I18N.t('Timbre e sotaque: {origem}.', { origem: esc(atual.origem) }) : ''} ${I18N.t('A voz é gerada pelo modelo a partir de uma amostra curta; as amostras do app são leituras brasileiras de domínio público.')}</div>
             <div class="dois campo" style="margin-top:10px"><div><label class="rot">Ritmo <em id="voz-ritmo-v">${Math.round(v.ritmo * 100)}</em></label><input type="range" class="faixa" id="voz-ritmo" min="15" max="80" step="5" value="${Math.round(v.ritmo * 100)}"><div class="dica-v" style="color:var(--mudo)">Para a esquerda fala mais pausado; para a direita, mais corrido.</div></div>
               <div><label class="rot">Expressividade <em id="voz-exp-v">${Math.round(v.expressividade * 100)}</em></label><input type="range" class="faixa" id="voz-exp" min="20" max="90" step="5" value="${Math.round(v.expressividade * 100)}"><div class="dica-v" style="color:var(--mudo)">Mais alto é mais entonação (e um pouco mais rápido).</div></div></div>
             <div class="linha-in"><button class="btn-sec" data-acao="voz-previa">Ouvir prévia</button><label class="btn-sec arquivo">Usar minha amostra (WAV de 10 a 20 s)<input type="file" accept=".wav,audio/wav" hidden id="voz-amostra"></label><small class="dica-v" id="voz-previa-st" style="color:var(--mudo)"></small></div></div>`; })()}
@@ -2110,13 +2110,13 @@ async function modalAjustes() {
         <select class="in" id="a-esforco">${ESFORCOS.map(([v, n]) => `<option value="${v}" ${c.esforcoClaude === v ? 'selected' : ''}>${n}</option>`).join('')}</select>
         <div class="dica-v" style="color:var(--mudo)">Mais esforço pensa melhor e demora mais. Vale para todos os agentes.</div></div>
       <div class="campo"><label class="rot">Claude Code, versão em uso</label>
-        <select class="in" id="a-claude-exe">${[['', `Automático${versoesClaude.maisNovo ? ` (${(versoesClaude.opcoes.find((o) => o.id === versoesClaude.maisNovo) || {}).versao || ''})` : ''}`], ...versoesClaude.opcoes.map((o) => [o.id, `${o.rotulo}: ${o.versao}`])].map(([v, n]) => `<option value="${esc(v)}" ${c.claudeExe === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>
+        <select class="in" id="a-claude-exe">${[['', `${I18N.t('Automático')}${versoesClaude.maisNovo ? ` (${(versoesClaude.opcoes.find((o) => o.id === versoesClaude.maisNovo) || {}).versao || ''})` : ''}`], ...versoesClaude.opcoes.map((o) => [o.id, `${o.rotulo}: ${o.versao}`])].map(([v, n]) => `<option value="${esc(v)}" ${c.claudeExe === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>
         <div style="margin-top:8px"><button class="btn-sec" data-testar="claude">Testar Claude</button></div><div id="t-claude"></div></div>
       </fieldset>
       ${contaCard('codex', contasM)}
       <fieldset class="aj-motor" ${contasM.codex?.conectado ? '' : 'disabled'}>
       <div class="campo"><label class="rot">Codex, versão em uso</label>
-        <select class="in" id="a-exe">${[['', `Automático${versoes.maisNovo ? ` (${(versoes.opcoes.find((o) => o.id === versoes.maisNovo) || {}).versao || ''})` : ''}`], ...versoes.opcoes.map((o) => [o.id, `${o.rotulo}: ${o.versao}`])].map(([v, n]) => `<option value="${esc(v)}" ${c.codexExe === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
+        <select class="in" id="a-exe">${[['', `${I18N.t('Automático')}${versoes.maisNovo ? ` (${(versoes.opcoes.find((o) => o.id === versoes.maisNovo) || {}).versao || ''})` : ''}`], ...versoes.opcoes.map((o) => [o.id, `${o.rotulo}: ${o.versao}`])].map(([v, n]) => `<option value="${esc(v)}" ${c.codexExe === v ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
       <div class="campo"><label class="rot">Codex, nível de raciocínio</label>
         <select class="in" id="a-esforco-codex">${ESFORCOS_CODEX.map(([v, n]) => `<option value="${v}" ${c.esforcoCodex === v ? 'selected' : ''}>${n}</option>`).join('')}</select>
         <div class="dica-v" style="color:var(--mudo)">Vale para quando o card não define o raciocínio. Cada modelo do Codex aceita um conjunto de níveis.</div></div>
@@ -2126,7 +2126,7 @@ async function modalAjustes() {
       </fieldset>`,
     mcp: `<h2>MCP</h2>
       <p class="mudo" style="margin-top:-4px">Ferramentas externas que o agente de MCP usa para o time. Os do Claude Code desta máquina aparecem sozinhos; ligue os que o time pode usar.</p>
-      <div class="mcp-lista">${mcps.map((x) => `<div class="mcp-i ${x.ativo ? 'on' : ''}"><label class="interruptor"><input type="checkbox" data-mcp-ativo="${esc(x.nome)}" ${x.ativo ? 'checked' : ''}><span><b>${esc(x.nome)}</b><small title="${esc(x.alvo)}">${x.tipo === 'stdio' ? 'local' : 'remoto'}, ${x.origem === 'claude' ? 'do Claude Code' : 'cadastrado aqui'}${x.alvo ? `: ${esc(x.alvo)}` : ''}</small></span></label><input class="in" data-mcp-desc="${esc(x.nome)}" value="${esc(x.descricao)}" placeholder="Para que serve (os agentes leem isto)">${x.origem === 'manual' ? `<button class="btn-ic" data-acao="mcp-remover" data-mcp="${esc(x.nome)}" title="Remover">${ic('fechar')}</button>` : ''}</div>`).join('') || '<div class="vazio-p">Nenhum MCP encontrado.</div>'}</div>
+      <div class="mcp-lista">${mcps.map((x) => `<div class="mcp-i ${x.ativo ? 'on' : ''}"><label class="interruptor"><input type="checkbox" data-mcp-ativo="${esc(x.nome)}" ${x.ativo ? 'checked' : ''}><span><b>${esc(x.nome)}</b><small title="${esc(x.alvo)}">${I18N.t(x.tipo === 'stdio' ? 'local' : 'remoto')}, ${I18N.t(x.origem === 'claude' ? 'do Claude Code' : 'cadastrado aqui')}${x.alvo ? `: ${esc(x.alvo)}` : ''}</small></span></label><input class="in" data-mcp-desc="${esc(x.nome)}" value="${esc(x.descricao)}" placeholder="Para que serve (os agentes leem isto)">${x.origem === 'manual' ? `<button class="btn-ic" data-acao="mcp-remover" data-mcp="${esc(x.nome)}" title="Remover">${ic('fechar')}</button>` : ''}</div>`).join('') || '<div class="vazio-p">Nenhum MCP encontrado.</div>'}</div>
       <div class="campo" style="margin-top:16px"><label class="rot">Adicionar MCP</label>
         <div class="linha-in"><input class="in" id="mcp-nome" placeholder="nome, ex.: notion" style="max-width:170px"><select class="in" id="mcp-tipo" style="max-width:120px"><option value="http">Remoto (URL)</option><option value="stdio">Local (comando)</option></select><input class="in" id="mcp-alvo" placeholder="https://... ou o comando, ex.: npx -y @notionhq/mcp"></div>
         <div class="linha-in" style="margin-top:6px"><input class="in" id="mcp-extra" placeholder='Variáveis ou cabeçalhos em JSON (opcional), ex.: {"API_KEY":"..."}'><button class="btn-sec" data-acao="mcp-adicionar">Adicionar</button></div></div>`,
@@ -2163,7 +2163,7 @@ async function modalAjustes() {
       <div class="campo"><label class="rot">Link do calendário (ICS) ou arquivo .ics</label><input class="in" id="ig-agenda-fonte" value="${esc(a.fonte || '')}" placeholder="https://outlook.office365.com/owa/calendar/…/calendar.ics" autocomplete="off">
         <div class="dica-v" style="color:var(--mudo)">No Outlook na web: Configurações, Calendário, Calendários compartilhados, Publicar um calendário, e copie o link ICS. As reuniões do Teams estão nele. Se a sua empresa bloquear a publicação, exporte um .ics e aponte o arquivo.</div></div>
       <div style="margin:-6px 0 14px"><button class="btn-sec" data-acao="testar-integ" data-alvo="agenda">Testar agenda</button><div id="ig-agenda-teste"></div></div>
-      <div class="campo"><label class="rot">Reler a cada</label><select class="in" id="ig-int" style="max-width:140px">${[5, 10, 15, 30, 60].map((m) => `<option value="${m}" ${ig.intervaloMin === m ? 'selected' : ''}>${m} min</option>`).join('')}</select></div></details>`;
+      <div class="campo"><label class="rot">Reler a cada</label><select class="in" id="ig-int" style="max-width:140px">${[5, 10, 15, 30, 60].map((m) => `<option value="${m}" ${ig.intervaloMin === m ? 'selected' : ''}>${I18N.t('{n} min', { n: m })}</option>`).join('')}</select></div></details>`;
     })(),
     ciclo: `<h2>Ciclo da equipe</h2>
       ${sw('c-rev', 'Revisão e QA automáticos', 'Card que entra em Revisão chama o P.O.; em QA, chama o QA.', c.ciclo.revisaoAuto)}
@@ -2178,7 +2178,7 @@ async function modalAjustes() {
       <div class="campo"><label class="rot">Quem escreve a fala de evento dos agentes (entrega, conclusão, job)</label><select class="in" id="c-loc-falas" style="max-width:420px">${[['haiku', 'Haiku (personalidade inteira; o local é reserva quando a cota aperta)'], ['local', 'Só o modelo local (tom curto, de graça)'], ['off', 'Ninguém (só as mensagens do app)']].map(([v, n]) => `<option value="${v}" ${v === ((c.local || {}).falasMotor || 'haiku') ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
       ${sw('c-ass', 'Assessor por conta própria (Assessoria)', 'O app junta sinais sem gastar chamada (reunião chegando, demanda nova no Jira, entrega ou impedimento nas outras equipes, card aguardando você) e só chama o assessor quando há sinal novo. Ele adianta o que cabe na autonomia dele e propõe o resto. Sem sinal novo, silêncio.', c.ciclo.assessorAuto === true)}
       ${sw('c-background', 'Continuar com a janela fechada', 'No aplicativo instalado, mantém as execuções na bandeja do Windows enquanto o piloto ou o Assessor estiver ligado. Use Encerrar na bandeja para parar.', c.ciclo.segundoPlano === true)}
-      <div class="campo"><label class="rot">Intervalo mínimo entre rondas do assessor</label><select class="in" id="c-ass-min" style="max-width:160px">${[15, 30, 60, 120, 240].map((n) => `<option value="${n}" ${Number(c.ciclo.assessorIntervaloMin || 60) === n ? 'selected' : ''}>${n < 60 ? `${n} min` : `${n / 60} h`}</option>`).join('')}</select></div>
+      <div class="campo"><label class="rot">Intervalo mínimo entre rondas do assessor</label><select class="in" id="c-ass-min" style="max-width:160px">${[15, 30, 60, 120, 240].map((n) => `<option value="${n}" ${Number(c.ciclo.assessorIntervaloMin || 60) === n ? 'selected' : ''}>${n < 60 ? I18N.t('{n} min', { n }) : I18N.t('{n} h', { n: n / 60 })}</option>`).join('')}</select></div>
       <div class="campo"><label class="rot">O que pode acordar o assessor</label><div class="ass-cats">${[['agenda', 'Reunião chegando (agenda)'], ['jira', 'Demanda nova ou mudada no Jira'], ['equipes', 'Entrega ou impedimento nas outras equipes'], ['quadro', 'Card aguardando você ou bloqueado'], ['perguntas', 'Pergunta aberta dos agentes'], ['custos', 'Uso dos modelos perto do limite']].map(([k, rot]) => `<label class="ass-cat"><input type="checkbox" data-ass-cat="${k}" ${(c.ciclo.assessorCategorias || {})[k] !== false && !(k === 'custos' && (c.ciclo.assessorCategorias || {})[k] === undefined) ? 'checked' : ''}> ${rot}</label>`).join('')}</div></div>
       <div class="campo" style="display:flex;gap:14px;align-items:flex-end"><div><label class="rot">Horário em que ele toma iniciativa</label><div class="linha-in"><input type="time" class="in" id="c-ass-ini" value="${esc(c.ciclo.assessorHorario?.inicio || '07:00')}" style="max-width:120px"><input type="time" class="in" id="c-ass-fim" value="${esc(c.ciclo.assessorHorario?.fim || '21:00')}" style="max-width:120px"></div></div></div>
       ${sw('c-rel', 'Relatório do dia', 'Na hora marcada, com o app aberto, o app monta o relatório do dia (o que concluiu, o que está parado, o que depende de você) sem gastar nenhuma chamada de modelo.', c.relatorio.ativo)}
@@ -2209,7 +2209,7 @@ async function modalAjustes() {
       <div class="campo"><label class="rot">Vigia dos repositórios</label>
         ${sw('vg-ativo', 'Acompanhar os repositórios', 'Enquanto houver trabalho no projeto, o app olha os repositórios abaixo (só leitura) e, se houver commit, branch ou mudança no remoto, a P.O. analisa o impacto no andamento.', vigia.ativo)}
         <textarea class="in" id="vg-repos" rows="3" placeholder="Um repositório por linha (caminho da pasta).">${esc((vigia.repos || []).join('\n'))}</textarea>
-        <div class="dois" style="margin-top:8px"><div><label class="rot">Olhar a cada</label><select class="in" id="vg-int">${[5, 10, 15, 30, 60].map((n) => `<option value="${n}" ${vigia.intervaloMin === n ? 'selected' : ''}>${n} min</option>`).join('')}</select></div>
+        <div class="dois" style="margin-top:8px"><div><label class="rot">Olhar a cada</label><select class="in" id="vg-int">${[5, 10, 15, 30, 60].map((n) => `<option value="${n}" ${vigia.intervaloMin === n ? 'selected' : ''}>${I18N.t('{n} min', { n })}</option>`).join('')}</select></div>
           <div style="padding-top:18px">${sw('vg-remoto', 'Buscar o remoto', 'Faz git fetch (não mexe em branch nem arquivo).', vigia.buscarRemoto)}</div></div>
         <div style="margin-top:8px;display:flex;gap:8px"><button class="btn-sec" data-acao="salvar-vigia">Salvar vigia</button><button class="btn-sec" data-acao="vigia-agora">Olhar agora</button></div></div>
       ${blocoRegras('projeto', regrasProj, 'Regras do projeto, para todos os agentes')}
@@ -2262,7 +2262,7 @@ async function modalAjustes() {
       await salvar();
       alvo.innerHTML = '<div class="teste espera">Testando…</div>';
       const r = await api('POST', '/api/testar', { engine: eng });
-      alvo.innerHTML = r.ok ? `<div class="teste ok">Funcionou. Respondeu "${esc(r.texto)}" em ${(r.ms / 1000).toFixed(1)} s.</div>` : `<div class="teste falha">${esc(r.erro || 'Falhou.')}</div>`;
+      alvo.innerHTML = r.ok ? `<div class="teste ok">${I18N.t('Funcionou. Respondeu "{texto}" em {s} s.', { texto: esc(r.texto), s: (r.ms / 1000).toFixed(1) })}</div>` : `<div class="teste falha">${esc(r.erro || 'Falhou.')}</div>`;
     };
   });
   if (U.ajuste === 'projeto') carregarArquivos();   // tamanho por categoria e faxina, medido depois de a tela abrir
@@ -2278,7 +2278,7 @@ function abrirTroca() {
 function itensTroca() {
   const q = U.troca.q.trim().toLowerCase();
   const projs = [...E.projetos.map((p) => ({ id: p.id, rotulo: p.nome, sub: 'Projeto', icone: `<span class="av p" style="--c:hsl(${matiz(p.id)} 60% 50%)">${esc(iniciais(p.nome))}</span>`, ir: `${ultimaEquipe(p.id)}/chat/equipe` })),
-    ...todasEquipes().filter((e) => equipesDoProjeto(e.projeto).length > 1).map((e) => ({ id: e.cid, rotulo: e.nome, sub: `Equipe de ${e.projeto.nome}`, icone: `<span class="av p" style="--c:hsl(${matiz(e.cid)} 50% 45%)">${esc(iniciais(e.nome))}</span>`, ir: `${e.cid}/chat/equipe` }))];
+    ...todasEquipes().filter((e) => equipesDoProjeto(e.projeto).length > 1).map((e) => ({ id: e.cid, rotulo: e.nome, sub: I18N.t('Equipe de {projeto}', { projeto: e.projeto.nome }), icone: `<span class="av p" style="--c:hsl(${matiz(e.cid)} 50% 45%)">${esc(iniciais(e.nome))}</span>`, ir: `${e.cid}/chat/equipe` }))];
   const canais = [{ id: 'equipe', rotulo: 'equipe', sub: 'Canal', icone: ic('hash'), ir: `${U.proj}/chat/equipe` },
     ...rosterDaEquipe().filter((a) => !a.sistema).map((a) => ({ id: a.id, rotulo: a.nome, sub: a.papel, icone: av(a.id, 'p', { dot: false }), ir: `${U.proj}/chat/dm:${a.id}` }))];
   const cards = J().cartoes.map((c) => ({ id: c.id, rotulo: c.titulo, sub: c.id, icone: `<span class="tipo">${ic('check')}</span>`, card: c.id }));
@@ -2368,7 +2368,7 @@ function presencaMudou(e) {
       renderLista(); renderMembros(); renderDigitando();
       const cab = $('#centro .cabeca'); if (cab) cab.outerHTML = cabecaChat();
       const slot = $('#slot-enviar'); if (slot) slot.innerHTML = botaoEnviar();
-      $$('.msg[data-status="trabalhando"]').forEach((m) => { const p = j.presenca[m.dataset.de]; const a = $('.ativ', m); if (p && a) a.textContent = p.atividade || 'trabalhando'; });
+      $$('.msg[data-status="trabalhando"]').forEach((m) => { const p = j.presenca[m.dataset.de]; const a = $('.ativ', m); if (p && a) a.textContent = p.atividade || I18N.t('trabalhando'); });
     } else if (U.vista === 'planner') renderConteudoPlanner();
   });
 }
@@ -2384,7 +2384,7 @@ function perguntaNova(e) {
   if (!E.perguntas.some((x) => x.id === q.id && x.projeto === q.projeto)) E.perguntas.unshift(q);
   const j = PJ[e.projeto];
   if (j && !j.perguntas.some((x) => x.id === q.id)) j.perguntas.push(e.pergunta);
-  notificar(`${nomeAgente(q.de)} precisa de você`, `${q.projetoNome}: ${q.texto.slice(0, 120)}`);
+  notificar(I18N.t('{nome} precisa de você', { nome: nomeAgente(q.de) }), `${q.projetoNome}: ${q.texto.slice(0, 120)}`);
   renderRail();
   if (e.projeto === U.proj && U.vista === 'chat') { renderLista(); renderMembros(); }
   if (U.inbox) modalInbox();
@@ -2440,9 +2440,9 @@ document.addEventListener('click', async (ev) => {
     ev.stopPropagation();
     const id = ac.dataset.cardComentar || ac.dataset.cardRemover;
     if (ac.dataset.cardComentar) { abrirIssue(id); U.abaAtiv = 'comentarios'; renderIssue(true); setTimeout(() => $('[data-comentario]')?.focus(), 80); return; }
-    if (await perguntar(`Cancelar ${id}? O card é excluído do quadro e a equipe não vai recriá-lo.`, 'Cancelar tarefa')) {
+    if (await perguntar(I18N.t('Cancelar {id}? O card é excluído do quadro e a equipe não vai recriá-lo.', { id }), I18N.t('Cancelar tarefa'))) {
       const r = await api('POST', P(`/cartao/${id}/arquivar`), {});
-      if (r._ok) aviso(`${id} cancelada e excluída.`);
+      if (r._ok) aviso(I18N.t('{id} cancelada e excluída.', { id }));
     }
     return;
   }
@@ -2489,41 +2489,41 @@ document.addEventListener('click', async (ev) => {
     case 'aceitar-decisao': {
       const r = await api('POST', P(`/decisoes/${d.decisao}/aceitar`), { revisao: Number(d.revisao), opcao: d.opcao });
       if (r._ok) return modalDecisoes();
-      return aviso(r.erro || 'Não foi possível registrar a escolha.');
+      return aviso(r.erro || I18N.t('Não foi possível registrar a escolha.'));
     }
     case 'salvar-decisao': {
       const anterior = U.decisaoEdit;
       const body = { id: anterior?.id || `decisao-${Date.now()}`, tipo: $('#dc-tipo').value, contexto: $('#dc-contexto').value, cards: $('#dc-cards').value.split(',').map(x=>x.trim()).filter(Boolean), opcoes: $$('[data-decisao-opcao]').map(el=>({ id: el.dataset.decisaoOpcao, texto: $('[data-dc-texto]',el).value, consequencia: $('[data-dc-consequencia]',el).value })), revisaoEsperada: anterior?.revisao, substituir: anterior?.status==='aceita' };
       const r = await api('POST', P('/decisoes'), body);
       if (r._ok) return modalDecisoes();
-      return aviso(r.erro || 'Não foi possível salvar a proposta.');
+      return aviso(r.erro || I18N.t('Não foi possível salvar a proposta.'));
     }
     case 'regras-equipe': {
       const r = await api('GET', P('/regras-equipe'));
-      return abrirModal(`<h2>Regras da equipe</h2><p>Aplicadas nas próximas chamadas. Suas instruções têm prioridade.</p>${(r.regras || []).map(x => `<div class="campo"><b>${esc(x.id)} · ${esc(x.escopo)} · ${x.ativa ? 'Ativa' : 'Revogada'}</b><p>${esc(x.texto)}</p><small>${esc(x.motivo)} · Origem: ${esc(x.origem)}</small>${x.ativa ? `<button class="btn-sec" data-acao="revogar-regra" data-regra="${esc(x.id)}">Revogar regra</button>` : ''}</div>`).join('') || '<p>A P.O. ainda não registrou regras.</p>'}<button class="btn-sec" data-acao="fechar">Fechar</button>`, 'perfil');
+      return abrirModal(`<h2>Regras da equipe</h2><p>Aplicadas nas próximas chamadas. Suas instruções têm prioridade.</p>${(r.regras || []).map(x => `<div class="campo"><b>${esc(x.id)} · ${esc(x.escopo)} · ${x.ativa ? I18N.t('Ativa') : I18N.t('Revogada')}</b><p>${esc(x.texto)}</p><small>${I18N.t('{motivo} · Origem: {origem}', { motivo: esc(x.motivo), origem: esc(x.origem) })}</small>${x.ativa ? `<button class="btn-sec" data-acao="revogar-regra" data-regra="${esc(x.id)}">Revogar regra</button>` : ''}</div>`).join('') || '<p>A P.O. ainda não registrou regras.</p>'}<button class="btn-sec" data-acao="fechar">Fechar</button>`, 'perfil');
     }
     case 'revogar-regra': {
       const r = await api('GET', P('/regras-equipe'));
       const regra = r.regras?.find(x => x.id === d.regra);
       if (!regra) return;
       const result = await api('PUT', P('/regras-equipe'), { ...regra, ativa: false, motivo: 'Revogada pela pessoa responsável pelo projeto.', origem: 'Painel de regras' });
-      if (result._ok) { fecharModal(); aviso('Regra revogada.'); } else aviso(result.erro);
+      if (result._ok) { fecharModal(); aviso(I18N.t('Regra revogada.')); } else aviso(result.erro);
       return;
     }
     case 'relatorio-creditos': {
       const r = await api('GET', '/api/uso');
-      return abrirModal(`<h2>Consumo e otimização</h2><pre class="creditos-relatorio">${esc(r.relatorio || 'Sem dados disponíveis.')}</pre><div class="acoes"><button class="btn-sec" data-acao="fechar">Fechar</button></div>`, 'perfil');
+      return abrirModal(`<h2>Consumo e otimização</h2><pre class="creditos-relatorio">${esc(r.relatorio || I18N.t('Sem dados disponíveis.'))}</pre><div class="acoes"><button class="btn-sec" data-acao="fechar">Fechar</button></div>`, 'perfil');
     }
     case 'enviar': return enviar();
     case 'motor-ativo': {
       const atual = J().motores?.[d.eng]?.ativo !== false;
       const r = await api('PUT', P('/motores'), { [d.eng]: { ativo: !atual } });
-      if (r._ok) { J().motores = r; renderMembros(); } else aviso(r.erro || 'Não consegui mudar.');
+      if (r._ok) { J().motores = r; renderMembros(); } else aviso(r.erro || I18N.t('Não consegui mudar.'));
       return;
     }
     case 'motor-teto': {
       const r = await api('PUT', P('/motores'), { [d.eng]: { teto: d.teto } });
-      if (r._ok) { J().motores = r; renderMembros(); } else aviso(r.erro || 'Não consegui mudar.');
+      if (r._ok) { J().motores = r; renderMembros(); } else aviso(r.erro || I18N.t('Não consegui mudar.'));
       return;
     }
     case 'novo-post': return modalNovoPost();
@@ -2536,41 +2536,41 @@ document.addEventListener('click', async (ev) => {
       else { U.postsAbertos.add(d.post); if (pt && !J().canais[pt.canal]) { const h = await (await fetch(P(`/canal/${pt.canal}`))).json().catch(() => []); J().canais[pt.canal] = Array.isArray(h) ? h : []; } }
       renderPostsSuave(); return;
     }
-    case 'grupo-encerrar': { if (await perguntar('Encerrar este grupo? A conversa fica guardada, mas ninguém mais responde nele.', 'Encerrar')) await api('POST', P(`/grupos/${d.grupo}/encerrar`), {}); return; }
-    case 'planning-cancelar': { if (await perguntar('Encerrar este planning? Nenhum card será criado.', 'Encerrar')) await api('POST', P(`/planning/${d.plan}/cancelar`), {}); return; }
-    case 'validar-ok': { const r = await api('POST', P(`/cartao/${U.issue}/validar`), { ok: true }); aviso(r._ok ? 'Validação registrada.' : (r.erro || 'Não consegui registrar.')); return; }
+    case 'grupo-encerrar': { if (await perguntar(I18N.t('Encerrar este grupo? A conversa fica guardada, mas ninguém mais responde nele.'), I18N.t('Encerrar'))) await api('POST', P(`/grupos/${d.grupo}/encerrar`), {}); return; }
+    case 'planning-cancelar': { if (await perguntar(I18N.t('Encerrar este planning? Nenhum card será criado.'), I18N.t('Encerrar'))) await api('POST', P(`/planning/${d.plan}/cancelar`), {}); return; }
+    case 'validar-ok': { const r = await api('POST', P(`/cartao/${U.issue}/validar`), { ok: true }); aviso(r._ok ? I18N.t('Validação registrada.') : (r.erro || I18N.t('Não consegui registrar.'))); return; }
     case 'validar-nok': {
-      const motivo = await perguntarTexto('O que não está certo?', 'Conte o que você encontrou e o que esperava', 'Reprovar');
+      const motivo = await perguntarTexto(I18N.t('O que não está certo?'), I18N.t('Conte o que você encontrou e o que esperava'), I18N.t('Reprovar'));
       if (!motivo) return;
       const r = await api('POST', P(`/cartao/${U.issue}/validar`), { ok: false, motivo });
-      aviso(r._ok ? 'Voltou para o time com o seu relato.' : (r.erro || 'Não consegui registrar.'));
+      aviso(r._ok ? I18N.t('Voltou para o time com o seu relato.') : (r.erro || I18N.t('Não consegui registrar.')));
       return;
     }
-    case 'parar-agente': await api('POST', P(`/agente/${d.ag}/parar`), {}); return aviso('Parando…', 1500);
-    case 'parar': await api('POST', P('/cancelar'), {}); return aviso('Parando…', 1500);
+    case 'parar-agente': await api('POST', P(`/agente/${d.ag}/parar`), {}); return aviso(I18N.t('Parando…'), 1500);
+    case 'parar': await api('POST', P('/cancelar'), {}); return aviso(I18N.t('Parando…'), 1500);
     case 'ajustes': return modalAjustes();
     case 'proj-config': U.ajuste = 'projeto'; return modalAjustes();
     case 'inbox': return modalInbox();
     case 'assessor-auto': {
       const ligar = E.config.ciclo?.assessorAuto === false;
       const r = await api('POST', '/api/config', { ciclo: { assessorAuto: ligar } });
-      if (r._ok) { E.config = { ...E.config, ...r }; renderMembros(); aviso(ligar ? 'Assessor por conta própria: ele age quando aparecer sinal novo.' : 'Assessor só faz o que você pedir.'); }
+      if (r._ok) { E.config = { ...E.config, ...r }; renderMembros(); aviso(ligar ? I18N.t('Assessor por conta própria: ele age quando aparecer sinal novo.') : I18N.t('Assessor só faz o que você pedir.')); }
       return;
     }
     case 'iniciativas': return modalIniciativas();
     case 'desde': return modalDesde();
-    case 'ini-decidir': { const r = await api('POST', P(`/iniciativas/${d.ini}/${d.dec}`), {}); if (!r._ok) aviso(r.erro || 'Não consegui.'); else modalIniciativas(); return; }
-    case 'ronda-assessor': { t.disabled = true; const r = await api('POST', P('/ronda'), {}); aviso(r._ok ? `Ronda iniciada: ${r.sinais} ${r.sinais === 1 ? 'sinal' : 'sinais'} nas fontes.` : (r.erro || r.motivo || 'Não consegui.')); setTimeout(() => { t.disabled = false; }, 3000); return; }
+    case 'ini-decidir': { const r = await api('POST', P(`/iniciativas/${d.ini}/${d.dec}`), {}); if (!r._ok) aviso(r.erro || I18N.t('Não consegui.')); else modalIniciativas(); return; }
+    case 'ronda-assessor': { t.disabled = true; const r = await api('POST', P('/ronda'), {}); aviso(r._ok ? (r.sinais === 1 ? I18N.t('Ronda iniciada: {n} sinal nas fontes.', { n: r.sinais }) : I18N.t('Ronda iniciada: {n} sinais nas fontes.', { n: r.sinais })) : (r.erro || r.motivo || I18N.t('Não consegui.'))); setTimeout(() => { t.disabled = false; }, 3000); return; }
     case 'piloto': {
       const ligar = !E.config.piloto.ativo;
-      if (ligar && E.config.modo === 'trabalhar' && !(await perguntar('O piloto automático vai deixar o time EDITAR arquivos do projeto enquanto você estiver fora (modo Executar). Ligar mesmo assim?', 'Ligar o piloto'))) return;
+      if (ligar && E.config.modo === 'trabalhar' && !(await perguntar(I18N.t('O piloto automático vai deixar o time EDITAR arquivos do projeto enquanto você estiver fora (modo Executar). Ligar mesmo assim?'), I18N.t('Ligar o piloto')))) return;
       const r = await api('POST', '/api/config', { piloto: { ativo: ligar } });
-      if (r._ok) { E.config = { ...E.config, ...r }; aplicarPiloto(); renderMembros(); aviso(ligar ? 'Piloto automático ligado. Pode deixar o app aberto.' : 'Piloto automático desligado.'); }
+      if (r._ok) { E.config = { ...E.config, ...r }; aplicarPiloto(); renderMembros(); aviso(ligar ? I18N.t('Piloto automático ligado. Pode deixar o app aberto.') : I18N.t('Piloto automático desligado.')); }
       return;
     }
     case 'demandas': return modalDemandas();
     case 'sincronizar-integ': { const r = await api('POST', P('/integracoes/sincronizar'), {}); if (r._ok) { J().integ = r; modalDemandas(); } return; }
-    case 'trazer-demanda': { const r = await api('POST', P('/jira/trazer'), { key: d.key }); aviso(r._ok ? `${d.key} entrou no Backlog como ${r.card.id}. Peça à P.O. para estimar e distribuir.` : (r.erro || 'Não consegui trazer.')); if (r._ok) modalDemandas(); return; }
+    case 'trazer-demanda': { const r = await api('POST', P('/jira/trazer'), { key: d.key }); aviso(r._ok ? I18N.t('{key} entrou no Backlog como {id}. Peça à P.O. para estimar e distribuir.', { key: d.key, id: r.card.id }) : (r.erro || I18N.t('Não consegui trazer.'))); if (r._ok) modalDemandas(); return; }
     case 'discutir-demanda': {
       const it = (J().integ?.cache?.jira?.itens || []).find((x) => x.key === d.key);
       const lead = agente(liderAtual());
@@ -2586,7 +2586,7 @@ document.addEventListener('click', async (ev) => {
         ? { alvo, jira: { url: $('#ig-jira-url').value, tipo: $('#ig-jira-tipo').value, usuario: $('#ig-jira-usuario').value, jql: $('#ig-jira-jql').value, token: $('#ig-jira-token').value } }
         : { alvo, agenda: { fonte: $('#ig-agenda-fonte').value } };
       const r = await api('POST', P('/integracoes/testar'), corpo);
-      saida.innerHTML = r.ok ? `<div class="teste ok">Funcionou. ${alvo === 'jira' ? `${r.total} demandas na consulta.` : `${r.total} eventos no calendário.`}${(r.amostra || []).length ? `<br>${r.amostra.map(esc).join('<br>')}` : ''}</div>` : `<div class="teste falha">${esc(r.erro || 'Falhou.')}</div>`;
+      saida.innerHTML = r.ok ? `<div class="teste ok">${alvo === 'jira' ? I18N.t('Funcionou. {n} demandas na consulta.', { n: r.total }) : I18N.t('Funcionou. {n} eventos no calendário.', { n: r.total })}${(r.amostra || []).length ? `<br>${r.amostra.map(esc).join('<br>')}` : ''}</div>` : `<div class="teste falha">${esc(r.erro || I18N.t('Falhou.'))}</div>`;
       return;
     }
     case 'anexar': return campoAnexo().click();
@@ -2597,8 +2597,8 @@ document.addEventListener('click', async (ev) => {
     case 'perfil': return modalPerfil(d.ag);
     case 'salvar-nome': {
       const r = await api('PUT', P(`/agente/${d.ag}/perfil`), { nome: $('#pf-nome').value });
-      if (!r._ok) { $('#pf-dica').className = 'dica-v erro'; $('#pf-dica').textContent = r.erro || 'Não salvou.'; return; }
-      $('#pf-dica').className = 'dica-v ok'; $('#pf-dica').textContent = `Pronto. Agora é @${primeiroNome($('#pf-nome').value)}.`;
+      if (!r._ok) { $('#pf-dica').className = 'dica-v erro'; $('#pf-dica').textContent = r.erro || I18N.t('Não salvou.'); return; }
+      $('#pf-dica').className = 'dica-v ok'; $('#pf-dica').textContent = I18N.t('Pronto. Agora é @{nome}.', { nome: primeiroNome($('#pf-nome').value) });
       return;
     }
     case 'tirar-foto': { const r = await api('DELETE', P(`/agente/${d.ag}/foto`)); if (r._ok) setTimeout(() => modalPerfil(d.ag, { manter: true }), 150); return; }
@@ -2609,28 +2609,28 @@ document.addEventListener('click', async (ev) => {
     case 'conv-salvar': {
       const v = (n) => { const x = $(`[name=${n}]:checked`)?.value; return x === 'sim' ? true : x === 'nao' ? false : null; };
       const r = await api('PUT', P(`/agente/${d.ag}/conversa`), { personalidade: $('#cv-pers').value, emojis: v('cv-emojis'), gifs: v('cv-gifs'), zoeira: v('cv-zoeira') });
-      if (!r._ok) return aviso(r.erro || 'Não salvou.');
-      return aviso('Jeito de conversar salvo. Vale a partir da próxima mensagem.');
+      if (!r._ok) return aviso(r.erro || I18N.t('Não salvou.'));
+      return aviso(I18N.t('Jeito de conversar salvo. Vale a partir da próxima mensagem.'));
     }
     case 'conv-persona': case 'conv-sortear': {
       const l = window.PERSONAS || []; const p = d.persona ? l.find((x) => x.id === d.persona) : l[Math.floor(Math.random() * l.length)];
       if (!p) return;
       const atual = $('#cv-pers').value.trim();
-      if (atual && !l.some((x) => x.texto === atual) && !(await perguntar('O campo tem uma personalidade que você escreveu. Trocar pelo temperamento? A que está lá fica guardada em "Versões anteriores" assim que você salvar.', 'Trocar'))) return;
+      if (atual && !l.some((x) => x.texto === atual) && !(await perguntar(I18N.t('O campo tem uma personalidade que você escreveu. Trocar pelo temperamento? A que está lá fica guardada em "Versões anteriores" assim que você salvar.'), I18N.t('Trocar')))) return;
       $('#cv-pers').value = p.texto;
       const z = $('[name=cv-zoeira][value=sim]'); if (z) z.checked = true;
       $$('.persona-chip').forEach((b) => b.classList.toggle('on', b.dataset.persona === p.id));
-      return aviso(`${p.nome}: clique em Salvar para valer. Os colegas já podem ser zoados.`);
+      return aviso(I18N.t('{nome}: clique em Salvar para valer. Os colegas já podem ser zoados.', { nome: p.nome }));
     }
-    case 'conv-versao': { const h = (agente(U.ped.id)?.conversa?.historico || [])[Number(d.i)]; if (h) { $('#cv-pers').value = h.texto; aviso('Versão anterior no campo. Clique em Salvar para voltar a ela.'); } return; }
+    case 'conv-versao': { const h = (agente(U.ped.id)?.conversa?.historico || [])[Number(d.i)]; if (h) { $('#cv-pers').value = h.texto; aviso(I18N.t('Versão anterior no campo. Clique em Salvar para voltar a ela.')); } return; }
     case 'sortear-time': {
-      if (!(await perguntar('Sortear um temperamento para cada agente que ainda não escreveu a própria personalidade? Quem já tem personalidade fica como está.', 'Sortear'))) return;
+      if (!(await perguntar(I18N.t('Sortear um temperamento para cada agente que ainda não escreveu a própria personalidade? Quem já tem personalidade fica como está.'), I18N.t('Sortear')))) return;
       const l = [...(window.PERSONAS || [])].sort(() => Math.random() - 0.5); let n = 0;
       for (const a of rosterAtual().filter((x) => !x.sistema && x.id !== 'creditos' && x.id !== 'mcp' && !x.conversa?.personalidade)) {
         const p = l[n % l.length]; n++;
         await api('PUT', P(`/agente/${a.id}/conversa`), { personalidade: `${a.nome}: ${p.texto}`, zoeira: true });
       }
-      return aviso(n ? `${n} agentes com personalidade nova. Eles já podem se zoar.` : 'Todos já têm personalidade própria.');
+      return aviso(n ? I18N.t('{n} agentes com personalidade nova. Eles já podem se zoar.', { n }) : I18N.t('Todos já têm personalidade própria.'));
     }
     case 'conv-padrao': { const el = $('#cv-pers'); if (el) el.value = el.dataset.padrao || ''; return; }
     case 'ped-opc': return pedEscolher(d.campo, d.valor);
@@ -2646,12 +2646,12 @@ document.addEventListener('click', async (ev) => {
       const tipo = $('#mcp-tipo').value, alvo = $('#mcp-alvo').value.trim(), extra = $('#mcp-extra').value.trim();
       const [comando, ...args] = alvo.split(/\s+/);
       const r = await api('POST', '/api/mcp', tipo === 'stdio' ? { nome: $('#mcp-nome').value, tipo, comando, args: args.join(' '), env: extra } : { nome: $('#mcp-nome').value, tipo, url: alvo, headers: extra });
-      if (!r._ok) return aviso(r.erro || 'Não adicionou.'); return modalAjustes();
+      if (!r._ok) return aviso(r.erro || I18N.t('Não adicionou.')); return modalAjustes();
     }
-    case 'mcp-remover': { const r = await api('DELETE', `/api/mcp/${encodeURIComponent(d.mcp)}`); if (!r._ok) return aviso(r.erro || 'Não removeu.'); return modalAjustes(); }
+    case 'mcp-remover': { const r = await api('DELETE', `/api/mcp/${encodeURIComponent(d.mcp)}`); if (!r._ok) return aviso(r.erro || I18N.t('Não removeu.')); return modalAjustes(); }
     case 'cx-conectar': {
       const r = await api('POST', `/api/conexoes/${d.app}/conectar`);
-      if (!r._ok) { await modalAjustes(); if (r.precisaConfig) { const det = $('.cx-app'); if (det) det.open = true; } return aviso(r.erro || 'Não abriu a conexão.', 9000); }
+      if (!r._ok) { await modalAjustes(); if (r.precisaConfig) { const det = $('.cx-app'); if (det) det.open = true; } return aviso(r.erro || I18N.t('Não abriu a conexão.'), 9000); }
       if (r.url) window.open(r.url, '_blank');
       await modalAjustes(); return acompanharConexoes();
     }
@@ -2660,106 +2660,106 @@ document.addEventListener('click', async (ev) => {
       await api('POST', '/api/conexoes/teams/configurar', { clientId: $('#app-teams').value, tenant: $('#app-tenant').value });
       await api('POST', '/api/conexoes/github/configurar', { clientId: $('#app-github').value });
       if ($('#app-gif').value.trim() || $('#app-gif-prov').value) await api('PUT', '/api/gifs', { provedor: $('#app-gif-prov').value, chave: $('#app-gif').value.trim() || undefined });
-      aviso('Configuração da TI salva.'); return modalAjustes();
+      aviso(I18N.t('Configuração da TI salva.')); return modalAjustes();
     }
-    case 'cx-verificar': { aviso('Testando a conexão…', 1500); const r = await api('POST', `/api/conexoes/${d.app}/verificar`, {}); const st = r.status || {}; aviso(st.conectado ? `${CX_NOME[d.app]} respondendo: ${st.detalhe || 'ok'}` : `${CX_NOME[d.app]}: ${st.detalhe || 'não respondeu'}`, 7000); return modalAjustes(); }
+    case 'cx-verificar': { aviso(I18N.t('Testando a conexão…'), 1500); const r = await api('POST', `/api/conexoes/${d.app}/verificar`, {}); const st = r.status || {}; aviso(st.conectado ? I18N.t('{app} respondendo: {detalhe}', { app: CX_NOME[d.app], detalhe: st.detalhe || 'ok' }) : `${CX_NOME[d.app]}: ${st.detalhe || I18N.t('não respondeu')}`, 7000); return modalAjustes(); }
     case 'cx-cancelar': await api('POST', `/api/conexoes/${d.app}/cancelar`); return modalAjustes();
     case 'cx-github-token': {
-      const token = $('#ig-github-token').value.trim(); if (!token) return aviso('Cole o token primeiro.');
-      aviso('Conferindo o token com o GitHub…', 2000);
+      const token = $('#ig-github-token').value.trim(); if (!token) return aviso(I18N.t('Cole o token primeiro.'));
+      aviso(I18N.t('Conferindo o token com o GitHub…'), 2000);
       const r = await api('POST', '/api/conexoes/github/configurar', { token });
-      if (!r._ok) return aviso(r.erro || 'O GitHub não aceitou o token.', 8000);
-      const st = r.status?.github || {}; aviso(st.conectado ? `GitHub conectado como ${st.conta || 'você'}.` : `GitHub: ${st.detalhe || 'não respondeu'}`, 7000); return modalAjustes();
+      if (!r._ok) return aviso(r.erro || I18N.t('O GitHub não aceitou o token.'), 8000);
+      const st = r.status?.github || {}; aviso(st.conectado ? I18N.t('GitHub conectado como {conta}.', { conta: st.conta || I18N.t('você') }) : `GitHub: ${st.detalhe || I18N.t('não respondeu')}`, 7000); return modalAjustes();
     }
-    case 'cx-desconectar': { if (!(await perguntar(`Desconectar o ${CX_NOME[d.app]} deste computador? A liderança deixa de usar essa conta como contexto.`, 'Desconectar'))) return; await api('POST', `/api/conexoes/${d.app}/desconectar`); return modalAjustes(); }
-    case 'conta-conectar': { const r = await api('POST', `/api/contas/${d.eng}/conectar`); if (!r._ok) return aviso(r.erro || 'Não abriu o login.'); await modalAjustes(); return acompanharContas(); }
+    case 'cx-desconectar': { if (!(await perguntar(I18N.t('Desconectar o {app} deste computador? A liderança deixa de usar essa conta como contexto.', { app: CX_NOME[d.app] }), I18N.t('Desconectar')))) return; await api('POST', `/api/conexoes/${d.app}/desconectar`); return modalAjustes(); }
+    case 'conta-conectar': { const r = await api('POST', `/api/contas/${d.eng}/conectar`); if (!r._ok) return aviso(r.erro || I18N.t('Não abriu o login.')); await modalAjustes(); return acompanharContas(); }
     case 'conta-cancelar': await api('POST', `/api/contas/${d.eng}/cancelar`); return modalAjustes();
-    case 'conta-desconectar': { if (!(await perguntar(`Desconectar a conta do ${d.eng === 'claude' ? 'Claude' : 'Codex'} deste computador? Os agentes param de usar esse modelo até você conectar de novo.`, 'Desconectar'))) return; const r = await api('POST', `/api/contas/${d.eng}/desconectar`); if (!r._ok) aviso(r.erro || 'Não desconectou.'); return modalAjustes(); }
+    case 'conta-desconectar': { if (!(await perguntar(I18N.t('Desconectar a conta do {motor} deste computador? Os agentes param de usar esse modelo até você conectar de novo.', { motor: d.eng === 'claude' ? 'Claude' : 'Codex' }), I18N.t('Desconectar')))) return; const r = await api('POST', `/api/contas/${d.eng}/desconectar`); if (!r._ok) aviso(r.erro || I18N.t('Não desconectou.')); return modalAjustes(); }
     case 'conta-verificar': await fetch('/api/contas?forcar=1'); return modalAjustes();
     case 'sel-abrir': return abrirSeletor(d.sel, ev.target.closest('[data-sel]'));
     case 'emoji': return abrirEmoji(ev.target.closest('[data-acao=emoji]'));
     case 'ver-arquivadas': U.verArq = !U.verArq; return renderLista();
-    case 'ctx-arquivar': { fecharCtx(); const r = await api('POST', P('/conversa/arquivar'), { canal: d.cv, arquivar: d.arq !== '0' }); if (!r._ok) aviso(r.erro || 'Não arquivou.'); else if (d.arq !== '0' && U.canal === d.cv) irPara('chat', 'equipe'); return; }
-    case 'ctx-limpar': fecharCtx(); if (await perguntar(`Limpar o histórico de ${nomeCanal(d.cv)}? As mensagens somem para todos.`, 'Limpar')) await api('POST', P('/limpar'), { canal: d.cv }); return;
-    case 'ctx-excluir': { fecharCtx(); if (!(await perguntar(`Excluir ${nomeCanal(d.cv)}? A conversa e o histórico somem de vez.`, 'Excluir'))) return; const r = await api('POST', P('/conversa/excluir'), { canal: d.cv }); if (!r._ok) aviso(r.erro || 'Não excluiu.'); return; }
+    case 'ctx-arquivar': { fecharCtx(); const r = await api('POST', P('/conversa/arquivar'), { canal: d.cv, arquivar: d.arq !== '0' }); if (!r._ok) aviso(r.erro || I18N.t('Não arquivou.')); else if (d.arq !== '0' && U.canal === d.cv) irPara('chat', 'equipe'); return; }
+    case 'ctx-limpar': fecharCtx(); if (await perguntar(I18N.t('Limpar o histórico de {canal}? As mensagens somem para todos.', { canal: nomeCanal(d.cv) }), I18N.t('Limpar'))) await api('POST', P('/limpar'), { canal: d.cv }); return;
+    case 'ctx-excluir': { fecharCtx(); if (!(await perguntar(I18N.t('Excluir {canal}? A conversa e o histórico somem de vez.', { canal: nomeCanal(d.cv) }), I18N.t('Excluir')))) return; const r = await api('POST', P('/conversa/excluir'), { canal: d.cv }); if (!r._ok) aviso(r.erro || I18N.t('Não excluiu.')); return; }
     case 'ctx-membros': fecharCtx(); return modalMembros(d.cv);
-    case 'membros-ok': { const ids = $$('#modal [data-mb]:checked').map((x) => x.dataset.mb); const r = await api('POST', P('/conversa/membros'), { canal: d.cv, membros: ids }); if (!r._ok) return aviso(r.erro || 'Não adicionou.'); fecharModal(); return irPara('chat', r.canal); }
+    case 'membros-ok': { const ids = $$('#modal [data-mb]:checked').map((x) => x.dataset.mb); const r = await api('POST', P('/conversa/membros'), { canal: d.cv, membros: ids }); if (!r._ok) return aviso(r.erro || I18N.t('Não adicionou.')); fecharModal(); return irPara('chat', r.canal); }
     case 'recorte-cancelar': return $('#recorte')?.remove();
     case 'recorte-aplicar': return aplicarRecorte();
-    case 'salvar-vigia': { const r = await api('PUT', P('/vigia'), { ativo: $('#vg-ativo').checked, buscarRemoto: $('#vg-remoto').checked, intervaloMin: Number($('#vg-int').value), repos: $('#vg-repos').value.split('\n').map((x) => x.trim()).filter(Boolean) }); aviso(r._ok ? 'Vigia salvo.' : (r.erro || 'Não salvou.')); return; }
-    case 'vigia-agora': { aviso('Olhando os repositórios…', 2000); const r = await api('POST', P('/vigia/agora'), {}); aviso(!r._ok ? 'Não consegui olhar.' : r.primeira ? 'Base registrada. Aviso quando mudar.' : r.mudou ? 'Houve mudanças, veja no #equipe.' : (r.motivo || 'Nada mudou.')); return; }
-    case 'faxina': { t.disabled = true; const r = await api('POST', P('/faxina'), {}); aviso(r._ok ? (r.removidos.length ? `Faxina feita: ${r.removidos.length} ${r.removidos.length === 1 ? 'item' : 'itens'}, ${r.liberadoTexto} liberados.` : 'Nada para tirar agora.') : (r.erro || 'Não consegui fazer a faxina.')); carregarArquivos(); return; }
-    case 'salvar-extras': { const r = await api('PUT', P('/extras'), { lista: $('#ex-texto').value.split('\n').map((x) => x.trim()).filter(Boolean) }); if (r._ok) { await recarregarApp(); aviso('Pastas extras salvas.'); } else aviso(r.erro || 'Não salvou.'); return; }
-    case 'relatorio': { fecharModal(); const r = await api('POST', P('/relatorio'), {}); if (!r._ok) aviso('Não consegui montar o relatório.'); else irPara('chat', 'equipe'); return; }
+    case 'salvar-vigia': { const r = await api('PUT', P('/vigia'), { ativo: $('#vg-ativo').checked, buscarRemoto: $('#vg-remoto').checked, intervaloMin: Number($('#vg-int').value), repos: $('#vg-repos').value.split('\n').map((x) => x.trim()).filter(Boolean) }); aviso(r._ok ? I18N.t('Vigia salvo.') : (r.erro || I18N.t('Não salvou.'))); return; }
+    case 'vigia-agora': { aviso(I18N.t('Olhando os repositórios…'), 2000); const r = await api('POST', P('/vigia/agora'), {}); aviso(!r._ok ? I18N.t('Não consegui olhar.') : r.primeira ? I18N.t('Base registrada. Aviso quando mudar.') : r.mudou ? I18N.t('Houve mudanças, veja no #equipe.') : (r.motivo || I18N.t('Nada mudou.'))); return; }
+    case 'faxina': { t.disabled = true; const r = await api('POST', P('/faxina'), {}); aviso(r._ok ? (r.removidos.length ? (r.removidos.length === 1 ? I18N.t('Faxina feita: {n} item, {tam} liberados.', { n: r.removidos.length, tam: r.liberadoTexto }) : I18N.t('Faxina feita: {n} itens, {tam} liberados.', { n: r.removidos.length, tam: r.liberadoTexto })) : I18N.t('Nada para tirar agora.')) : (r.erro || I18N.t('Não consegui fazer a faxina.'))); carregarArquivos(); return; }
+    case 'salvar-extras': { const r = await api('PUT', P('/extras'), { lista: $('#ex-texto').value.split('\n').map((x) => x.trim()).filter(Boolean) }); if (r._ok) { await recarregarApp(); aviso(I18N.t('Pastas extras salvas.')); } else aviso(r.erro || I18N.t('Não salvou.')); return; }
+    case 'relatorio': { fecharModal(); const r = await api('POST', P('/relatorio'), {}); if (!r._ok) aviso(I18N.t('Não consegui montar o relatório.')); else irPara('chat', 'equipe'); return; }
     case 'teamwork': {
       const r=await fetch(P('/teamwork')).then(x=>x.json()).catch(()=>null);
-      if(!r)return aviso('Não consegui consultar as execuções.');
+      if(!r)return aviso(I18N.t('Não consegui consultar as execuções.'));
       J().teamwork=r;
       const labels={draft:'Em preparação',ready:'Pronta',queued:'Na fila',running:'Executando',submitted:'Entregue, aguardando validação',verifying:'Em validação',accepted:'Aceita',integrated:'Integrada',completed:'Concluída',failed:'Falhou',blocked:'Bloqueada',cancelled:'Cancelada',waiting_dependency:'Aguardando dependência',waiting_approval:'Aguardando aprovação',waiting_clarification:'Aguardando informação'};
-      abrirModal(`<h2>Execuções e entregas</h2><p class="mudo">${r.metrics.validatedDeliveries} entregas validadas de ${r.metrics.tasks} tarefas. Uma resposta entregue ainda precisa passar pelas verificações aplicáveis.</p><div class="teamwork-list">${r.tasks.slice().reverse().map(t=>`<article class="teamwork-task"><strong>${esc(t.objective.slice(0,180))}</strong><p>${esc(nomeAgente(t.assigneeAgentId))} · ${esc(t.gates.review?.outcome==='failed'?'Entrega reprovada':labels[t.status]||t.status)}</p>${t.failure?`<p>${esc(t.failure.class)}: ${esc(t.failure.repair||'')}</p>`:''}${(t.result?.artifacts||[]).map(id=>`<a href="${P('/teamwork/artifacts/'+encodeURIComponent(id))}" download>Baixar entrega</a>`).join(' ')}${['submitted','verifying'].includes(t.status)?`<p><button class="btn-sec" data-acao="teamwork-review" data-task="${esc(t.taskId)}">Registrar parecer</button></p>`:''}</article>`).join('')||'<p>Ainda não há tarefas registradas.</p>'}</div><div class="acoes"><button class="btn-sec" data-acao="fechar">Fechar</button></div>`,'perfil');
+      abrirModal(`<h2>Execuções e entregas</h2><p class="mudo">${I18N.t('{v} entregas validadas de {n} tarefas. Uma resposta entregue ainda precisa passar pelas verificações aplicáveis.', { v: r.metrics.validatedDeliveries, n: r.metrics.tasks })}</p><div class="teamwork-list">${r.tasks.slice().reverse().map(t=>`<article class="teamwork-task"><strong>${esc(t.objective.slice(0,180))}</strong><p>${esc(nomeAgente(t.assigneeAgentId))} · ${esc(I18N.t(t.gates.review?.outcome==='failed'?'Entrega reprovada':labels[t.status]||t.status))}</p>${t.failure?`<p>${esc(t.failure.class)}: ${esc(t.failure.repair||'')}</p>`:''}${(t.result?.artifacts||[]).map(id=>`<a href="${P('/teamwork/artifacts/'+encodeURIComponent(id))}" download>Baixar entrega</a>`).join(' ')}${['submitted','verifying'].includes(t.status)?`<p><button class="btn-sec" data-acao="teamwork-review" data-task="${esc(t.taskId)}">Registrar parecer</button></p>`:''}</article>`).join('')||'<p>Ainda não há tarefas registradas.</p>'}</div><div class="acoes"><button class="btn-sec" data-acao="fechar">Fechar</button></div>`,'perfil');
       return;
     }
     case 'teamwork-review': {
-      const task=J().teamwork?.tasks.find(x=>x.taskId===d.task);if(!task)return aviso('Atualize a lista de execuções.');
+      const task=J().teamwork?.tasks.find(x=>x.taskId===d.task);if(!task)return aviso(I18N.t('Atualize a lista de execuções.'));
       abrirModal(`<h2>Revisar entrega</h2><p>${esc(task.objective)}</p><p>Confira os arquivos e os critérios antes de registrar o parecer. Gates técnicos e de integração continuam obrigatórios.</p>${(task.result?.artifacts||[]).map(id=>`<a href="${P('/teamwork/artifacts/'+encodeURIComponent(id))}" download>Baixar entrega</a>`).join(' ')}<label class="rot" for="tw-review-reason">Evidências e motivo do parecer</label><textarea id="tw-review-reason" class="in" rows="4"></textarea><div class="acoes"><button class="btn-sec" data-acao="fechar">Cancelar</button><button class="btn-sec" data-acao="teamwork-verdict" data-task="${esc(task.taskId)}" data-version="${task.version}" data-approved="false">Reprovar entrega</button><button class="btn-primario" data-acao="teamwork-verdict" data-task="${esc(task.taskId)}" data-version="${task.version}" data-approved="true">Aprovar entrega</button></div>`,'perfil');return;
     }
     case 'teamwork-verdict': {
-      const reason=$('#tw-review-reason').value.trim();if(!reason)return aviso('Registre as evidências e o motivo.');
+      const reason=$('#tw-review-reason').value.trim();if(!reason)return aviso(I18N.t('Registre as evidências e o motivo.'));
       const r=await api('POST',P(`/teamwork/tasks/${encodeURIComponent(d.task)}/review`),{expectedVersion:Number(d.version),approved:d.approved==='true',reason});
-      if(!r._ok)return aviso(r.erro||'O parecer não foi registrado.');
+      if(!r._ok)return aviso(r.erro||I18N.t('O parecer não foi registrado.'));
       fecharModal();$('[data-acao="teamwork"]')?.click();return;
     }
     case 'metricas': {
       const m = await (await fetch(P('/metricas?dias=30'))).json().catch(() => null);
-      if (!m) { aviso('Não consegui calcular as métricas.'); return; }
+      if (!m) { aviso(I18N.t('Não consegui calcular as métricas.')); return; }
       const linha = (k, v, sub = '') => `<div class="met"><span class="k">${k}</span><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
-      abrirModal(`<h2>Métricas dos últimos ${m.dias} dias</h2><p class="mudo">Calculadas pelo app a partir do quadro, das chamadas e da ficha de fatos. Nenhum modelo envolvido.</p>
+      abrirModal(`<h2>${I18N.t('Métricas dos últimos {n} dias', { n: m.dias })}</h2><p class="mudo">Calculadas pelo app a partir do quadro, das chamadas e da ficha de fatos. Nenhum modelo envolvido.</p>
         <div class="met-grade">
           ${linha('Cards concluídos', m.cardsConcluidos)}
-          ${linha('Chamadas de modelo', m.chamadas, `custo normalizado ${m.custoTotal}`)}
-          ${linha('Lead time', `${m.leadTimeHoras.mediana} h`, `p90 ${m.leadTimeHoras.p90} h; parado ${m.tempoParadoHoras.mediana} h`)}
-          ${linha('Por ponto entregue', m.custoPorPonto ?? '-', `${m.chamadasPorPonto ?? '-'} chamadas por ponto`)}
-          ${linha('Retrabalho', `${m.retrabalho.taxa}%`, `média ${m.retrabalho.media} por card`)}
-          ${linha('Evidência falsa', `${m.evidenciaFalsa.taxa}%`, `${m.evidenciaFalsa.recusados} relatos recusados, ${m.evidenciaFalsa.medidos} fatos medidos`)}
-          ${linha('Decisões revertidas', `${m.decisoes.taxa}%`, `${m.decisoes.revertidas} de ${m.decisoes.porOutros} tomadas no seu lugar`)}
+          ${linha('Chamadas de modelo', m.chamadas, I18N.t('custo normalizado {v}', { v: m.custoTotal }))}
+          ${linha('Lead time', `${m.leadTimeHoras.mediana} h`, I18N.t('p90 {p90} h; parado {parado} h', { p90: m.leadTimeHoras.p90, parado: m.tempoParadoHoras.mediana }))}
+          ${linha('Por ponto entregue', m.custoPorPonto ?? '-', I18N.t('{n} chamadas por ponto', { n: m.chamadasPorPonto ?? '-' }))}
+          ${linha('Retrabalho', `${m.retrabalho.taxa}%`, I18N.t('média {n} por card', { n: m.retrabalho.media }))}
+          ${linha('Evidência falsa', `${m.evidenciaFalsa.taxa}%`, I18N.t('{recusados} relatos recusados, {medidos} fatos medidos', { recusados: m.evidenciaFalsa.recusados, medidos: m.evidenciaFalsa.medidos }))}
+          ${linha('Decisões revertidas', `${m.decisoes.taxa}%`, I18N.t('{revertidas} de {total} tomadas no seu lugar', { revertidas: m.decisoes.revertidas, total: m.decisoes.porOutros }))}
         </div>
         ${m.porAgente.length ? `<h4 style="margin-top:14px">Chamadas por agente</h4>${m.porAgente.map((a) => `<div class="met-ag">${av(a.agente, 'p', { dot: false })}<span>${esc(nomeAgente(a.agente))}</span><i style="width:${a.pct}%"></i><b>${a.chamadas} (${a.pct}%)</b></div>`).join('')}` : ''}
         <div class="acoes"><button class="btn-sec" data-acao="fechar">Fechar</button></div>`, 'perfil');
       return;
     }
     case 'ler-tudo': await marcarLidas('todas'); return modalCentral();
-    case 'pedir-status': { const r = await api('POST', P(`/cartao/${U.issue}/pedir-status`), {}); aviso(r._ok ? `${(r.chamados || []).map(nomeAgente).join(' e ') || 'O time'} vai responder no card.` : (r.erro || 'Não consegui perguntar.')); return; }
+    case 'pedir-status': { const r = await api('POST', P(`/cartao/${U.issue}/pedir-status`), {}); aviso(r._ok ? I18N.t('{quem} vai responder no card.', { quem: (r.chamados || []).map(nomeAgente).join(' e ') || I18N.t('O time') }) : (r.erro || I18N.t('Não consegui perguntar.'))); return; }
     case 'regra-add': return adicionarRegra(d.escopo);
     case 'regra-del': {
       const atual = (await (await fetch(P(`${rotaEscopo(d.escopo)}/regras`))).json().catch(() => ({}))).itens || [];
       const r = await api('PUT', P(`${rotaEscopo(d.escopo)}/regras`), { itens: atual.filter((_, i) => i !== Number(d.i)) });
-      if (!r._ok) return aviso(r.erro || 'Não removeu.'); return redesenharRegras(d.escopo);
+      if (!r._ok) return aviso(r.erro || I18N.t('Não removeu.')); return redesenharRegras(d.escopo);
     }
-    case 'ref-del': { const r = await api('DELETE', P(`${rotaEscopo(d.escopo)}/referencias/${encodeURIComponent(d.arquivo)}`)); if (!r._ok) return aviso(r.erro || 'Não tirou o documento.'); return redesenharRegras(d.escopo); }
-    case 'add-contexto': { const t = $('#cx-texto').value.trim(); if (!t) return; const r = await api('POST', P(`/agente/${d.escopo}/contexto`), { texto: t }); if (r._ok) { $('#cx-texto').value = ''; aviso('Contexto anotado na memória do agente.'); } else aviso(r.erro || 'Não salvou.'); return; }
+    case 'ref-del': { const r = await api('DELETE', P(`${rotaEscopo(d.escopo)}/referencias/${encodeURIComponent(d.arquivo)}`)); if (!r._ok) return aviso(r.erro || I18N.t('Não tirou o documento.')); return redesenharRegras(d.escopo); }
+    case 'add-contexto': { const t = $('#cx-texto').value.trim(); if (!t) return; const r = await api('POST', P(`/agente/${d.escopo}/contexto`), { texto: t }); if (r._ok) { $('#cx-texto').value = ''; aviso(I18N.t('Contexto anotado na memória do agente.')); } else aviso(r.erro || I18N.t('Não salvou.')); return; }
     case 'nota-agente': fecharModal(); U.memSel = `agentes/${d.ag}/contexto.md`; return irPara('memoria');
     case 'novo-projeto': return modalNovoProjeto();
     case 'abrir-avaliacao': { const e = equipeAvaliacao(); if (e) { location.hash = `${e.cid}/registro`; return; } return modalNovoProjeto({ template: 'avaliacao-agentes', nome: 'Avaliação de agentes' }); }
     case 'nova-equipe': return modalNovaEquipe();
-    case 'eq-renomear': { const n = await perguntarTexto('Novo nome da equipe', d.nome || '', 'Renomear'); if (!n) return; const r = await api('PUT', P(`/equipes/${d.eq}`), { nome: n }); if (!r._ok) return aviso(r.erro || 'Não renomeou.'); await recarregarApp(); return modalAjustes(); }
-    case 'eq-tirar': { if (!(await perguntar(`Tirar a equipe ${d.nome} do projeto? As conversas, o planner e a memória dela continuam guardados na pasta do projeto; adicionar de novo com o mesmo nome traz tudo de volta.`, 'Tirar equipe'))) return; const r = await api('DELETE', P(`/equipes/${d.eq}`)); if (!r._ok) return aviso(r.erro || 'Não tirou.'); if (U.proj.endsWith(`__${d.eq}`)) U.proj = baseDe(U.proj); await recarregarApp(); fecharModal(); location.hash = `${U.proj}/chat/equipe`; return rotear(); }
+    case 'eq-renomear': { const n = await perguntarTexto(I18N.t('Novo nome da equipe'), d.nome || '', I18N.t('Renomear')); if (!n) return; const r = await api('PUT', P(`/equipes/${d.eq}`), { nome: n }); if (!r._ok) return aviso(r.erro || I18N.t('Não renomeou.')); await recarregarApp(); return modalAjustes(); }
+    case 'eq-tirar': { if (!(await perguntar(I18N.t('Tirar a equipe {nome} do projeto? As conversas, o planner e a memória dela continuam guardados na pasta do projeto; adicionar de novo com o mesmo nome traz tudo de volta.', { nome: d.nome }), I18N.t('Tirar equipe')))) return; const r = await api('DELETE', P(`/equipes/${d.eq}`)); if (!r._ok) return aviso(r.erro || I18N.t('Não tirou.')); if (U.proj.endsWith(`__${d.eq}`)) U.proj = baseDe(U.proj); await recarregarApp(); fecharModal(); location.hash = `${U.proj}/chat/equipe`; return rotear(); }
     case 'criar': return modalCriar(d.col || 'backlog');
     case 'fechar': return fecharModal();
     case 'membros': U.membros = !U.membros; $('#app').classList.toggle('sem-membros', !U.membros); return $('#centro .cabeca [data-acao=membros]')?.classList.toggle('on', U.membros);
     case 'todos-concluidos': U.todosConcluidos = true; return renderConteudoPlanner();
     case 'so-bloq': U.soBloq = !U.soBloq; return renderPlanner();
     case 'limpar-filtros': U.filtro.clear(); U.soBloq = false; U.busca = ''; return renderPlanner();
-    case 'limpar': if (await perguntar(`Limpar a conversa de ${nomeCanal(U.canal)}?`, 'Limpar')) await api('POST', P('/limpar'), { canal: U.canal }); return;
-    case 'delegar-pergunta': { const pid = d.proj || U.proj; const r = await api('POST', P(`/perguntas/${d.q}/delegar`, pid), {}); if (!r._ok) return aviso(r.erro || 'Não consegui repassar.'); E.perguntas = E.perguntas.filter((x) => !(x.id === d.q && x.projeto === pid)); renderRail(); if (U.inbox) modalInbox(); return; }
+    case 'limpar': if (await perguntar(I18N.t('Limpar a conversa de {canal}?', { canal: nomeCanal(U.canal) }), I18N.t('Limpar'))) await api('POST', P('/limpar'), { canal: U.canal }); return;
+    case 'delegar-pergunta': { const pid = d.proj || U.proj; const r = await api('POST', P(`/perguntas/${d.q}/delegar`, pid), {}); if (!r._ok) return aviso(r.erro || I18N.t('Não consegui repassar.')); E.perguntas = E.perguntas.filter((x) => !(x.id === d.q && x.projeto === pid)); renderRail(); if (U.inbox) modalInbox(); return; }
     case 'responder-livre': { if (d.q) (U.respPergunta ||= {})[`${U.proj}/${U.canal}`] = d.q; const ta = $('#texto'); if (ta) { ta.value = `@${MENCOES[d.de] || MENCOES[liderAtual()] || 'po'} `; ta.focus(); autoAltura(ta); } return; }
-    case 'ronda': await api('POST', P('/ronda'), { engine: E.config.engine, modo: E.config.modo }); return aviso('O P.O. vai dar uma olhada no quadro.');
-    case 'briefing': { const r = await api('POST', P('/briefing'), { engine: E.config.engine, modo: E.config.modo }); return aviso(r._ok ? 'A assessoria está fazendo a leitura do dia; a proposta chega na DM dela.' : (r.erro || 'Não consegui pedir a leitura do dia.')); }
-    case 'curar': await api('POST', P('/curar'), { engine: E.config.engine, modo: E.config.modo }); return aviso('O Curador vai organizar a memória. Acompanhe no #equipe.');
-    case 'conhecer': fecharModal(); await api('POST', P('/conhecer'), { engine: E.config.engine, modo: E.config.modo }); irPara('chat', 'equipe'); return aviso('O P.O. vai conhecer o projeto.');
-    case 'renomear-proj': { const n = $('#p-nome').value.trim(); if (n && (await api('POST', P('/renomear'), { nome: n }))._ok) { await recarregarApp(); renderTudo(); aviso('Renomeado.'); } return; }
+    case 'ronda': await api('POST', P('/ronda'), { engine: E.config.engine, modo: E.config.modo }); return aviso(I18N.t('O P.O. vai dar uma olhada no quadro.'));
+    case 'briefing': { const r = await api('POST', P('/briefing'), { engine: E.config.engine, modo: E.config.modo }); return aviso(r._ok ? I18N.t('A assessoria está fazendo a leitura do dia; a proposta chega na DM dela.') : (r.erro || I18N.t('Não consegui pedir a leitura do dia.'))); }
+    case 'curar': await api('POST', P('/curar'), { engine: E.config.engine, modo: E.config.modo }); return aviso(I18N.t('O Curador vai organizar a memória. Acompanhe no #equipe.'));
+    case 'conhecer': fecharModal(); await api('POST', P('/conhecer'), { engine: E.config.engine, modo: E.config.modo }); irPara('chat', 'equipe'); return aviso(I18N.t('O P.O. vai conhecer o projeto.'));
+    case 'renomear-proj': { const n = $('#p-nome').value.trim(); if (n && (await api('POST', P('/renomear'), { nome: n }))._ok) { await recarregarApp(); renderTudo(); aviso(I18N.t('Renomeado.')); } return; }
     case 'remover-proj': {
       const p = projetoAtual();
-      if (p && await perguntar(`Remover "${p.nome}" do app? A pasta alvo e a pasta de registros (memória, quadro e conversas) continuam no disco. Se você adicionar a mesma pasta alvo de novo, o histórico volta.`, 'Remover')) {
+      if (p && await perguntar(I18N.t('Remover "{nome}" do app? A pasta alvo e a pasta de registros (memória, quadro e conversas) continuam no disco. Se você adicionar a mesma pasta alvo de novo, o histórico volta.', { nome: p.nome }), I18N.t('Remover'))) {
         await api('POST', P('/remover'), {}); delete PJ[p.id]; U.proj = null; fecharModal(); await recarregarApp(); location.hash = '';
         return rotear();
       }
@@ -2789,23 +2789,23 @@ document.addEventListener('click', async (ev) => {
     case 'ag-novo': return modalEvento(null);
     case 'ag-ver': { const ev = AG.eventos.find((x) => x.id === d.ev); return ev ? modalEvento(ev) : null; }
     case 'ag-salvar': return salvarEvento(d.ev || null);
-    case 'ag-cancelar-ev': { const r = await api('PUT', P(`/agenda/${d.ev}`), { cancelado: true }); if (!r._ok) return aviso(r.erro || 'Não cancelou.'); fecharModal(); aviso('Evento cancelado.'); return carregarAgenda(); }
-    case 'ag-excluir': { if (!(await perguntar('Excluir este evento da agenda?', 'Excluir'))) return; const r = await api('DELETE', P(`/agenda/${d.ev}`)); if (!r._ok) return aviso(r.erro || 'Não excluiu.'); fecharModal(); return carregarAgenda(); }
+    case 'ag-cancelar-ev': { const r = await api('PUT', P(`/agenda/${d.ev}`), { cancelado: true }); if (!r._ok) return aviso(r.erro || I18N.t('Não cancelou.')); fecharModal(); aviso(I18N.t('Evento cancelado.')); return carregarAgenda(); }
+    case 'ag-excluir': { if (!(await perguntar(I18N.t('Excluir este evento da agenda?'), I18N.t('Excluir')))) return; const r = await api('DELETE', P(`/agenda/${d.ev}`)); if (!r._ok) return aviso(r.erro || I18N.t('Não excluiu.')); fecharModal(); return carregarAgenda(); }
     case 'voz-previa': return ouvirPrevia();
     case 'chamada-encerrar': return fecharChamada();
     case 'ponto-restaurar': return restaurarPonto(d.ponto);
     case 'ponto-excluir': {
-      if (!(await perguntar('Excluir este ponto de salvamento?', 'Excluir'))) return;
+      if (!(await perguntar(I18N.t('Excluir este ponto de salvamento?'), I18N.t('Excluir')))) return;
       const r = await api('DELETE', P(`/pontos/${d.ponto}`));
-      if (!r._ok) return aviso(r.erro || 'Não consegui excluir.');
+      if (!r._ok) return aviso(r.erro || I18N.t('Não consegui excluir.'));
       return carregarPontos();
     }
     case 'abrir-pasta': return window.studioApp?.abrirPasta(d.caminho || projetoAtual()?.raiz);
     case 'abrir-memoria': return window.studioApp?.abrirPasta(`${projetoAtual()?.pastaProjeto}\\memoria`);
     case 'abrir-pasta-projeto': return window.studioApp?.abrirPasta(projetoAtual()?.raiz);
-    case 'bloquear': { const motivo = await perguntarTexto('Motivo do bloqueio', 'O que está impedindo', 'Bloquear'); const id = U.issue; if (motivo) await api('POST', P(`/cartao/${id}/bloquear`), { motivo }); return abrirIssue(id); }
+    case 'bloquear': { const motivo = await perguntarTexto(I18N.t('Motivo do bloqueio'), I18N.t('O que está impedindo'), I18N.t('Bloquear')); const id = U.issue; if (motivo) await api('POST', P(`/cartao/${id}/bloquear`), { motivo }); return abrirIssue(id); }
     case 'desbloquear': await api('POST', P(`/cartao/${U.issue}/desbloquear`), {}); return;
-    case 'arquivar': { const id = U.issue; if (await perguntar(`Remover ${id}? O histórico fica guardado na pasta do projeto.`, 'Remover')) { fecharModal(); await api('POST', P(`/cartao/${id}/arquivar`), {}); } else abrirIssue(id); return; }
+    case 'arquivar': { const id = U.issue; if (await perguntar(I18N.t('Remover {id}? O histórico fica guardado na pasta do projeto.', { id }), I18N.t('Remover'))) { fecharModal(); await api('POST', P(`/cartao/${id}/arquivar`), {}); } else abrirIssue(id); return; }
     default:
   }
 });
@@ -2815,22 +2815,22 @@ document.addEventListener('change', async (ev) => {
   if (t.matches('[data-validacoes]')) return patchCard({ validacoesObrigatorias: t.value.split('\n').map(x=>x.trim()).filter(Boolean) });
   if (t.matches('[data-dependencias]')) return patchCard({ dependeDe: t.value.split(',').map(x=>x.trim()).filter(Boolean) });
   if (t.id === 'anexo-input' && t.files.length) { const fs = [...t.files]; t.value = ''; return anexarArquivos(fs); }
-  if (t.matches('[data-mcp-ativo]')) { const r = await api('PUT', `/api/mcp/${encodeURIComponent(t.dataset.mcpAtivo)}`, { ativo: t.checked }); if (!r._ok) aviso(r.erro || 'Não salvou.'); t.closest('.mcp-i')?.classList.toggle('on', t.checked); return; }
+  if (t.matches('[data-mcp-ativo]')) { const r = await api('PUT', `/api/mcp/${encodeURIComponent(t.dataset.mcpAtivo)}`, { ativo: t.checked }); if (!r._ok) aviso(r.erro || I18N.t('Não salvou.')); t.closest('.mcp-i')?.classList.toggle('on', t.checked); return; }
   if (t.matches('[data-mcp-desc]')) { await api('PUT', `/api/mcp/${encodeURIComponent(t.dataset.mcpDesc)}`, { descricao: t.value }); return; }
   if ((t.matches('[data-importar-regras]') || t.matches('[data-importar-ref]')) && t.files.length) {
     const regras = t.matches('[data-importar-regras]'); const escopo = t.dataset.importarRegras || t.dataset.importarRef;
     const arquivos = [...t.files]; t.value = '';
     let novas = 0, repetidas = 0; const falhas = [];
     for (const f of arquivos) {
-      if (f.size > 1_000_000) { falhas.push(`${f.name}: grande demais`); continue; }
+      if (f.size > 1_000_000) { falhas.push(`${f.name}: ${I18N.t('grande demais')}`); continue; }
       const texto = await f.text();
       const r = regras ? await api('POST', P(`${rotaEscopo(escopo)}/regras/importar`), { texto }) : await api('POST', P(`${rotaEscopo(escopo)}/referencias`), { nome: f.name, texto });
-      if (!r._ok) { falhas.push(`${f.name}: ${r.erro || 'não importou'}`); continue; }
+      if (!r._ok) { falhas.push(`${f.name}: ${r.erro || I18N.t('não importou')}`); continue; }
       if (regras) { novas += r.adicionadas.length; repetidas += r.repetidas; }
     }
     await redesenharRegras(escopo);
-    if (regras) aviso(`${novas} ${novas === 1 ? 'regra nova' : 'regras novas'}${repetidas ? `, ${repetidas} já existiam` : ''}.${falhas.length ? ' ' + falhas.join('; ') : ''}`);
-    else aviso(falhas.length ? falhas.join('; ') : `${arquivos.length === 1 ? 'Documento importado' : `${arquivos.length} documentos importados`}. Vale a partir da próxima chamada.`);
+    if (regras) aviso(`${novas === 1 ? I18N.t('{n} regra nova', { n: novas }) : I18N.t('{n} regras novas', { n: novas })}${repetidas ? `, ${I18N.t('{n} já existiam', { n: repetidas })}` : ''}.${falhas.length ? ' ' + falhas.join('; ') : ''}`);
+    else aviso(falhas.length ? falhas.join('; ') : (arquivos.length === 1 ? I18N.t('Documento importado. Vale a partir da próxima chamada.') : I18N.t('{n} documentos importados. Vale a partir da próxima chamada.', { n: arquivos.length })));
     return;
   }
   if (t.matches('[data-recorte]') && t.files[0]) { const f = t.files[0]; t.value = ''; return abrirRecorte(U.ped.id, t.dataset.recorte, f); }
@@ -2838,7 +2838,7 @@ document.addEventListener('change', async (ev) => {
     try {
       const dataUrl = await prepararFoto(t.files[0]);
       const r = await api('POST', P(`/agente/${t.dataset.ag}/foto`), { dataUrl });
-      if (r._ok) modalPerfil(t.dataset.ag); else aviso(r.erro || 'Não salvou a foto.');
+      if (r._ok) modalPerfil(t.dataset.ag); else aviso(r.erro || I18N.t('Não salvou a foto.'));
     } catch (e) { aviso(e.message); }
     return;
   }
@@ -2874,7 +2874,7 @@ document.addEventListener('mousedown', (ev) => { if (!ev.target.closest('#ctx-me
 function modalMembros(canal) {
   const ja = canal.startsWith('grp-') ? ((J().grupos || []).find((g) => g.canal === canal)?.membros || []) : [canal.slice(3)];
   const livres = rosterAtual().filter((a) => !ja.includes(a.id) && !a.sistema && a.id !== 'creditos');
-  abrirModal(`<h2>Adicionar membros</h2><p>${canal.startsWith('dm:') ? `Abre um grupo com ${esc(nomeAgente(canal.slice(3)))} e quem você escolher.` : `Entram no grupo ${esc(nomeCanal(canal))}.`}</p>
+  abrirModal(`<h2>Adicionar membros</h2><p>${canal.startsWith('dm:') ? I18N.t('Abre um grupo com {nome} e quem você escolher.', { nome: esc(nomeAgente(canal.slice(3))) }) : I18N.t('Entram no grupo {grupo}.', { grupo: esc(nomeCanal(canal)) })}</p>
     <div class="membros-pick">${livres.map((a) => `<label class="mb-op">${av(a.id, 'p', { dot: false })}<span>${esc(a.nome)}<small>${esc(a.cargo)}</small></span><input type="checkbox" data-mb="${a.id}"></label>`).join('')}</div>
     <div class="acoes"><button class="btn-sec" data-acao="fechar">Cancelar</button><button class="btn-primario" data-acao="membros-ok" data-cv="${esc(canal)}">Adicionar</button></div>`, 'perfil');
 }
@@ -2901,7 +2901,7 @@ function chTile(id) {
 function chamadaHtml() {
   const lider = CH.lider || 'po';
   return `<div class="ch-palco ${CH.tela ? 'com-tela' : ''}">
-    <div class="ch-cabecalho"><span class="ch-tit">${ic('fone')}<span>Chamada com ${nomeHtml(lider)}</span></span><span class="ch-mini">${av('voce', 'p', { dot: false })}${av(lider, 'p', { dot: false })}</span><span class="ch-estado" data-estado="${esc(CH.estado)}">${esc(ESTADO_CH[CH.estado] || '')}</span>
+    <div class="ch-cabecalho"><span class="ch-tit">${ic('fone')}<span>${I18N.t('Chamada com {nome}', { nome: nomeHtml(lider) })}</span></span><span class="ch-mini">${av('voce', 'p', { dot: false })}${av(lider, 'p', { dot: false })}</span><span class="ch-estado" data-estado="${esc(CH.estado)}">${esc(ESTADO_CH[CH.estado] || '')}</span>
       <span class="ch-layout"><button class="ch-ico ${CH.layout === 'compacto' ? 'on' : ''}" data-acao="chamada-layout" data-layout="compacto" title="${CH.layout === 'compacto' ? 'Abrir a chamada' : 'Encolher a chamada'}">${ic(CH.layout === 'compacto' ? 'maximizar' : 'minimizar')}</button></span></div>
     <div class="ch-corpo">
       <div class="ch-grade" id="ch-grade">
@@ -2943,8 +2943,8 @@ function chNivel(id, v) {
 function chLayout() {
   const el = $('#chamada'); if (!el) return;
   el.className = `dock ${CH.layout}`;
-  const bl = $('#chamada [data-acao="chamada-layout"]'); if (bl) { bl.classList.toggle('on', CH.layout === 'compacto'); bl.innerHTML = ic(CH.layout === 'compacto' ? 'maximizar' : 'minimizar'); bl.title = CH.layout === 'compacto' ? 'Abrir a chamada' : 'Encolher a chamada'; }
-  const bc = $('#chamada [data-acao="chamada-chat"]'); if (bc) { bc.classList.toggle('on', CH.layout !== 'cheio'); bc.title = CH.layout === 'cheio' ? 'Mostrar o chat' : 'Esconder o chat'; }
+  const bl = $('#chamada [data-acao="chamada-layout"]'); if (bl) { bl.classList.toggle('on', CH.layout === 'compacto'); bl.innerHTML = ic(CH.layout === 'compacto' ? 'maximizar' : 'minimizar'); bl.title = CH.layout === 'compacto' ? I18N.t('Abrir a chamada') : I18N.t('Encolher a chamada'); }
+  const bc = $('#chamada [data-acao="chamada-chat"]'); if (bc) { bc.classList.toggle('on', CH.layout !== 'cheio'); bc.title = CH.layout === 'cheio' ? I18N.t('Mostrar o chat') : I18N.t('Esconder o chat'); }
   const m = $('#mensagens'); if (m) m.scrollTop = m.scrollHeight;
 }
 /** Medidor do áudio do agente: o som que toca passa por um analisador e vira o nível da borda dele. */
@@ -2999,8 +2999,8 @@ function agendarAudio(url, { ack = false } = {}) {
   });
 }
 function chBotoes() {   // os mesmos botões existem no palco e no painel lateral
-  for (const b of $$('[data-acao="chamada-mudo"]')) { b.innerHTML = ic(CH.mudo ? 'micOff' : 'mic'); b.classList.toggle('off', CH.mudo); b.title = CH.mudo ? 'Ligar microfone' : 'Silenciar'; }
-  for (const b of $$('[data-acao="chamada-tela"]')) { b.classList.toggle('on', !!CH.tela); b.title = CH.tela ? 'Parar de compartilhar' : 'Compartilhar tela'; }
+  for (const b of $$('[data-acao="chamada-mudo"]')) { b.innerHTML = ic(CH.mudo ? 'micOff' : 'mic'); b.classList.toggle('off', CH.mudo); b.title = CH.mudo ? I18N.t('Ligar microfone') : I18N.t('Silenciar'); }
+  for (const b of $$('[data-acao="chamada-tela"]')) { b.classList.toggle('on', !!CH.tela); b.title = CH.tela ? I18N.t('Parar de compartilhar') : I18N.t('Compartilhar tela'); }
   $('#chamada [data-tile="voce"]')?.classList.toggle('mudo', CH.mudo);
 }
 /** Escolha de tela ou janela dentro da própria chamada (no app; no navegador o Chrome tem o seletor dele). */
@@ -3016,7 +3016,7 @@ function escolherFonteTela(fontes) {
 async function compartilharTela() {
   if (!CH.aberta) return;
   if (CH.tela) return pararTela();
-  if (!navigator.mediaDevices?.getDisplayMedia) return aviso('Este navegador não compartilha tela.');
+  if (!navigator.mediaDevices?.getDisplayMedia) return aviso(I18N.t('Este navegador não compartilha tela.'));
   try {
     if (window.studioApp?.fontesTela) {
       const fontes = await window.studioApp.fontesTela();
@@ -3034,7 +3034,7 @@ async function compartilharTela() {
     CH.assinatura = null; CH.ultimoQuadro = 0;
     clearInterval(CH.vigia); CH.vigia = setInterval(vigiarTela, 2500);
   } catch (e) {
-    if (e.name !== 'NotAllowedError') aviso(`Não consegui compartilhar a tela: ${e.message}`, 7000);
+    if (e.name !== 'NotAllowedError') aviso(I18N.t('Não consegui compartilhar a tela: {erro}', { erro: e.message }), 7000);
   }
 }
 function pararTela() {
@@ -3116,36 +3116,36 @@ async function abrirMicrofone(deviceId) {
     const rotulo = padrao.getAudioTracks()[0]?.label || '';
     const fisico = micVirtual(rotulo) ? devs.find((d) => !micVirtual(d.label)) : null;
     if (!fisico) return padrao;
-    try { const s = await tentar(fisico.deviceId); padrao.getTracks().forEach((t) => t.stop()); aviso(`O microfone padrão do Windows é virtual (${rotulo.replace(/^Default - /, '')}); usando ${fisico.label}.`, 7000); return s; } catch { return padrao; }
+    try { const s = await tentar(fisico.deviceId); padrao.getTracks().forEach((t) => t.stop()); aviso(I18N.t('O microfone padrão do Windows é virtual ({virtual}); usando {fisico}.', { virtual: rotulo.replace(/^Default - /, ''), fisico: fisico.label }), 7000); return s; } catch { return padrao; }
   }
   // o padrão não abriu: tenta cada microfone, físicos primeiro
   for (const d of devs) { try { const s = await tentar(d.deviceId); salvarDisp({ mic: d.deviceId }); return s; } catch (e) { erros.push(`${d.label || d.deviceId.slice(0, 6)}: ${e.message}`); } }
-  throw new Error(`nenhum microfone abriu. ${[...new Set(erros)].slice(0, 3).join(' | ')}`);
+  throw new Error(I18N.t('nenhum microfone abriu. {erros}', { erros: [...new Set(erros)].slice(0, 3).join(' | ') }));
 }
 /* ---- Ajustes > Modelos: a voz do agente (timbre, ritmo, expressividade), prévia e amostra própria ---- */
 const vozEscolhida = () => ({ nome: $('#voz-nome')?.value, ritmo: Number($('#voz-ritmo')?.value) / 100, expressividade: Number($('#voz-exp')?.value) / 100 });
 function montarVozAjustes(vz) {
   const sel = $('#voz-nome'); if (!sel) return;
-  sel.onchange = () => { const x = (vz.vozes || []).find((o) => o.id === sel.value); const or = $('#voz-origem'); if (or && x) or.firstChild.textContent = `Timbre e sotaque: ${x.origem}. `; };
+  sel.onchange = () => { const x = (vz.vozes || []).find((o) => o.id === sel.value); const or = $('#voz-origem'); if (or && x) or.firstChild.textContent = `${I18N.t('Timbre e sotaque: {origem}.', { origem: x.origem })} `; };
   for (const [id, rot] of [['#voz-ritmo', '#voz-ritmo-v'], ['#voz-exp', '#voz-exp-v']]) { const el = $(id); if (el) el.oninput = () => { $(rot).textContent = el.value; }; }
   const fi = $('#voz-amostra');
   if (fi) fi.onchange = async () => {
     const f = fi.files?.[0]; if (!f) return;
-    const st = $('#voz-previa-st'); st.textContent = 'Enviando a amostra…';
+    const st = $('#voz-previa-st'); st.textContent = I18N.t('Enviando a amostra…');
     const r = await fetch('/api/voz/amostra', { method: 'PUT', body: f, headers: { 'x-studio-voz': '1', 'content-type': 'audio/wav' } }).then((x) => x.json()).catch(() => ({}));
-    if (!r.ok) { st.textContent = r.erro || 'Não consegui usar essa amostra.'; return; }
+    if (!r.ok) { st.textContent = r.erro || I18N.t('Não consegui usar essa amostra.'); return; }
     await api('PUT', '/api/voz', { voz: { ...vozEscolhida(), nome: 'propria' } });
-    aviso('Amostra guardada. A voz passa a usar o seu timbre.'); return modalAjustes();
+    aviso(I18N.t('Amostra guardada. A voz passa a usar o seu timbre.')); return modalAjustes();
   };
 }
 async function ouvirPrevia() {
-  const st = $('#voz-previa-st'); if (st) st.textContent = 'Gerando a prévia (na primeira vez carrega o modelo)…';
+  const st = $('#voz-previa-st'); if (st) st.textContent = I18N.t('Gerando a prévia (na primeira vez carrega o modelo)…');
   const r = await api('POST', '/api/voz/previa', vozEscolhida());
-  if (!r._ok) { if (st) st.textContent = r.erro || 'Não consegui gerar a prévia.'; return; }
-  if (st) st.textContent = `Pronto em ${((r.ms || 0) / 1000).toFixed(1)} s.`;
+  if (!r._ok) { if (st) st.textContent = r.erro || I18N.t('Não consegui gerar a prévia.'); return; }
+  if (st) st.textContent = I18N.t('Pronto em {s} s.', { s: ((r.ms || 0) / 1000).toFixed(1) });
   const d = lerDisp(); const a = new Audio(`/api/voz/previa/audio?t=${Date.now()}`); a.volume = d.volume;
   if (d.saida && a.setSinkId) await a.setSinkId(d.saida).catch(() => {});
-  a.play().catch(() => { if (st) st.textContent = 'O navegador bloqueou o áudio; clique de novo.'; });
+  a.play().catch(() => { if (st) st.textContent = I18N.t('O navegador bloqueou o áudio; clique de novo.'); });
 }
 
 /* ---- Ajustes > Dispositivos: microfone, alto-falante, volume e sensibilidade da chamada. Fica neste computador (localStorage). ---- */
@@ -3188,18 +3188,18 @@ let dispTeste = null;   // { stream, ctx } do medidor ao vivo
 function pararTesteMic() { if (!dispTeste) return; try { dispTeste.stream.getTracks().forEach((t) => t.stop()); } catch { /* ok */ } try { dispTeste.ctx.close(); } catch { /* ok */ } dispTeste = null; }
 async function montarDispositivos() {
   const selMic = $('#disp-mic'), selSaida = $('#disp-saida'); if (!selMic) return;
-  if (!navigator.mediaDevices?.enumerateDevices) { $('#disp-status').textContent = 'Este navegador não lista dispositivos de áudio.'; return; }
+  if (!navigator.mediaDevices?.enumerateDevices) { $('#disp-status').textContent = I18N.t('Este navegador não lista dispositivos de áudio.'); return; }
   let devs = await navigator.mediaDevices.enumerateDevices().catch(() => []);
   // sem permissão concedida ainda, o navegador esconde os nomes: pede uma vez, só para listar, e solta o microfone na hora
   if (devs.some((x) => x.kind === 'audioinput') && devs.filter((x) => x.kind === 'audioinput').every((x) => !x.label)) { try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach((t) => t.stop()); devs = await navigator.mediaDevices.enumerateDevices(); } catch { /* fica sem nomes */ } }
   const d = lerDisp();
-  const op = (x, atual, virt) => `<option value="${esc(x.deviceId)}" ${x.deviceId === atual ? 'selected' : ''}>${esc(x.label || 'Dispositivo')}${virt && micVirtual(x.label) ? ' (virtual)' : ''}</option>`;
+  const op = (x, atual, virt) => `<option value="${esc(x.deviceId)}" ${x.deviceId === atual ? 'selected' : ''}>${esc(x.label || I18N.t('Dispositivo'))}${virt && micVirtual(x.label) ? ' (virtual)' : ''}</option>`;
   selMic.insertAdjacentHTML('beforeend', devs.filter((x) => x.kind === 'audioinput' && x.deviceId && !['default', 'communications'].includes(x.deviceId)).map((x) => op(x, d.mic, true)).join(''));
   selSaida.insertAdjacentHTML('beforeend', devs.filter((x) => x.kind === 'audiooutput' && x.deviceId && !['default', 'communications'].includes(x.deviceId)).map((x) => op(x, d.saida, false)).join(''));
   const liga = (id, chave, escala, rot) => { const el = $(id); if (!el) return; el.oninput = () => { const v = Number(el.value) / escala; salvarDisp({ [chave]: v }); $(rot).textContent = pct(v); }; };
   liga('#disp-ganho', 'ganho', 100, '#disp-ganho-v'); liga('#disp-sens', 'sensibilidade', 100, '#disp-sens-v'); liga('#disp-vol', 'volume', 100, '#disp-vol-v');
   selSaida.onchange = () => salvarDisp({ saida: selSaida.value });
-  selMic.onchange = async () => { salvarDisp({ mic: selMic.value }); await testarMic(); if (CH.aberta) { try { const novo = await abrirMicrofone(selMic.value); CH.stream?.getTracks().forEach((t) => t.stop()); CH.stream = novo; CH.fonte?.disconnect(); CH.fonte = CH.ctx.createMediaStreamSource(novo); CH.fonte.connect(CH.ganho || CH.proc); CH.ruido = 0.01; } catch (e) { aviso(`Esse microfone não abriu: ${e.message}`, 6000); } } };
+  selMic.onchange = async () => { salvarDisp({ mic: selMic.value }); await testarMic(); if (CH.aberta) { try { const novo = await abrirMicrofone(selMic.value); CH.stream?.getTracks().forEach((t) => t.stop()); CH.stream = novo; CH.fonte?.disconnect(); CH.fonte = CH.ctx.createMediaStreamSource(novo); CH.fonte.connect(CH.ganho || CH.proc); CH.ruido = 0.01; } catch (e) { aviso(I18N.t('Esse microfone não abriu: {erro}', { erro: e.message }), 6000); } } };
   await testarMic();
 }
 /** Medidor ao vivo: o mesmo caminho da chamada (ganho e piso de ruído), para o que você vê aqui ser o que a chamada ouve. */
@@ -3207,9 +3207,9 @@ async function testarMic() {
   pararTesteMic();
   const status = $('#disp-status'); if (!status) return;
   let stream;
-  try { stream = await abrirMicrofone($('#disp-mic')?.value || ''); } catch (e) { status.textContent = e.name === 'NotReadableError' ? 'O microfone existe, mas este app foi impedido de usá-lo (Windows ou antivírus).' : `Não abriu: ${e.message}`; return; }
+  try { stream = await abrirMicrofone($('#disp-mic')?.value || ''); } catch (e) { status.textContent = e.name === 'NotReadableError' ? I18N.t('O microfone existe, mas este app foi impedido de usá-lo (Windows ou antivírus).') : I18N.t('Não abriu: {erro}', { erro: e.message }); return; }
   const rotulo = stream.getAudioTracks()[0]?.label || '';
-  const sel = $('#disp-mic'); if (sel && !sel.value) { const o = [...sel.options].find((x) => x.textContent.startsWith(rotulo.replace(/^Default - /, ''))); status.textContent = `Usando ${rotulo.replace(/^Default - /, '') || 'o microfone padrão'}${o ? '' : ''}.`; } else status.textContent = `Usando ${rotulo}.`;
+  const sel = $('#disp-mic'); if (sel && !sel.value) { const o = [...sel.options].find((x) => x.textContent.startsWith(rotulo.replace(/^Default - /, ''))); status.textContent = I18N.t('Usando {mic}.', { mic: (rotulo.replace(/^Default - /, '') || I18N.t('o microfone padrão')) + (o ? '' : '') }); } else status.textContent = I18N.t('Usando {mic}.', { mic: rotulo });
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const fonte = ctx.createMediaStreamSource(stream); const ganho = ctx.createGain(); const an = ctx.createAnalyser(); an.fftSize = 1024;
   fonte.connect(ganho); ganho.connect(an);
@@ -3228,7 +3228,7 @@ async function testarMic() {
     $('#disp-nivel').style.width = pct(suave); $('#disp-limiar').style.left = pct(esc01(limiar));
     $('#disp-nivel').classList.toggle('fala', rms > limiar);
     if (rms > limiar) falouAlguma = true;
-    status.textContent = rms > limiar ? 'Captando a sua voz.' : falouAlguma ? `Em silêncio. Usando ${rotulo.replace(/^Default - /, '')}.` : `Usando ${rotulo.replace(/^Default - /, '')}. Fale alguma coisa para testar.`;
+    status.textContent = rms > limiar ? I18N.t('Captando a sua voz.') : falouAlguma ? I18N.t('Em silêncio. Usando {mic}.', { mic: rotulo.replace(/^Default - /, '') }) : I18N.t('Usando {mic}. Fale alguma coisa para testar.', { mic: rotulo.replace(/^Default - /, '') });
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -3248,7 +3248,7 @@ async function montarSeletorMic() {
   const box = $('#ch-mic'); if (!box) return;
   const devs = (await navigator.mediaDevices.enumerateDevices().catch(() => [])).filter((d) => d.kind === 'audioinput' && d.deviceId && !['default', 'communications'].includes(d.deviceId));
   const atual = CH.stream?.getAudioTracks()[0]?.getSettings().deviceId || '';
-  box.innerHTML = `<select class="in" data-mic-sel title="Microfone">${devs.map((d) => `<option value="${esc(d.deviceId)}" ${d.deviceId === atual ? 'selected' : ''}>${esc(d.label || 'Microfone')}</option>`).join('')}</select>`;
+  box.innerHTML = `<select class="in" data-mic-sel title="Microfone">${devs.map((d) => `<option value="${esc(d.deviceId)}" ${d.deviceId === atual ? 'selected' : ''}>${esc(d.label || I18N.t('Microfone'))}</option>`).join('')}</select>`;
   box.querySelector('select').onchange = async (ev) => {
     const id = ev.target.value;
     try {
@@ -3257,25 +3257,25 @@ async function montarSeletorMic() {
       CH.stream = novo; salvarDisp({ mic: id });
       if (CH.ctx && CH.proc) { CH.fonte?.disconnect(); CH.fonte = CH.ctx.createMediaStreamSource(novo); CH.fonte.connect(CH.ganho || CH.proc); }
       CH.ruido = 0.01;
-    } catch (e) { aviso(`Esse microfone não abriu: ${e.message}`, 6000); }
+    } catch (e) { aviso(I18N.t('Esse microfone não abriu: {erro}', { erro: e.message }), 6000); }
   };
 }
 async function abrirChamada() {
   if (CH.aberta) return;
-  if (!navigator.mediaDevices?.getUserMedia) return aviso('Este navegador não dá acesso ao microfone.');
+  if (!navigator.mediaDevices?.getUserMedia) return aviso(I18N.t('Este navegador não dá acesso ao microfone.'));
   const lider = liderAtual(); const a = agente(lider);
-  Object.assign(CH, { aberta: true, lider, nome: a?.nome || 'Liderança', canal: `dm:${lider}`, mudo: false, estado: 'preparando', buf: [], amostras: 0, silencio: 0, voz: 0, falando: false, tela: null, lado: false, transcricao: [] });
+  Object.assign(CH, { aberta: true, lider, nome: a?.nome || I18N.t('Liderança'), canal: `dm:${lider}`, mudo: false, estado: 'preparando', buf: [], amostras: 0, silencio: 0, voz: 0, falando: false, tela: null, lado: false, transcricao: [] });
   // a chamada acontece na DM da liderança: entra nela (o palco é desenhado junto com o chat) e o painel lateral aparece
   if (U.vista !== 'chat' || U.canal !== CH.canal) await irPara('chat', CH.canal); else { renderChat(); renderLista(); }
   try { CH.stream = await abrirMicrofone(); } catch (e) {
     fecharChamada();
     // NotReadableError com microfones listados: o Windows ou um antivírus (Kaspersky, por exemplo) está barrando este app, não é falta de aparelho
-    if (e.name === 'NotReadableError') return aviso('O microfone existe, mas este app foi impedido de usá-lo. Confira em Configurações do Windows > Privacidade > Microfone se apps da área de trabalho têm acesso; se houver um antivírus corporativo (Kaspersky), peça à TI para permitir o NECTAR em "Acesso a dispositivos de gravação de som".', 14000);
-    return aviso(`Sem microfone: ${e.message}`, 9000);
+    if (e.name === 'NotReadableError') return aviso(I18N.t('O microfone existe, mas este app foi impedido de usá-lo. Confira em Configurações do Windows > Privacidade > Microfone se apps da área de trabalho têm acesso; se houver um antivírus corporativo (Kaspersky), peça à TI para permitir o NECTAR em "Acesso a dispositivos de gravação de som".'), 14000);
+    return aviso(I18N.t('Sem microfone: {erro}', { erro: e.message }), 9000);
   }
   montarSeletorMic();
   const r = await api('POST', P('/voz/iniciar'), { engine: E.config.engine, modo: 'conversar' });
-  if (!r._ok) { const msg = r.erro || 'Não consegui iniciar a chamada.'; fecharChamada(); return aviso(msg, 10000); }
+  if (!r._ok) { const msg = r.erro || I18N.t('Não consegui iniciar a chamada.'); fecharChamada(); return aviso(msg, 10000); }
   CH.ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
   CH.fonte = CH.ctx.createMediaStreamSource(CH.stream);
   CH.ganho = CH.ctx.createGain(); CH.ganho.gain.value = lerDisp().ganho;   // volume do microfone (Ajustes > Dispositivos)
@@ -3320,7 +3320,7 @@ async function enviarFala() {
     if (CH.tela && Date.now() - CH.ultimoQuadro > 4000) { const rel = await quadroDaTela(); if (rel) { CH.ultimoQuadro = Date.now(); await api('POST', P('/voz/tela'), { rel }); } }   // o agente vê a tela como ela está na hora em que você fala
     const r = await fetch(P('/voz/falar'), { method: 'POST', headers: { 'Content-Type': 'audio/wav', 'x-studio-voz': '1' }, body: wavDe(tudo, CH.ctx.sampleRate) });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) chEstado('ouvindo', j.erro || 'Não entendi.');
+    if (!r.ok) chEstado('ouvindo', j.erro || I18N.t('Não entendi.'));
     else if (j.texto) chLinha('voce', j.texto);
   } catch (e) { chEstado('ouvindo', e.message); }
   CH.enviando--;
@@ -3369,10 +3369,10 @@ function fecharChamada(jaEncerrada = false) {
 
 /* ------------------------------------------------------------ pontos de salvamento */
 async function salvarProjeto() {
-  if (!U.proj) return aviso('Abra um projeto para salvar.');
+  if (!U.proj) return aviso(I18N.t('Abra um projeto para salvar.'));
   const r = await api('POST', P('/pontos'), {});
-  if (!r._ok) return aviso(r.erro || 'Não consegui salvar o projeto.');
-  aviso(`Projeto salvo: ${r.ponto.cards} cards, ${r.ponto.mensagens} mensagens, ${r.ponto.tamanho}.`);
+  if (!r._ok) return aviso(r.erro || I18N.t('Não consegui salvar o projeto.'));
+  aviso(I18N.t('Projeto salvo: {cards} cards, {msgs} mensagens, {tam}.', { cards: r.ponto.cards, msgs: r.ponto.mensagens, tam: r.ponto.tamanho }));
   if ($('#pontos-lista')) carregarPontos();
 }
 const TIPO_PONTO = { auto: 'Automático', manual: 'Manual', 'antes-de-restaurar': 'Antes de restaurar' };
@@ -3382,22 +3382,22 @@ async function carregarPontos() {
   const r = await api('GET', P('/pontos'));
   const lista = r.lista || [];
   const ultimoAuto = lista.find((x) => x.tipo === 'auto');
-  caixa.innerHTML = lista.length ? `${ultimoAuto ? `<div class="dica-v" style="color:var(--mudo);margin:8px 0">Último salvamento automático às ${hhmm(ultimoAuto.em)}</div>` : ''}
-    ${lista.map((x) => `<div class="ponto-item"><div class="ponto-info"><b>${TIPO_PONTO[x.tipo] || x.tipo}${x.rotulo ? `: ${esc(x.rotulo)}` : ''}</b>
-      <span>${diaTxt(x.em)} às ${hhmm(x.em)}, ${x.cards} cards, ${x.mensagens} mensagens, ${esc(x.tamanho)}${x.completo ? '' : ' (leve)'}</span></div>
+  caixa.innerHTML = lista.length ? `${ultimoAuto ? `<div class="dica-v" style="color:var(--mudo);margin:8px 0">${I18N.t('Último salvamento automático às {hora}', { hora: hhmm(ultimoAuto.em) })}</div>` : ''}
+    ${lista.map((x) => `<div class="ponto-item"><div class="ponto-info"><b>${I18N.t(TIPO_PONTO[x.tipo] || x.tipo)}${x.rotulo ? `: ${esc(x.rotulo)}` : ''}</b>
+      <span>${I18N.t('{dia} às {hora}, {cards} cards, {msgs} mensagens, {tam}', { dia: diaTxt(x.em), hora: hhmm(x.em), cards: x.cards, msgs: x.mensagens, tam: esc(x.tamanho) })}${x.completo ? '' : ` (${I18N.t('leve')})`}</span></div>
       <div class="ponto-acoes"><button class="btn-sec" data-acao="ponto-restaurar" data-ponto="${esc(x.id)}">Restaurar</button>${x.tipo === 'antes-de-restaurar' ? '' : `<button class="btn-sec btn-perigo" data-acao="ponto-excluir" data-ponto="${esc(x.id)}">Excluir</button>`}</div></div>`).join('')}`
     : '<div class="dica-v" style="color:var(--mudo);margin-top:8px">Ainda não há pontos salvos. O primeiro automático sai em até 10 minutos.</div>';
 }
 async function restaurarPonto(id) {
   const r0 = await api('GET', P('/pontos'));
   const x = (r0.lista || []).find((y) => y.id === id);
-  if (!x) return aviso('Esse ponto não existe mais.');
-  const quando = `${diaTxt(x.em)} às ${hhmm(x.em)}`;
-  if (!(await perguntar(`Voltar o projeto para o ponto de ${quando} (${x.cards} cards, ${x.mensagens} mensagens)? O estado de agora é guardado antes como um ponto "Antes de restaurar", e o app reabre para aplicar.`, 'Restaurar'))) return;
+  if (!x) return aviso(I18N.t('Esse ponto não existe mais.'));
+  const quando = I18N.t('{dia} às {hora}', { dia: diaTxt(x.em), hora: hhmm(x.em) });
+  if (!(await perguntar(I18N.t('Voltar o projeto para o ponto de {quando} ({cards} cards, {msgs} mensagens)? O estado de agora é guardado antes como um ponto "Antes de restaurar", e o app reabre para aplicar.', { quando, cards: x.cards, msgs: x.mensagens }), I18N.t('Restaurar')))) return;
   const r = await api('POST', P(`/pontos/${id}/restaurar`), {});
-  if (!r._ok) return aviso(r.erro || 'Não consegui restaurar.');
-  if (window.studioApp?.reiniciar) { aviso('Reabrindo o app para voltar ao ponto salvo...', 8000); return window.studioApp.reiniciar(); }
-  aviso('Restauração marcada. Feche o programa e abra de novo para voltar ao ponto salvo.', 12000);
+  if (!r._ok) return aviso(r.erro || I18N.t('Não consegui restaurar.'));
+  if (window.studioApp?.reiniciar) { aviso(I18N.t('Reabrindo o app para voltar ao ponto salvo...'), 8000); return window.studioApp.reiniciar(); }
+  aviso(I18N.t('Restauração marcada. Feche o programa e abra de novo para voltar ao ponto salvo.'), 12000);
 }
 
 document.addEventListener('keydown', async (ev) => {
@@ -3452,7 +3452,7 @@ document.addEventListener('keydown', async (ev) => {
     ev.preventDefault();
     const texto = t.value.trim(); t.value = '';
     const r = await api('POST', P(`/cartao/${U.issue}/comentar`), { texto });
-    if (!r._ok) aviso(r.erro); else if ((r.chamados || []).length) aviso(`${r.chamados.map(nomeAgente).join(' e ')} vai responder aqui no card.`);
+    if (!r._ok) aviso(r.erro); else if ((r.chamados || []).length) aviso(I18N.t('{quem} vai responder aqui no card.', { quem: r.chamados.map(nomeAgente).join(' e ') }));
   }
   if (t.id === 'i-titulo' && ev.key === 'Enter') { ev.preventDefault(); t.blur(); }
 });

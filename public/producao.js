@@ -43,10 +43,10 @@ function desenharRegistro() {
   const grupos = regTipos().map((t) => {
     const itens = todas.filter((e) => e.tipo === t).filter(casa);
     if (!itens.length && (q || !d.tipos[t])) return '';
-    return `<div class="mem-grupo reg-grupo">${esc(regPlural(t))}<span class="n">${itens.length}</span><button class="btn-ic" data-reg="nova" data-tipo="${esc(t)}" title="Nova ficha: ${esc(regTitulo(t))}">${ic('mais')}</button></div>
+    return `<div class="mem-grupo reg-grupo">${esc(regPlural(t))}<span class="n">${itens.length}</span><button class="btn-ic" data-reg="nova" data-tipo="${esc(t)}" title="${I18N.t('Nova ficha: {tipo}', { tipo: esc(regTitulo(t)) })}">${ic('mais')}</button></div>
       ${itens.map((e) => { const img = e.refs.find(ehImagem); return `<button class="nota reg-item ${U.regSel === e.chave && !gerados ? 'ativa' : ''} ${d.tipos[e.tipo]?.sempre ? 'fixa' : ''}" data-reg="abrir" data-chave="${esc(e.chave)}">
         <span class="reg-thumb" style="--c:${corDe(e.chave)}">${img ? `<img src="${urlArquivo(img)}" alt="" loading="lazy">` : esc(e.nome.trim()[0] || '?')}</span>
-        <span class="reg-txt"><span class="t">${esc(e.nome)}</span><span class="m">v${e.versao}, ${esc(nomeAgente(e.por))}, ${ha(e.em)}${e.refs.length ? `, ${e.refs.length} ref.` : ''}</span></span></button>`; }).join('')}`;
+        <span class="reg-txt"><span class="t">${esc(e.nome)}</span><span class="m">v${e.versao}, ${esc(nomeAgente(e.por))}, ${ha(e.em)}${e.refs.length ? `, ${I18N.t('{n} ref.', { n: e.refs.length })}` : ''}</span></span></button>`; }).join('')}`;
   }).join('');
   const naoLidos = 0;
   $('#centro').innerHTML = `<div class="planner producao" style="min-height:0">
@@ -75,7 +75,7 @@ function desenharListaSo() {
   return regTipos().map((t) => {
     const itens = regEntradas().filter((e) => e.tipo === t).filter(casa);
     if (!itens.length && (q || !d.tipos[t])) return '';
-    return `<div class="mem-grupo reg-grupo">${esc(regPlural(t))}<span class="n">${itens.length}</span><button class="btn-ic" data-reg="nova" data-tipo="${esc(t)}" title="Nova ficha: ${esc(regTitulo(t))}">${ic('mais')}</button></div>
+    return `<div class="mem-grupo reg-grupo">${esc(regPlural(t))}<span class="n">${itens.length}</span><button class="btn-ic" data-reg="nova" data-tipo="${esc(t)}" title="${I18N.t('Nova ficha: {tipo}', { tipo: esc(regTitulo(t)) })}">${ic('mais')}</button></div>
       ${itens.map((e) => { const img = e.refs.find(ehImagem); return `<button class="nota reg-item ${U.regSel === e.chave && U.regModo !== 'gerados' ? 'ativa' : ''}" data-reg="abrir" data-chave="${esc(e.chave)}"><span class="reg-thumb" style="--c:${corDe(e.chave)}">${img ? `<img src="${urlArquivo(img)}" alt="" loading="lazy">` : esc(e.nome.trim()[0] || '?')}</span><span class="reg-txt"><span class="t">${esc(e.nome)}</span><span class="m">v${e.versao}, ${esc(nomeAgente(e.por))}, ${ha(e.em)}</span></span></button>`; }).join('')}`;
   }).join('') || '<div class="vazio-p">Nada com esse nome.</div>';
 }
@@ -85,7 +85,7 @@ function regVazioHtml() {
   const d = REG.dados; const fixos = Object.entries(d.tipos).filter(([, t]) => t.sempre);
   return `<div class="reg-vazio">
     <h2>${esc(regVista())}</h2>
-    <p>Cada ficha aqui chega inteira ao agente sempre que a tarefa cita o nome dela ou o card aponta para ela. ${fixos.length ? `${fixos.map(([, t]) => esc(t.titulo)).join(' e ').replace(/ e (?=.* e )/g, ', ')} ${fixos.length > 1 ? 'entram' : 'entra'} em toda chamada.` : ''}</p>
+    <p>${I18N.t('Cada ficha aqui chega inteira ao agente sempre que a tarefa cita o nome dela ou o card aponta para ela.')} ${fixos.length ? I18N.t(fixos.length > 1 ? '{tipos} entram em toda chamada.' : '{tipos} entra em toda chamada.', { tipos: fixos.map(([, t]) => esc(t.titulo)).join(' e ').replace(/ e (?=.* e )/g, ', ') }) : ''}</p>
     <div class="reg-tipos">${Object.entries(d.tipos).map(([k, t]) => `<button class="reg-tipo" data-reg="nova" data-tipo="${esc(k)}"><b>${esc(t.titulo)}</b><small>${esc(t.descricao || '')}</small></button>`).join('')}</div>
   </div>`;
 }
@@ -104,17 +104,17 @@ function fichaHtml(e) {
     ${e.apelidos.length ? `<div class="reg-apelidos">${e.apelidos.map((a) => `<span class="chip-cam">${esc(a)}</span>`).join('')}</div>` : ''}
     <div class="texto corpo reg-resumo">${md(e.resumo)}</div>
     <div class="reg-acrescentar"><textarea class="in" id="reg-acresc" rows="1" placeholder="Acrescentar algo à ficha (Enter envia, Shift+Enter quebra linha)"></textarea></div>
-    ${REG.dados?.imagens === false && !e.refs.length ? '' : `<div class="sec reg-sec-refs"><h4>Referências aprovadas ${e.refs.length ? `<span class="mudo">${e.refs.length} de 8</span>` : ''}<span class="espaco"></span><button class="btn-sec" data-reg="add-ref">Adicionar imagem</button></h4>
+    ${REG.dados?.imagens === false && !e.refs.length ? '' : `<div class="sec reg-sec-refs"><h4>Referências aprovadas ${e.refs.length ? `<span class="mudo">${I18N.t('{n} de {max}', { n: e.refs.length, max: 8 })}</span>` : ''}<span class="espaco"></span><button class="btn-sec" data-reg="add-ref">Adicionar imagem</button></h4>
       <div class="reg-refs" id="reg-refs">${refs || '<div class="reg-solta">Solte imagens aqui, ou aprove na aba Gerados. Os agentes usam estas imagens em toda geração com este nome.</div>'}</div></div>`}
     ${e.arquivo ? `<div class="sec"><h4>Documento completo</h4><button class="reg-doc" data-reg="ler-doc" data-arq="${esc(e.arquivo)}">${ic('pasta')}<span>${esc(e.arquivo)}</span></button></div>` : ''}
     ${usos.length ? `<div class="sec"><h4>Cards que apontam esta ficha</h4><div class="reg-usos">${usos.map((u) => `<button class="reg-uso" data-issue="${esc(u.id)}"><span class="loz ${esc(u.coluna)}">${esc(u.coluna)}</span>${u.dono ? av(u.dono, 'p', { dot: false }) : ''}<span>${esc(u.titulo)}</span></button>`).join('')}</div></div>` : ''}
-    ${(e.historico || []).length ? `<details class="reg-hist"><summary>Versões anteriores (${e.historico.length})</summary>${[...e.historico].reverse().map((h) => `<div class="reg-hist-i"><div class="m">v${h.versao}, ${esc(nomeAgente(h.por))}, ${ha(h.em)}</div><div class="texto corpo">${md(h.resumo)}</div></div>`).join('')}</details>` : ''}`;
+    ${(e.historico || []).length ? `<details class="reg-hist"><summary>${I18N.t('Versões anteriores ({n})', { n: e.historico.length })}</summary>${[...e.historico].reverse().map((h) => `<div class="reg-hist-i"><div class="m">v${h.versao}, ${esc(nomeAgente(h.por))}, ${ha(h.em)}</div><div class="texto corpo">${md(h.resumo)}</div></div>`).join('')}</details>` : ''}`;
 }
 
 function ladoHtml(e) {
   const d = REG.dados; const t = d.tipos[e.tipo] || {};
   const lider = liderAtual();
-  const pedidos = (t.pedidos && t.pedidos.length ? t.pedidos : [{ rotulo: `Pedir a ${primeiroNome(nomeAgente(lider))}`, agente: lider, texto: 'sobre {nome}: ' }]).filter((p) => agente(p.agente));
+  const pedidos = (t.pedidos && t.pedidos.length ? t.pedidos : [{ rotulo: I18N.t('Pedir a {nome}', { nome: primeiroNome(nomeAgente(lider)) }), agente: lider, texto: 'sobre {nome}: ' }]).filter((p) => agente(p.agente));
   return `<div class="rot">Pedir à equipe</div>
     <div class="reg-pedidos">${pedidos.map((p, i) => `<button class="reg-pedido" data-reg="pedir" data-i="${i}" title="${esc(p.texto.replace('{nome}', e.nome))}">${av(p.agente, 'p', { dot: false })}<span><b>${esc(p.rotulo)}</b><small>${esc(primeiroNome(nomeAgente(p.agente)))}</small></span></button>`).join('')}</div>
     <div class="rot" style="margin-top:14px">Planejar</div>
@@ -143,26 +143,26 @@ function geradosHtml() {
 /* ------------------------------------------------------------ ações */
 async function regAnotar(corpo) {
   const r = await api('POST', P('/registro'), corpo);
-  if (!r._ok) { aviso(r.erro || 'Não consegui anotar.'); return null; }
-  if (r.cortado) aviso('O resumo passou de 1800 caracteres e foi cortado. Ponha o detalhe no documento completo.');
+  if (!r._ok) { aviso(r.erro || I18N.t('Não consegui anotar.')); return null; }
+  if (r.cortado) aviso(I18N.t('O resumo passou de 1800 caracteres e foi cortado. Ponha o detalhe no documento completo.'));
   return r;
 }
 function modalFicha(e = null, tipoInicial = '') {
   const d = REG.dados; const tipos = regTipos();
   const tipo = e?.tipo || tipoInicial || tipos[0] || 'entidade';
   REG.editando = true;
-  abrirModal(`<h2>${e ? `Editar ${esc(e.nome)}` : 'Nova ficha'}</h2>
+  abrirModal(`<h2>${e ? I18N.t('Editar {nome}', { nome: esc(e.nome) }) : 'Nova ficha'}</h2>
     <div class="dois campo">
       <div><label class="rot">Tipo</label>${e ? `<div class="caminho">${esc(regTitulo(e.tipo))}</div>` : `<select class="in" id="rf-tipo">${tipos.map((t) => `<option value="${esc(t)}" ${t === tipo ? 'selected' : ''}>${esc(regTitulo(t))}</option>`).join('')}<option value="__outro">Outro tipo…</option></select><input class="in" id="rf-tipo-outro" placeholder="nome do tipo" hidden style="margin-top:6px">`}</div>
       <div><label class="rot">Nome</label><input class="in" id="rf-nome" value="${esc(e?.nome || '')}" placeholder="Ana, Cena 2 do ep 1, Padaria da esquina" autocomplete="off"></div></div>
-    <div class="campo"><label class="rot">Resumo <small class="mudo" id="rf-cont"></small></label><textarea class="in" id="rf-resumo" rows="9" placeholder="${esc(d.tipos[tipo]?.descricao ? `O que a equipe precisa saber sem abrir arquivo: ${d.tipos[tipo].descricao}.` : 'O que a equipe precisa saber, sem abrir arquivo.')}">${esc(e?.resumo || '')}</textarea></div>
+    <div class="campo"><label class="rot">Resumo <small class="mudo" id="rf-cont"></small></label><textarea class="in" id="rf-resumo" rows="9" placeholder="${esc(d.tipos[tipo]?.descricao ? I18N.t('O que a equipe precisa saber sem abrir arquivo: {descricao}.', { descricao: d.tipos[tipo].descricao }) : I18N.t('O que a equipe precisa saber, sem abrir arquivo.'))}">${esc(e?.resumo || '')}</textarea></div>
     <div class="dois campo">
       <div><label class="rot">Outros nomes</label><input class="in" id="rf-apelidos" value="${esc((e?.apelidos || []).join(', '))}" placeholder="separados por vírgula"></div>
       <div><label class="rot">Documento completo</label><input class="in" id="rf-arquivo" value="${esc(e?.arquivo || '')}" placeholder="biblia/personagens/ana/ficha.md"></div></div>
     <div class="acoes"><button class="btn-sec" id="m-nao">Cancelar</button><button class="btn-primario" id="m-sim">${e ? 'Salvar' : 'Criar ficha'}</button></div>`, 'modal-pq reg-modal');
-  const cont = () => { const n = $('#rf-resumo').value.length; $('#rf-cont').textContent = `${n} de 1800`; $('#rf-cont').style.color = n > 1800 ? 'var(--verm)' : ''; };
+  const cont = () => { const n = $('#rf-resumo').value.length; $('#rf-cont').textContent = I18N.t('{n} de {max}', { n, max: 1800 }); $('#rf-cont').style.color = n > 1800 ? 'var(--verm)' : ''; };
   $('#rf-resumo').oninput = cont; cont();
-  const selT = $('#rf-tipo'); if (selT) selT.onchange = () => { $('#rf-tipo-outro').hidden = selT.value !== '__outro'; if (selT.value === '__outro') $('#rf-tipo-outro').focus(); const dt = d.tipos[selT.value]; $('#rf-resumo').placeholder = dt?.descricao ? `O que a equipe precisa saber sem abrir arquivo: ${dt.descricao}.` : 'O que a equipe precisa saber, sem abrir arquivo.'; };
+  const selT = $('#rf-tipo'); if (selT) selT.onchange = () => { $('#rf-tipo-outro').hidden = selT.value !== '__outro'; if (selT.value === '__outro') $('#rf-tipo-outro').focus(); const dt = d.tipos[selT.value]; $('#rf-resumo').placeholder = dt?.descricao ? I18N.t('O que a equipe precisa saber sem abrir arquivo: {descricao}.', { descricao: dt.descricao }) : I18N.t('O que a equipe precisa saber, sem abrir arquivo.'); };
   const fechar = () => { REG.editando = false; fecharModal(); if (REG.pendente) renderRegistro(false); };
   $('#m-nao').onclick = fechar;
   $('#m-sim').onclick = async () => {
@@ -188,11 +188,11 @@ async function regPedir(e, i) {
 }
 async function regEnviarImagens(e, arquivos) {
   const imgs = [...arquivos].filter((f) => /^image\//.test(f.type) || ehImagem(f.name)).slice(0, 8 - e.refs.length);
-  if (!imgs.length) { aviso(e.refs.length >= 8 ? 'A ficha já tem 8 referências. Tire uma antes.' : 'Só imagens entram como referência.'); return; }
+  if (!imgs.length) { aviso(I18N.t(e.refs.length >= 8 ? 'A ficha já tem 8 referências. Tire uma antes.' : 'Só imagens entram como referência.')); return; }
   const rels = [];
   for (const f of imgs) {
     const r = await fetch(P(`/anexo?nome=${encodeURIComponent(f.name)}`), { method: 'PUT', body: f }).then((x) => x.json()).catch(() => null);
-    if (r?.ok) rels.push(r.anexo.rel); else aviso(r?.erro || `Não consegui enviar ${f.name}.`);
+    if (r?.ok) rels.push(r.anexo.rel); else aviso(r?.erro || I18N.t('Não consegui enviar {arquivo}.', { arquivo: f.name }));
   }
   if (rels.length) await regAnotar({ tipo: e.tipo, id: e.id, nome: e.nome, refsAnexo: rels, modo: 'substituir' });
 }
@@ -212,7 +212,7 @@ function modalVerGerado(caminho) {
       <div class="reg-ver-nome">${esc(i.nome.replace(/^\d{6}-/, ''))}</div>
       <div class="reg-meta">${ha(i.em)}, ${(i.tamanho / 1024).toFixed(0)} KB</div>
       <div class="reg-ver-cam">${esc(i.caminho)}</div>
-      ${i.ficha ? `<div class="reg-aprovada">${ic('check')} Referência de <b>${esc(fichas.find((e) => e.chave === i.ficha)?.nome || i.ficha)}</b></div>` : ''}
+      ${i.ficha ? `<div class="reg-aprovada">${ic('check')} ${I18N.t('Referência de <b>{nome}</b>', { nome: esc(fichas.find((e) => e.chave === i.ficha)?.nome || i.ficha) })}</div>` : ''}
       <div class="rot" style="margin-top:16px">Aprovar como referência de</div>
       ${fichas.length ? `<select class="in" id="rv-ficha"><option value="">Escolha a ficha</option>${opcoes}</select>
       <button class="btn-primario reg-largo" id="rv-aprovar" style="margin-top:8px">${ic('check')}Aprovar</button>` : '<div class="vazio-p">Crie uma ficha primeiro.</div>'}
@@ -223,15 +223,15 @@ function modalVerGerado(caminho) {
   if (btn) btn.onclick = async () => {
     const k = $('#rv-ficha').value; if (!k) { $('#rv-ficha').focus(); return; }
     const e = fichas.find((x) => x.chave === k); if (!e) return;
-    if (e.refs.length >= 8) { aviso(`${e.nome} já tem 8 referências. Tire uma antes.`); return; }
+    if (e.refs.length >= 8) { aviso(I18N.t('{nome} já tem 8 referências. Tire uma antes.', { nome: e.nome })); return; }
     const r = await regAnotar({ tipo: e.tipo, id: e.id, nome: e.nome, refs: [i.caminho], modo: 'substituir' });
-    if (r) { fecharModal(); aviso(`${i.gif ? 'GIF' : 'Imagem'} aprovado como referência de ${e.nome}.`); renderRegistro(false); }
+    if (r) { fecharModal(); aviso(I18N.t(i.gif ? 'GIF aprovado como referência de {nome}.' : 'Imagem aprovado como referência de {nome}.', { nome: e.nome })); renderRegistro(false); }
   };
 }
 async function modalLerDoc(arq) {
   const r = await fetch(P(`/arquivo?caminho=${encodeURIComponent(arq)}&texto=1`)).then((x) => x.json()).catch(() => ({}));
   abrirModal(`<div class="reg-doc-modal"><div class="issue-topo"><span class="chave">${esc(arq)}</span><span class="espaco"></span><button class="btn-ic" data-acao="fechar" title="Fechar (Esc)">${ic('fechar')}</button></div>
-    <div class="mem-leitor"><div class="texto corpo">${r.texto != null ? md(String(r.texto).replace(/^---[\s\S]*?---\s*/, '')) : `<p class="mudo">${esc(r.erro || 'Não encontrei esse arquivo. O caminho é relativo à pasta do projeto.')}</p>`}</div></div></div>`, 'issue reg-doc');
+    <div class="mem-leitor"><div class="texto corpo">${r.texto != null ? md(String(r.texto).replace(/^---[\s\S]*?---\s*/, '')) : `<p class="mudo">${esc(r.erro || I18N.t('Não encontrei esse arquivo. O caminho é relativo à pasta do projeto.'))}</p>`}</div></div></div>`, 'issue reg-doc');
 }
 
 /* ------------------------------------------------------------ eventos */
@@ -248,8 +248,8 @@ document.addEventListener('click', async (ev) => {
     case 'ver': return modalVerGerado(d.caminho);
     case 'ler-doc': return modalLerDoc(d.arq);
     case 'add-ref': { if (!e) return; const inp = Object.assign(document.createElement('input'), { type: 'file', accept: 'image/*', multiple: true }); inp.onchange = () => regEnviarImagens(e, inp.files); inp.click(); return; }
-    case 'tirar-ref': if (e && await perguntar(`Tirar esta imagem das referências de ${e.nome}? O arquivo continua na pasta.`, 'Tirar')) await regAnotar({ tipo: e.tipo, id: e.id, nome: e.nome, tirarRefs: [d.ref], modo: 'substituir' }); return;
-    case 'remover': if (e && await perguntar(`Remover a ficha ${e.nome}? Os agentes deixam de recebê-la.`, 'Remover')) { const r = await api('DELETE', P(`/registro/${encodeURIComponent(e.chave)}`)); if (!r._ok) aviso(r.erro || 'Não removi.'); else { U.regSel = null; location.hash = `${U.proj}/registro`; } } return;
+    case 'tirar-ref': if (e && await perguntar(I18N.t('Tirar esta imagem das referências de {nome}? O arquivo continua na pasta.', { nome: e.nome }), I18N.t('Tirar'))) await regAnotar({ tipo: e.tipo, id: e.id, nome: e.nome, tirarRefs: [d.ref], modo: 'substituir' }); return;
+    case 'remover': if (e && await perguntar(I18N.t('Remover a ficha {nome}? Os agentes deixam de recebê-la.', { nome: e.nome }), I18N.t('Remover'))) { const r = await api('DELETE', P(`/registro/${encodeURIComponent(e.chave)}`)); if (!r._ok) aviso(r.erro || I18N.t('Não removi.')); else { U.regSel = null; location.hash = `${U.proj}/registro`; } } return;
     default:
   }
 });

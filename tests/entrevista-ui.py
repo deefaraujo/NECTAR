@@ -16,6 +16,7 @@ with tempfile.TemporaryDirectory(prefix='nectar-entrevista-') as temp:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, channel='msedge')
             page = browser.new_page(viewport={'width': 1366, 'height': 900})
+            page.add_init_script("localStorage.setItem('nectar:idioma', 'pt-BR')")  # os seletores destes testes estão em português
             errors = []
             page.on('pageerror', lambda e: errors.append(str(e)))
             page.goto(base)

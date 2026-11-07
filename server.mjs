@@ -728,6 +728,7 @@ async function api(req, res, url) {
       claudeExe: typeof b.claudeExe === 'string' ? b.claudeExe.trim().slice(0, 200) : atual.claudeExe,
       modeloCodex: typeof b.modeloCodex === 'string' ? b.modeloCodex.trim().slice(0, 80) : atual.modeloCodex,
       codexExe: typeof b.codexExe === 'string' ? b.codexExe.trim().slice(0, 200) : atual.codexExe,
+      idioma: ['pt-BR', 'en', 'es', 'fr', 'zh-CN', 'ja', 'ko', 'ru'].includes(b.idioma) ? b.idioma : (atual.idioma || 'en'),
     };
     if (b.wip && typeof b.wip === 'object') {
       for (const k of Object.keys(atual.wip)) {
