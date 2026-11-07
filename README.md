@@ -124,7 +124,11 @@ Este repositório contém **somente a ferramenta**. Projetos, conversas, credenc
 A NECTAR é feita por uma pessoa, no tempo livre. Se ela te ajudou e você quiser colaborar com o desenvolvimento:
 
 <p align="center">
-  <a href="https://www.paypal.com/donate/?hosted_button_id=COLOQUE_SEU_ID"><img src="https://img.shields.io/badge/Doar%20via%20PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white" alt="Doar via PayPal"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=TNJJ5CSX9E5DC"><img src="https://img.shields.io/badge/Doar%20via%20PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white" alt="Doar via PayPal"></a>
+</p>
+<p align="center">
+  <a href="https://www.paypal.com/donate/?hosted_button_id=TNJJ5CSX9E5DC"><img src="docs/imagens/paypal-qr.png" width="140" alt="QR code para doação via PayPal"></a><br>
+  <sub>ou aponte a câmera para o QR code</sub>
 </p>
 
 Doações não concedem licença comercial; são só um apoio ao trabalho. Ideias, dúvidas e bugs são bem-vindos nas issues.
